@@ -5,12 +5,11 @@ import { TrendGlyph } from "@/design-system/icons/glyphs";
 import { AIMark, StatusText } from "@/design-system/primitives/indicators";
 import { cx } from "@/design-system/utils/cx";
 import {
-  FINANCE_AI_INSIGHT,
   FINANCE_FORECAST,
   FINANCE_MONTHS,
   FINANCE_TARGET,
-  FINANCE_TOTALS,
 } from "../data";
+import { FINANCE_DINO, FINANCE_FLAGS, FINANCE_SENTENCE } from "../office";
 
 const CHART_HEIGHT = 96;
 
@@ -25,39 +24,28 @@ export function FinanceStrip() {
   const targetY = Math.round((FINANCE_TARGET / max) * CHART_HEIGHT);
 
   return (
-    <section aria-label="העסק" className="surface-paper rounded-xl">
+    <section id="section-finance" aria-label="העסק" className="surface-paper rounded-xl">
       <div className="flex flex-wrap items-center gap-x-7 gap-y-3 px-6 py-4.5 md:px-7">
         <p className="flex items-center gap-2 text-small font-semibold text-foreground">
           <TrendGlyph size={15} className="text-foreground-faint" />
           העסק
         </p>
 
-        <dl className="flex min-w-0 flex-wrap items-center gap-x-7 gap-y-2">
-          {FINANCE_TOTALS.map((total) => (
-            <div key={total.id} className="flex items-baseline gap-2">
-              <dt className="text-caption text-foreground-faint">{total.label}</dt>
-              <dd className="text-small font-semibold tracking-tight tabular-nums text-foreground">
-                {total.value}
-                <StatusText status={total.trendStatus} className="ms-2">
-                  <span dir="ltr" className="tabular-nums">
-                    {total.trend}
-                  </span>
-                </StatusText>
-              </dd>
-            </div>
-          ))}
-        </dl>
+        {/* the executive sentence — the primary view */}
+        <p className="min-w-0 flex-1 text-small leading-relaxed font-medium text-foreground">
+          {FINANCE_SENTENCE}
+        </p>
 
         {/* the one insight that matters */}
         <p className="flex min-w-0 items-center gap-1.5 text-caption text-foreground-soft">
           <AIMark />
-          <span className="min-w-0 truncate">{FINANCE_AI_INSIGHT.text}</span>
+          <span className="min-w-0 truncate">{FINANCE_DINO.text}</span>
           <button
             type="button"
             className="shrink-0 rounded-xs font-semibold text-gold-700 transition-colors hover:text-gold-600"
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
-            {FINANCE_AI_INSIGHT.action} ←
+            {FINANCE_DINO.action} ←
           </button>
         </p>
 
@@ -144,10 +132,17 @@ export function FinanceStrip() {
               ))}
             </div>
           </div>
-          <p className="mt-3 text-caption text-foreground-faint">
-            {FINANCE_FORECAST} · {FINANCE_AI_INSIGHT.source} · עודכן{" "}
-            {FINANCE_AI_INSIGHT.updatedAt}
-          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5">
+            <p className="text-caption text-foreground-faint">
+              {FINANCE_FORECAST} · {FINANCE_DINO.source} · עודכן{" "}
+              {FINANCE_DINO.updatedAt}
+            </p>
+            {FINANCE_FLAGS.map((flag) => (
+              <StatusText key={flag.id} status={flag.status} className="text-micro">
+                {flag.text}
+              </StatusText>
+            ))}
+          </div>
         </div>
       ) : null}
     </section>

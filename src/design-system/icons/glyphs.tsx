@@ -31,7 +31,7 @@ export function SearchGlyph({ size, ...rest }: GlyphProps) {
   );
 }
 
-/** עמית's four-point star. Gold when active — AI only. */
+/** דינו's four-point star. Gold when active — AI only. */
 export function SparkleGlyph({ size, ...rest }: GlyphProps) {
   return (
     <svg {...base(size)} {...rest}>
@@ -232,6 +232,26 @@ export function LedgerGlyph({ size, ...rest }: GlyphProps) {
     <svg {...base(size)} {...rest}>
       <rect x="5" y="3.5" width="14" height="17" rx="2" />
       <path d="M9 8h6M9 12h6M9 16h3.5" />
+    </svg>
+  );
+}
+
+/** WhatsApp-style chat — official channel form, drawn in our line grammar. */
+export function ChatGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M12 4a8 8 0 0 1 6.9 12 8 8 0 0 1-9.6 3.3L5 20.5l1.2-4.1A8 8 0 0 1 12 4Z" />
+      <path d="M9.3 9.8c.3 2.3 2.3 4.3 4.6 4.6l1.2-1.2 1.6 1c-.3 1-1.2 1.6-2.2 1.4-3-.6-5.8-3.4-6.4-6.4-.2-1 .4-1.9 1.4-2.2l1 1.6-1.2 1.2Z" />
+    </svg>
+  );
+}
+
+/** Email envelope. */
+export function MailGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+      <path d="m4.5 7.5 7.5 5.5 7.5-5.5" />
     </svg>
   );
 }

@@ -55,5 +55,5 @@ trend statuses.
 ## Fixes found during validation
 
 - 212px tablet overflow: hero grid tracks couldn't shrink (grid-item `min-width:auto`
-  on the עמית column) — fixed with `min-w-0` + truncation-safe StatusText.
+  on the דינו column) — fixed with `min-w-0` + truncation-safe StatusText.
 - Active-event chip truncation at xl column width — chip copy tightened.

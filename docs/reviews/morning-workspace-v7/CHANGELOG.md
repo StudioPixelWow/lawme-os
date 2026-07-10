@@ -25,7 +25,7 @@
   (milestone track + state chip + markers)
 - `components/document-shelf.tsx` — documents as physical objects
 - `components/finance-strip.tsx` — executive strip, chart on expansion
-- `components/intelligence-drawer.tsx` — עמית in depth, on demand
+- `components/intelligence-drawer.tsx` — דינו in depth, on demand
 
 ## Changed
 - `src/design-system/tokens/light.css` — added the two remaining

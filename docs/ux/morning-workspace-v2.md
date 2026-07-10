@@ -15,7 +15,7 @@ thinking.** The unit of the current design is the *section*. The unit of v2 is t
 
 Two metaphors replace the page-of-sections:
 
-- **המכתב (The Letter).** The workspace opens as a short letter עמית wrote to you this
+- **המכתב (The Letter).** The workspace opens as a short letter דינו wrote to you this
   morning — real prose, not widgets. Everything in the letter is alive: case names,
   dates and people are *live tokens* you can press. The interface is written, not arranged.
 - **הנהר (The River).** Below the letter, scrolling stops being "moving down a page" and
@@ -33,7 +33,7 @@ serif line inks itself in, slightly above center, like a fountain pen finishing 
 
 > **בוקר טוב, טל.**
 
-**Second 1–2:** A second line settles beneath it, smaller, written by עמית:
+**Second 1–2:** A second line settles beneath it, smaller, written by דינו:
 
 > הכנתי לך את הבוקר. שלושה דברים באמת חשובים היום — הנה הם.
 
@@ -103,9 +103,9 @@ morning has **four movements**, like a piece of music:
 
 | Movement | What it is | Voice |
 |---|---|---|
-| **א · המכתב** | 4–8 sentences עמית wrote: the state of the firm this morning, with live tokens. Ends with his signature: ✦ עמית | Prose, serif-led |
+| **א · המכתב** | 4–8 sentences דינו wrote: the state of the firm this morning, with live tokens. Ends with his signature: ✦ דינו | Prose, serif-led |
 | **ב · ההחלטות** | "רק אתה יכול להחליט" — the 0–3 things that genuinely need the lawyer's judgment today (a draft to sign, a conflict to resolve, an offer to answer). Rendered as **papers on the desk**: raised ivory sheets, one per decision | Objects, not list rows |
-| **ג · הנהר** | The chronological stream of scenes crossing the Now Line: hearings, deadlines, meetings, things עמית did overnight | Timeline as narrative |
+| **ג · הנהר** | The chronological stream of scenes crossing the Now Line: hearings, deadlines, meetings, things דינו did overnight | Timeline as narrative |
 | **ד · האופק** | The week ahead, compressed into three quiet lines of prose. Then the horizon sentence | Prose again, fading |
 
 A returning user at 15:00 doesn't get the morning letter again — the letter's place holds
@@ -121,7 +121,7 @@ a two-line afternoon note («שני דברים זזו מאז הבוקר…»). T
   be the size of the screen.
 - **The next hearing, when it is near.** Within ~2 hours of a hearing, its scene swells
   into the letter itself as a glass moment (the only ambient glass on the canvas — §8):
-  courtroom, judge, the two documents you need, one line from עמית on what to expect.
+  courtroom, judge, the two documents you need, one line from דינו on what to expect.
 - Everything else stays humble. Hugeness is a privilege of *now* and *decision* — never of
   categories, counts, or charts.
 
@@ -135,7 +135,7 @@ Killed, deliberately, from the current implementation:
   attention, it's in the letter or on the desk. Headings-over-boxes is CRM grammar.
 - **Placeholder wells / empty-state cards.** Emptiness is written, not boxed: an empty
   morning is simply a shorter letter («בוקר שקט. דיון אחד ביום חמישי, ושום דבר בוער.»).
-- **The עמית side panel as home for AI.** עמית doesn't live in a drawer; he wrote the
+- **The דינו side panel as home for AI.** דינו doesn't live in a drawer; he wrote the
   page. The panel survives only as a *conversation transcript* when you go deep (§7).
 - **Any surviving stat-card instinct.** Counts appear only inside sentences, as ink.
 - **The separate "search field" affordance.** Replaced by the quill line (§11).
@@ -144,14 +144,14 @@ Killed, deliberately, from the current implementation:
 
 Not a feature, not an assistant bolted to the edge — **the narrator of the workspace.**
 
-- **עמית writes the surface.** The letter, the scene annotations, the horizon — the actual
+- **דינו writes the surface.** The letter, the scene annotations, the horizon — the actual
   UI copy *is* model output (constrained, cited, template-scaffolded). The interface is
   the AI's handwriting; using LawME is corresponding with it.
-- **The gold signature is the trust seal.** Everything עמית wrote carries the gold
+- **The gold signature is the trust seal.** Everything דינו wrote carries the gold
   hairline + ✦ signature; his uncertainty is written in words («לא מצאתי אסמכתה — תבדוק
-  אותי כאן»), never hidden. Human ink is navy; עמית's presence is gold light. One glance —
+  אותי כאן»), never hidden. Human ink is navy; דינו's presence is gold light. One glance —
   never a doubt about who wrote what.
-- **Decisions, not chores.** עמית's overnight work arrives as finished papers awaiting
+- **Decisions, not chores.** דינו's overnight work arrives as finished papers awaiting
   signature (movement ב): a drafted response, a proposed time entry, a prepared filing.
   The lawyer's day is curated down to *judgment* — the one thing only they can do.
 - **The quill is a dialogue, not a query box** (§11). Ask in the middle of the river;
@@ -172,7 +172,7 @@ Exactly three glass objects exist in the entire OS:
    glass on screen.
 2. **The imminent-hearing moment** (§5) — a scene made of glass for the two hours it is
    "now-adjacent", returning to paper once it passes into the river's history.
-3. **The summoned עמית** — when the quill line is engaged, the response surface is glass
+3. **The summoned דינו** — when the quill line is engaged, the response surface is glass
    floating over the paper, because a conversation is always happening *now*.
 
 Everything else — letter, papers, scenes, horizon — is matte ivory. When the user sees
@@ -185,7 +185,7 @@ glass, their body should already know: *this is live.*
   position, roughly one idea owns the screen.
 - **Margins like a book, not padding like an app.** The letter column is a narrow measure
   (~40ch) swimming in paper; on wide screens the emptiness *grows* instead of the content.
-  The margin is where עמית's small annotations may sit (a gold footnote beside a scene).
+  The margin is where דינו's small annotations may sit (a gold footnote beside a scene).
 - **Space is the hierarchy.** No dividers anywhere on the morning surface. Distance says
   what borders used to say. If two things feel unrelated, they get further apart, not a line.
 - **Silence at the edges.** The first and last viewports of the experience contain almost
@@ -226,7 +226,7 @@ a resting caret on paper, like a pen waiting at the margin:
 - **One grammar, three intents, zero modes.** The quill infers: a *noun* («כהן נגד לוי»)
   finds and offers the Stage; a *verb* («קבע דיון הוכחות ליום שלישי») becomes a proposal
   paper awaiting confirmation; a *question* («מה נשאר פתוח מול המוסך?») is answered
-  inline by עמית, cited, in prose. Navigation, creation and conversation stop being
+  inline by דינו, cited, in prose. Navigation, creation and conversation stop being
   separate features — they are sentences.
 - **Answers are letters, not lists.** Results render as a short written reply with live
   tokens — «יש שלושה תיקים מול כהן. הפעיל שבהם, *כהן נ׳ לוי*, ממתין לתגובתך מיום שני.» —
@@ -248,7 +248,7 @@ A story asks: *what happened, what's at stake, what happens next?*
 | Empty states | Shorter letters |
 | AI in a panel | AI as narrator, signed in gold |
 
-**A matter, too, becomes a story told by עמית** (the same grammar carried inward): its
+**A matter, too, becomes a story told by דינו** (the same grammar carried inward): its
 Stage opens not with fields but with a paragraph — «התיק נפתח במרץ. שלב הראיות. הצד השני
 מתמהמה בגילוי מסמכים — הנה ההשתלשלות.» — and the river of that case runs beneath it.
 One grammar from the first morning to the deepest dossier. That coherence — every surface
@@ -271,7 +271,7 @@ the thing no one has seen before.
 │      התיק של *כהן נ׳ לוי* זז: בית המשפט קבע ⟨דיון הוכחות⟩  │  ← the letter; *live tokens*
 │      ליום שלישי. הכנתי ⟨טיוטת תגובה⟩ — היא מחכה לחתימתך.   │
 │      מול ⟨מוסך הצפון⟩ עברו 12 יום בלי מענה; ניסחתי תזכורת. │
-│                                                   ✦ עמית   │  ← gold signature
+│                                                   ✦ דינו   │  ← gold signature
 │                                                            │
 │              ─── רק אתה יכול להחליט ───                    │
 │      ┌──────────────────┐  ┌──────────────────┐            │

@@ -16,7 +16,7 @@ const REVIEW_PROGRESS: Record<string, number> = {
 /**
  * One document — a physical sheet on the shelf. Layered paper edges
  * give it thickness; the face carries a quiet preview; hover lifts
- * it off the shelf and surfaces עמית's note or the action.
+ * it off the shelf and surfaces דינו's note or the action.
  */
 function DocumentObject({ doc }: { doc: RecentDocument }) {
   const review = REVIEW_PROGRESS[doc.status] ?? 0.4;
@@ -45,7 +45,7 @@ function DocumentObject({ doc }: { doc: RecentDocument }) {
           <span className="h-1 w-full rounded-pill bg-ink-100/70 transition-opacity group-hover:opacity-0" />
         </div>
 
-        {/* עמית's issue marker / the action — revealed on hover */}
+        {/* דינו's issue marker / the action — revealed on hover */}
         <p
           className="pointer-events-none mt-1 h-0 overflow-hidden text-micro leading-snug text-foreground-soft opacity-0 transition-all group-hover:h-auto group-hover:opacity-100"
           style={{ transitionDuration: "var(--motion-quick)" }}
@@ -102,10 +102,10 @@ function DocumentObject({ doc }: { doc: RecentDocument }) {
  */
 export function DocumentShelf() {
   return (
-    <section aria-label="שולחן המסמכים">
+    <section id="section-documents" aria-label="שולחן העבודה במסמכים">
       <SectionHeading
-        title="שולחן המסמכים"
-        caption="מה שנגע בו המשרד לאחרונה · לפי תיק"
+        title="שולחן העבודה במסמכים"
+        caption="מסמכים הממתינים לפעולה · לבדיקה, לאישור, לחתימה ולהגשה"
         href="/documents"
         linkLabel="כל המסמכים"
       />

@@ -21,12 +21,12 @@
   ring (navy), documents, team, gating facts with actions, champagne CTA.
 - **New `SupportingPriorities`** — quiet secondary priorities under the mission.
 - **`MorningHero`** — rebuilt as the dark environment composition; day-signature with
-  breathing gold dot; עמית line with provenance; mode-driven.
+  breathing gold dot; דינו line with provenance; mode-driven.
 - **Removed** `hero-focus.tsx`, `attention-panel.tsx` (content absorbed into the
   mission + supporting priorities).
 - `HealthRing` — `surface="navy"` variant; MatterHealth missing-docs action.
 - **`RecentDocumentsSection`** — sheet-object grid (Finder-like), AI note support.
-- **`MeetingsPanel`** — preparation view: prep bar, materials, עמית prep line, action.
+- **`MeetingsPanel`** — preparation view: prep bar, materials, דינו prep line, action.
 - **`FinancePanel`** — full-width executive band: chart | totals + forecast |
   contextual AI insight with CTA.
 - `page.tsx` — new hierarchy, gold hero→timeline bridge, mt-20/28 rhythm,

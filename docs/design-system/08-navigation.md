@@ -18,7 +18,7 @@ A slim (56px), glass, constant bar:
 ## 2. The command bar (⌘K) — the fast path
 
 A glass overlay with three groups: **ניווט** (jump to any matter/client/document),
-**יצירה** ("תיק חדש", "רישום זמן"), **שאל את עמית** (free-text becomes an AI question).
+**יצירה** ("תיק חדש", "רישום זמן"), **שאל את דינו** (free-text becomes an AI question).
 Hebrew-first search with forgiving matching (initials, partial case numbers). Every power
 action is reachable here; the UI never depends on it (discoverability first, speed second).
 
@@ -35,6 +35,6 @@ active chapter marked in gold, smooth-scroll anchors. This replaces tabs entirel
   (Segmented controls may still switch *representations* of one thing — e.g. week/month.)
 - **Back always works.** Deep links, searchParams for filters and panels — the URL is the
   state; the browser's back button is a first-class navigation tool.
-- **The AI panel is not navigation.** עמית opens as a companion edge (start side), never
+- **The AI panel is not navigation.** דינו opens as a companion edge (start side), never
   takes you elsewhere; it brings answers *into* your context.
 - Keyboard: ⌘K everywhere; rail words reachable by ⌘1–⌘5; Esc always closes the topmost layer.

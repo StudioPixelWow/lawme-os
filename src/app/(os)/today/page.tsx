@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "היום" };
  * not a page. Today Focus (with the integrated timeline) + Context
  * Dock in the first viewport; the Matter Operations Board beneath;
  * documents as physical objects; finance as one executive strip;
- * עמית contextual everywhere, in depth only in the drawer.
+ * דינו contextual everywhere, in depth only in the drawer.
  * Typed mock data only.
  */
 export default function TodayPage() {

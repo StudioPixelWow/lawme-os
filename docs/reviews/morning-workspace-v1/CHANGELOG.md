@@ -3,7 +3,7 @@
 ## Shell
 
 - **New `TopBar`** (replaces `TopRail`): official logo (next/image, `/brand/lawme-logo.png`),
-  semantic search field (⌘K trigger), notifications (gold unread dot), עמית shortcut, profile orb.
+  semantic search field (⌘K trigger), notifications (gold unread dot), דינו shortcut, profile orb.
 - **New `SideRail`**: vertical start-edge (right) navigation — icons+words (lg), icons (md),
   gold active hairline, quiet hover glide, footer brand line.
 - **New `MobileNav`**: glass bottom bar with the five destinations, safe-area padding.
@@ -28,7 +28,7 @@
   matters, insights, documents, summary, meetings, finance).
 - New components (`src/modules/today/components/`):
   `MorningHero`, `AttentionPanel`, `AIIntelligencePanel` (deep navy, progress, 4 findings,
-  provenance, CTA→עמית), `DailyTimeline` (RTL horizontal, gold next-event, mobile swipe),
+  provenance, CTA→דינו), `DailyTimeline` (RTL horizontal, gold next-event, mobile swipe),
   `ActiveMattersSection`, `AIInsightsSection` (confidence + source + action + disclosure),
   `RecentDocumentsSection`, `DailySummaryPanel` (navy + gold bars), `MeetingsPanel`,
   `FinancePanel` (single-series billing chart: ink bars, gold current month, direct label,

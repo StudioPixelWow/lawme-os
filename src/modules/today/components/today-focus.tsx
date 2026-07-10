@@ -226,7 +226,7 @@ export function TodayFocus({
         <aside aria-label="העבודה שהוכנה" className="min-w-0 lg:ps-2">
           <p className="flex items-center gap-2 text-caption font-semibold text-foreground-soft">
             <AIMark />
-            עמית הכין לדיון
+            דינו הכין לדיון
             <span className="text-micro font-normal text-foreground-faint">
               · עודכן 07:20
             </span>

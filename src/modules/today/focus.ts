@@ -134,11 +134,20 @@ export function healthState(matter: Matter): HealthState {
 export type MilestoneTrack = { steps: string[]; current: number };
 
 const MILESTONES: Record<string, MilestoneTrack> = {
-  "m-1": { steps: ["כתבי טענות", "הוכחות", "סיכומים", "פסק דין"], current: 1 },
-  "m-2": { steps: ["כתבי טענות", "ראיות", "סיכומים", "פסק דין"], current: 2 },
-  "m-3": { steps: ["היכרות", "טיוטה", "משא ומתן", "חתימה"], current: 1 },
-  "m-4": { steps: ["הגשה", "רשם הירושה", "צו"], current: 1 },
-  "m-5": { steps: ["תביעה", "גישור", "הסדר"], current: 1 },
+  "m-1": {
+    steps: ["קליטה", "כתבי טענות", "הכנה לדיון", "דיון הוכחות", "הכרעה"],
+    current: 2,
+  },
+  "m-2": {
+    steps: ["קליטה", "כתבי טענות", "ראיות", "סיכומים", "הכרעה"],
+    current: 3,
+  },
+  "m-3": {
+    steps: ["בדיקת ניגוד", "איסוף מסמכים", "טיוטה", "אישור לקוח", "חתימה"],
+    current: 2,
+  },
+  "m-4": { steps: ["קליטה", "הגשה", "רשם הירושה", "צו"], current: 2 },
+  "m-5": { steps: ["קליטה", "כתב תביעה", "גישור", "הסדר"], current: 2 },
 };
 
 export function milestoneTrack(matter: Matter): MilestoneTrack {

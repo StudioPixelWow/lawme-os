@@ -14,7 +14,7 @@ import { useShell } from "./shell-provider";
 /**
  * The top bar — integrated workspace chrome spanning the central
  * canvas between the navy sidebar (start) and the utility rail (end).
- * Search · עמית · notifications · profile. Hardware, not a header.
+ * Search · דינו · notifications · profile. Hardware, not a header.
  */
 export function TopBar() {
   const { setCommandOpen, assistantOpen, setAssistantOpen } = useShell();
@@ -65,7 +65,7 @@ export function TopBar() {
           <button
             type="button"
             onClick={() => setAssistantOpen(!assistantOpen)}
-            aria-label="עמית — העמית המשפטי"
+            aria-label="דינו — הדינו המשפטי"
             aria-pressed={assistantOpen}
             className={cx(
               "flex h-10 w-10 shrink-0 items-center justify-center rounded-pill transition-all",

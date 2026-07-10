@@ -20,7 +20,7 @@ type ShellState = {
 const ShellContext = createContext<ShellState | null>(null);
 
 /**
- * Shell UI state: the command bar and the עמית panel.
+ * Shell UI state: the command bar and the דינו panel.
  * ⌘K / Ctrl+K toggles the command bar; Esc closes the topmost layer.
  * Future global providers (query, auth, theme) compose around this.
  */

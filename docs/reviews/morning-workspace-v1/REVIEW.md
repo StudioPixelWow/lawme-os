@@ -9,24 +9,24 @@ no Supabase, no auth, no real AI calls, no new routes, no business logic.
 1. **Shell restructure** (approved layout):
    - **Global top bar** — official LawME logo (untouched, `public/brand/lawme-logo.png`,
      via `next/image`), large semantic search field (opens ⌘K), notifications with
-     gold unread dot, עמית shortcut, profile. Glass with catch-light.
+     gold unread dot, דינו shortcut, profile. Glass with catch-light.
    - **Right vertical navigation rail** (RTL start edge) — icon + word on desktop,
      icons-only on tablet, with gold active indicator.
    - **Mobile bottom navigation** — glass bar, five destinations, safe-area aware.
-   - עמית panel moved to the end edge (left) — the rail owns the start edge now.
+   - דינו panel moved to the end edge (left) — the rail owns the start edge now.
 2. **Typography modernized** — sans (Assistant) is the interface voice everywhere,
    including the hero greeting («בוקר טוב, דניאל.», bold, tracking-tight). Serif
    remains available as a token but no longer leads the workspace.
 3. **Morning hero** — greeting + date, «הנה מה שחשוב היום.», attention surface
-   (3 prioritized items with דחוף/היום/ממתין chips and times), and עמית's
+   (3 prioritized items with דחוף/היום/ממתין chips and times), and דינו's
    **AI intelligence panel** on deep navy: status line, calm 72% progress, four live
    findings (פסק דין חדש · הזדמנויות · סיכונים · משימות מוכנות), CTA that opens the
-   עמית panel, and full provenance (עודכן 07:20 · מקורות).
+   דינו panel, and full provenance (עודכן 07:20 · מקורות).
 4. **היום ביומן** — wide horizontal timeline, six realistic events flowing right→left,
    next event (דיון בתיק כהן) with gold emphasis; swipeable cards on mobile.
 5. **Operational sections** — three *differentiated* structures: תיקים פעילים
    (editorial index rows), תובנות AI (gold-marked findings with confidence bars,
-   sources, actions and a "עמית עשוי לטעות" disclosure), מסמכים אחרונים (compact ledger
+   sources, actions and a "דינו עשוי לטעות" disclosure), מסמכים אחרונים (compact ledger
    with type/status).
 6. **Lower workspace** — סיכום יומי on navy with restrained gold metric bars +
    provenance; יומן פגישות list; ביצועים פיננסיים — light panel with a real single-series
@@ -36,9 +36,9 @@ no Supabase, no auth, no real AI calls, no new routes, no business logic.
 ## Data & AI honesty
 
 All content lives in `src/modules/today/data.ts` (typed, realistic Hebrew legal-office
-mock). Every AI surface states: who generated it (עמית), when it was updated, which
+mock). Every AI surface states: who generated it (דינו), when it was updated, which
 sources it used, and one concrete action. No fantasy objects; the one ✦ glyph appears
-only as עמית's mark.
+only as דינו's mark.
 
 ## Validation
 

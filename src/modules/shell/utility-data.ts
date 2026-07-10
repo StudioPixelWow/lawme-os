@@ -41,7 +41,7 @@ export const REMINDERS = [
 
 export const NOTIFICATIONS = [
   { id: "n-1", time: "07:12", text: "כתב הגנה התקבל — לוי נ׳ שיכון הצפון" },
-  { id: "n-2", time: "07:05", text: "עמית סיים את ניתוח הבוקר" },
+  { id: "n-2", time: "07:05", text: "דינו סיים את ניתוח הבוקר" },
 ];
 
 export const TEAM = [

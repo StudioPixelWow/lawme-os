@@ -16,7 +16,7 @@ export default function DocumentsPage() {
       <SectionChapter title="הספרייה" index={0}>
         <Placeholder
           headline="עוד אין מסמכים"
-          line="כתבי טענות, חוזים ופרוטוקולים יחיו כאן — ועמית ידע לסכם אותם, לאתר בהם מועדים ולהצביע על סעיפים חשובים."
+          line="כתבי טענות, חוזים ופרוטוקולים יחיו כאן — ודינו ידע לסכם אותם, לאתר בהם מועדים ולהצביע על סעיפים חשובים."
         />
       </SectionChapter>
     </Workspace>

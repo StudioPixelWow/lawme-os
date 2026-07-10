@@ -17,7 +17,7 @@ data only. **Uncommitted — awaiting founder approval** (commit message reserve
    fixed attachment, consistent one-sun light direction.
 3. **Hero** — greeting rhythm preserved; attention items now carry semantic icon seats
    (court/document/client), dot+word statuses (no pills), hover depth via `shadow-lift`.
-4. **עמית intelligence** — the 2×2 stat tiles were replaced by four **rich findings**:
+4. **דינו intelligence** — the 2×2 stat tiles were replaced by four **rich findings**:
    semantic icon (precedent/opportunity/risk/ready), count, one-line explanation, and a
    per-finding action; live status line, named progress context («קריאת כתב ההגנה»),
    provenance, CTA. The panel sits on the new lit navy.
@@ -66,7 +66,7 @@ reduced-motion via tokens · no hex/generic colors in components.
 
 1. The glass **active timeline event** — glass-on-content is within the "live moment"
    rule, but it's the boldest glass use yet; confirm it earns its place.
-2. **Navy density** — עמית + daily summary remain two navy surfaces (per the approved
+2. **Navy density** — דינו + daily summary remain two navy surfaces (per the approved
    structure); the new lighting differentiates them, but the earlier concern stands.
 3. The environmental background is deliberately near-invisible — if you want more
    presence, the radii/alphas are single-token adjustments.

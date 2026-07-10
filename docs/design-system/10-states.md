@@ -12,7 +12,7 @@ An empty state is the product's best typography with nothing competing against i
   never "No data found", never "אין נתונים".
 - **No illustration clip-art**, no giant grey icons, no empty-box drawings. Space + type +
   (optionally) one thin gold hairline is the aesthetic.
-- First-run empties may include a single עמית suggestion (gold-marked): "אפשר לייבא תיקים
+- First-run empties may include a single דינו suggestion (gold-marked): "אפשר לייבא תיקים
   קיימים — רוצה שאעזור?"
 - Filtered-empty ≠ true-empty: "אין תוצאות לסינון הזה" + one-tap clear filter.
 

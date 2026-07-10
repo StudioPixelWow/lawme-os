@@ -18,7 +18,7 @@ No more white hero. A **deep navy environment** (`surface-hero-dark`): warm ivor
 light entering from the top-start, a champagne reflection beneath it, blue-black
 gradient depth, a refined vignette, gold inner edge — one sun, no decoration.
 Composition (one environment, not columns): day signature (breathing gold dot) →
-greeting in paper-white → עמית's read of the day with full provenance → **Today's
+greeting in paper-white → דינו's read of the day with full provenance → **Today's
 Mission** → quiet supporting priorities.
 
 ## 3. Today's Mission
@@ -33,7 +33,7 @@ required documents, team state, four gating facts each with its next action
 
 ## 4. Dynamic hero modes
 
-`HERO_MODES` — four typed scenarios, each with signature, עמית line, mission label,
+`HERO_MODES` — four typed scenarios, each with signature, דינו line, mission label,
 mission and CTA: **hearing** (rendered), **high-load** (three priorities), **calm**
 (drafts + clients), **quiet** (inspirational: "הכול תחת שליטה… תקדים חדש עשוי לחזק
 שניים מהתיקים"). `HERO_ACTIVE_MODE` selects; no settings UI.
@@ -52,9 +52,9 @@ variant and a direct action on missing documents («בקש מהלקוח ←»).
 ## 7. Section identities
 
 - **Documents** → Finder-like workspace: sheet objects (type+version tile, name,
-  matter, state, owner, hover action, AI note on the contradiction עמית found).
+  matter, state, owner, hover action, AI note on the contradiction דינו found).
 - **Meetings** → preparation view (not a second calendar): prep completeness bar,
-  required material, related matter, עמית's one-line prep, action per meeting.
+  required material, related matter, דינו's one-line prep, action per meeting.
 - **Finance** → full-width executive instrument: chart | totals+forecast | one
   contextual AI insight (3.5 unbilled hours → «בדוק ורשום»).
 - Timeline/matters/AI keep their distinct instruments. No two sections share anatomy.
@@ -76,7 +76,7 @@ hero = strongest element ✓ · reduced-motion via tokens · focus states golden
 1. The dark hero's height/darkness balance on small laptops.
 2. The champagne CTA — bold champagne fill vs. quieter outline.
 3. AIIntelligencePanel now lives in the intelligence band — confirm it doesn't
-   feel redundant next to the hero's embedded עמית.
+   feel redundant next to the hero's embedded דינו.
 4. Mission copy tone (imperative vs. descriptive).
 
 ## Screenshots

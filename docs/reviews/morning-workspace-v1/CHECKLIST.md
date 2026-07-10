@@ -16,7 +16,7 @@
 - [x] **Old temporary /today fully replaced** — no PageHeader/SectionChapter/Placeholder
       remnants on the page
 - [x] Reduced motion — all animation collapses via `--motion-*` tokens
-- [x] Keyboard — ⌘K, Esc, tab order (עמית panel `inert` when closed), gold focus ring,
+- [x] Keyboard — ⌘K, Esc, tab order (דינו panel `inert` when closed), gold focus ring,
       skip-link
 - [x] AI provenance — every AI surface shows generator, update time, sources, and action
 - [x] Screenshots captured from the production build (see `screenshots/01–06`)

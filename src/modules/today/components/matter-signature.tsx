@@ -72,7 +72,7 @@ export function HealthStateChip({
 /**
  * MatterSignature — the composite Matter Health visualization.
  * A procedural milestone track with the matter's live position,
- * missing-item markers, dependency + risk pulse, and עמית's touch.
+ * missing-item markers, dependency + risk pulse, and דינו's touch.
  * Legible in under two seconds; specific to legal work — the track
  * IS the proceeding.
  */

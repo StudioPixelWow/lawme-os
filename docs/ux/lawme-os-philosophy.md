@@ -194,14 +194,14 @@ operating system. It is the only gold structure in the Room, and it is everywher
 
 One line. One meaning. Everywhere. Paper, ink, and a single golden thread of the
 present — that composition is the visual language nobody else has, and it is legally
-ownable the way Arc's sidebar or Linear's speed is. Everything עמית prepares carries a
+ownable the way Arc's sidebar or Linear's speed is. Everything דינו prepares carries a
 hairline of the same gold (§8) — meaning, precisely: *the intelligence touched this at
 the thread of now.*
 
-## 8. עמית — the OS is the intelligence
+## 8. דינו — the OS is the intelligence
 
 There is no AI panel. There is no chat window. There is no assistant avatar, no
-sparkle-button, no "AI area". **עמית is not an app that runs on LawME OS; עמית is the
+sparkle-button, no "AI area". **דינו is not an app that runs on LawME OS; דינו is the
 OS.** The intelligence manifests in exactly four ways:
 
 1. **Preparedness.** The Room is always already arranged: the Current ordered by real
@@ -221,7 +221,7 @@ OS.** The intelligence manifests in exactly four ways:
    awaiting your signature), questions answer — in written Hebrew, gold-marked, cited.
    Release: Esc, and the Room returns. This single line replaces search bars, command
    palettes, chatbots, and the notification bell.
-4. **Proposals as objects.** עמית never *does* — עמית *prepares*. Every mutation
+4. **Proposals as objects.** דינו never *does* — דינו *prepares*. Every mutation
    arrives as a physical paper on the plane: readable, editable, signable, declinable.
    Approving it is a physical act; the sheet settles into reality. Declining it sinks
    it quietly. The lawyer's authority is built into the physics.

@@ -11,7 +11,7 @@
 - [x] **Native RTL** — `document.dir === "rtl"`; timeline & chart flow right→left
 - [x] **Directional icons correct** — trend glyph drawn up-toward-left (RTL forward);
       arrows point left; pin/clock/court symmetric
-- [x] **Meaningful iconography in every major section** — attention, עמית findings,
+- [x] **Meaningful iconography in every major section** — attention, דינו findings,
       timeline kinds, matters, insights, documents, meetings, nav rail
 - [x] **Every status has a semantic treatment** — 10-state token layer; dot+word,
       state lines, tinted tags, readiness bars, confidence bars (chips only where best)

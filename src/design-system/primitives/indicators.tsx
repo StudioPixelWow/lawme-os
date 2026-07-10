@@ -233,7 +233,7 @@ export function ConfidenceBar({
 }
 
 /**
- * The AI mark — עמית's small, consistent signature.
+ * The AI mark — דינו's small, consistent signature.
  * The ONLY sparkle in the product; never decorative.
  */
 export function AIMark({
@@ -246,7 +246,7 @@ export function AIMark({
   return (
     <SparkleGlyph
       size={11}
-      aria-label="הוכן על ידי עמית"
+      aria-label="הוכן על ידי דינו"
       role="img"
       className={cx(
         "shrink-0",

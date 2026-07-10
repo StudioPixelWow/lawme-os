@@ -34,7 +34,7 @@ tokens  →  primitives  →  patterns  →  module compositions
 | [08-navigation.md](./08-navigation.md) | Navigation philosophy |
 | [09-components.md](./09-components.md) | Component · Card · Forms · Table · Charts philosophy |
 | [10-states.md](./10-states.md) | Empty · Loading · Error · Success states |
-| [11-ai-visual-language.md](./11-ai-visual-language.md) | AI visual language ("עמית") |
+| [11-ai-visual-language.md](./11-ai-visual-language.md) | AI visual language ("דינו") |
 | [12-accessibility.md](./12-accessibility.md) | Accessibility rules |
 | [13-rtl.md](./13-rtl.md) | RTL rules |
 | [14-tokens.md](./14-tokens.md) | Design token reference |

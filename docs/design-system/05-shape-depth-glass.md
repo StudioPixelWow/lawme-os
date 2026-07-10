@@ -41,7 +41,7 @@ Laws:
 ## 3. Glass system
 
 Glass is the material of **ephemeral intelligence** — surfaces that float above the workspace
-for a moment: the command bar, the עמית panel, sticky context headers during scroll, sheet
+for a moment: the command bar, the דינו panel, sticky context headers during scroll, sheet
 scrims. Content (cards, chapters, forms) is **never** glass.
 
 The recipe (one place, `tokens/glass.css`, applied only via the `glass` utility /

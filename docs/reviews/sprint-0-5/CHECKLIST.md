@@ -10,11 +10,11 @@ Verified against the production build (`next build` + `next start`), Chromium.
       logical properties only (no `left/right` classes in src), wordmark + 404 bidi-isolated
 - [x] **Keyboard reviewed** — ⌘K / Ctrl+K opens, Esc closes topmost layer, Enter opens the
       first navigation result, gold `:focus-visible` ring on all interactive elements,
-      skip-link to main, עמית panel `inert` while closed
+      skip-link to main, דינו panel `inert` while closed
 - [x] **Reduced motion reviewed** — all `--motion-*` durations collapse to 1ms centrally;
       breath animation disabled; smooth-scroll disabled
 - [x] **Command bar reviewed** — glass, filter, navigation, creation placeholder,
-      שאל את עמית handoff to the panel, keyboard-hint footer (screenshot 04)
+      שאל את דינו handoff to the panel, keyboard-hint footer (screenshot 04)
 - [x] **AI panel reviewed** — glass catch-light, gold mark on AI content, breath while
       open, disabled composer, trust line (screenshot 05)
 - [x] **Loading reviewed** — skeleton mirrors the editorial layout (screenshot 10)

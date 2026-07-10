@@ -16,7 +16,7 @@ a definition of done, not a sprint.
    `:focus-visible` on every interactive element — no `outline: none` without replacement, ever.
 4. **Screen readers.** Semantic HTML first (nav, main, article, h1–h3 mirror the chapter
    structure). React Aria supplies roles/ARIA for composite widgets. All AI content is
-   announced as such (`aria-label` on AIBlock: "תוכן שהוכן על ידי עמית").
+   announced as such (`aria-label` on AIBlock: "תוכן שהוכן על ידי דינו").
 5. **Motion safety.** `prefers-reduced-motion` collapses all animation to ≤120ms fades and
    stops the gold breath — wired centrally in tokens/variants, not per component.
 6. **Language & direction.** `<html lang="he" dir="rtl">`; embedded foreign phrases carry

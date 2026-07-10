@@ -89,6 +89,16 @@ function FeaturedMatter({
           </dd>
         </div>
         <div className="flex items-center gap-2 text-small">
+          <dt className="text-foreground-faint">עומס היום:</dt>
+          <dd className="font-medium text-foreground">{matter.workload}</dd>
+        </div>
+        <div className="flex items-center gap-2 text-small">
+          <dt className="text-foreground-faint">טרם חויב:</dt>
+          <dd className="font-medium tabular-nums text-status-scheduled">
+            3.5 שעות
+          </dd>
+        </div>
+        <div className="flex items-center gap-2 text-small">
           <dt className="text-foreground-faint">צוות:</dt>
           <dd className="flex items-center gap-1.5">
             <span aria-hidden className="flex -space-x-1.5">
@@ -105,7 +115,7 @@ function FeaturedMatter({
         </div>
       </dl>
 
-      {/* עמית's recommendation */}
+      {/* דינו's recommendation */}
       <p className="mt-5 flex max-w-3xl items-start gap-2 border-s-2 border-accent ps-3 text-small leading-relaxed text-pretty text-foreground-soft">
         <AIMark className="mt-1 shrink-0" />
         <span className="min-w-0">{matter.aiNote}</span>
@@ -195,6 +205,12 @@ function SupportingMatter({
         <span className="font-medium text-foreground">{matter.nextEvent}</span>
       </div>
       <p className="mt-1 truncate text-caption text-foreground-soft">{issue}</p>
+
+      {/* one דינו insight — quiet, meridian-marked */}
+      <p className="mt-2.5 flex items-start gap-1.5 border-s-2 border-accent ps-2.5 text-micro leading-relaxed text-foreground-soft">
+        <AIMark className="mt-0.5 shrink-0" />
+        <span className="min-w-0 line-clamp-2">{matter.aiNote}</span>
+      </p>
 
       {/* hover: the next action + recent activity surface */}
       <div

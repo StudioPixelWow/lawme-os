@@ -10,8 +10,8 @@ import { useShell } from "./shell-provider";
 
 /**
  * The command bar (⌘K) — the fast path.
- * Three groups: ניווט · יצירה · שאל את עמית.
- * Sprint 0: navigation is live; creation and עמית are designed placeholders.
+ * Three groups: ניווט · יצירה · שאל את דינו.
+ * Sprint 0: navigation is live; creation and דינו are designed placeholders.
  * The dialog mounts fresh on every open, so its state needs no reset effects.
  */
 export function CommandBar() {
@@ -34,7 +34,7 @@ function CommandDialog() {
     router.push(href);
   };
 
-  const askAmit = () => {
+  const askDino = () => {
     setCommandOpen(false);
     setAssistantOpen(true);
   };
@@ -63,7 +63,7 @@ function CommandDialog() {
             onKeyDown={(event) => {
               if (event.key === "Enter" && results[0]) go(results[0].href);
             }}
-            placeholder="חיפוש, ניווט או שאלה לעמית…"
+            placeholder="חיפוש, ניווט או שאלה לדינו…"
             className="h-14 w-full bg-transparent text-body text-foreground outline-none"
           />
         </div>
@@ -92,7 +92,7 @@ function CommandDialog() {
           ))}
           {results.length === 0 ? (
             <p className="px-3 py-2.5 text-small text-foreground-soft">
-              אין תוצאות ניווט — אפשר לשאול את עמית.
+              אין תוצאות ניווט — אפשר לשאול את דינו.
             </p>
           ) : null}
 
@@ -109,14 +109,14 @@ function CommandDialog() {
           <div className="mx-3 mt-3 border-t border-gold-300" />
           <button
             type="button"
-            onClick={askAmit}
+            onClick={askDino}
             className="mt-1 flex w-full items-center gap-3 rounded-sm px-3 py-2.5 text-start transition-colors duration-150 hover:bg-gold-100"
           >
             <SparkleGlyph size={16} className="shrink-0 text-gold-600" />
             <span className="text-small font-medium text-foreground">
               {query.trim() === ""
-                ? "שאל את עמית"
-                : `לשאול את עמית: ״${query.trim()}״`}
+                ? "שאל את דינו"
+                : `לשאול את דינו: ״${query.trim()}״`}
             </span>
           </button>
         </div>

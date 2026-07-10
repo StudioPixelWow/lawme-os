@@ -18,7 +18,7 @@ LTR is the theoretical future variant, not the base.
 | Thing | RTL behavior |
 |---|---|
 | Reading start / primary alignment | Right edge |
-| Panels, drawers (עמית) | Slide from **start** (right) |
+| Panels, drawers (דינו) | Slide from **start** (right) |
 | Toasts | Bottom-**start** |
 | "Next / forward" affordances | Point **left**; "back" points right |
 | Directional icons | Auto-flipped by the `<Icon>` wrapper flip-list (see 07) |

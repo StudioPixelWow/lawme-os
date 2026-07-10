@@ -5,7 +5,7 @@ Every meaningful UI change in this sprint. No business features were added.
 ## Tokens
 
 - `glass.css` — added a soft inset light-wash (`inset 0 16px 32px -20px white/55%`) to the
-  glass recipe; crisper top edge (white 60% → 65%). Affects rail, command bar, עמית panel.
+  glass recipe; crisper top edge (white 60% → 65%). Affects rail, command bar, דינו panel.
 - `motion.css` — new `underline-in` keyframes + `--animate-underline`
   (280ms, ease-settle) for the active-nav gold hairline.
 - `globals.css` — new `scrollbar-none` utility for scrollable chrome.
@@ -16,7 +16,7 @@ Every meaningful UI change in this sprint. No business features were added.
 - Nav words: quicker, token-driven color transitions (`--motion-quick`).
 - Search trigger: raised paper fill (`bg-surface-raised/50` → full on hover),
   depth change on hover (hairline → raised shadow), icon color shift via `group`.
-- עמית toggle: hover state now whispers gold (`bg-gold-100/70` + `gold-700` ink)
+- דינו toggle: hover state now whispers gold (`bg-gold-100/70` + `gold-700` ink)
   instead of neutral grey.
 - Wordmark: `dir="ltr"` bidi isolation; rounded focus-ring geometry (`rounded-xs`).
 - User orb: subtle raised shadow; `title` tooltip.
@@ -27,13 +27,13 @@ Every meaningful UI change in this sprint. No business features were added.
 - New footer with keyboard hints: ↵ ניווט · Esc סגירה (Kbd chips).
 - Inherits the improved glass catch-light.
 
-## עמית panel
+## דינו panel
 
 - `inert` while closed — controls leave the tab order (was: focusable while invisible).
 - Breath animation runs only while the panel is open.
 - Slide-in distance 24px → 32px for a clearer from-the-edge motion; documented the
   RTL-physical relationship of the offset.
-- Added the trust line: "עמית תמיד יציע — ואתם תמיד תחליטו…".
+- Added the trust line: "דינו תמיד יציע — ואתם תמיד תחליטו…".
 - Close button transition uses the motion token.
 
 ## Patterns

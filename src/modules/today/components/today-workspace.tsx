@@ -2,18 +2,25 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { DEFAULT_FOCUS, eventById, focusedMatter, type FocusRef } from "../focus";
+import { ACTIVE_ROLE, ROLE_SECTIONS } from "../office";
+import { ClientWaiting } from "./client-waiting";
 import { ContextDock } from "./context-dock";
+import { CourtUpdates } from "./court-updates";
+import { DinoOffice } from "./dino-office";
 import { DocumentShelf } from "./document-shelf";
 import { FinanceStrip } from "./finance-strip";
-import { IntelligenceDrawer } from "./intelligence-drawer";
+import { LeadStrip } from "./lead-strip";
 import { MatterBoard } from "./matter-board";
+import { OfficeAttentionStrip } from "./office-attention";
+import { TeamWorkload } from "./team-workload";
 import { TodayFocus } from "./today-focus";
 
 /**
- * The central workspace orchestrator — one focus, one transformation.
- * Selecting a timeline event re-aims Today Focus; selecting a matter
- * re-aims the Context Dock; Esc returns to the day's default focus.
- * The page is an operating surface, not a document.
+ * The central workspace orchestrator — the live operational map of
+ * the firm. One focus drives the transformation; the section order
+ * follows the active office role (Partner mode today); modules
+ * expand only when the day's scenario justifies it. Esc returns one
+ * focus level.
  */
 export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
   const [focus, setFocus] = useState<FocusRef>(DEFAULT_FOCUS);
@@ -34,6 +41,24 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
   const dockMatter = focusedMatter(focus) ?? focusedMatter(DEFAULT_FOCUS)!;
   const isDefault =
     focus.kind === DEFAULT_FOCUS.kind && focus.id === DEFAULT_FOCUS.id;
+
+  /* the role-ordered office sections (focus + attention always lead) */
+  const SECTIONS: Record<string, ReactNode> = {
+    matters: (
+      <MatterBoard
+        selectedId={dockMatter.id}
+        onSelect={(id) => setFocus({ kind: "matter", id })}
+      />
+    ),
+    team: <TeamWorkload />,
+    clients: <ClientWaiting />,
+    court: <CourtUpdates />,
+    documents: <DocumentShelf />,
+    leads: <LeadStrip />,
+    finance: <FinanceStrip />,
+    dino: <DinoOffice />,
+  };
+  const order = ROLE_SECTIONS[ACTIVE_ROLE].filter((key) => SECTIONS[key]);
 
   return (
     <div>
@@ -75,28 +100,22 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
         </details>
       </div>
 
-      {/* ── the work — the operations board ── */}
-      <div className="animate-rise mt-12 md:mt-14" style={{ animationDelay: "160ms" }}>
-        <MatterBoard
-          selectedId={dockMatter.id}
-          onSelect={(id) => setFocus({ kind: "matter", id })}
-        />
+      {/* ── the office attention strip — the health of the firm ── */}
+      <div className="animate-rise mt-6" style={{ animationDelay: "120ms" }}>
+        <OfficeAttentionStrip />
       </div>
 
-      {/* ── the documents — physical objects ── */}
-      <div className="animate-rise mt-12 md:mt-14" style={{ animationDelay: "240ms" }}>
-        <DocumentShelf />
-      </div>
-
-      {/* ── the business — one smart strip ── */}
-      <div className="animate-rise mt-12 md:mt-14" style={{ animationDelay: "320ms" }}>
-        <FinanceStrip />
-      </div>
-
-      {/* ── עמית in depth — on demand only ── */}
-      <div className="animate-rise mt-6" style={{ animationDelay: "400ms" }}>
-        <IntelligenceDrawer />
-      </div>
+      {/* ── the office, in the active role's priority order ── */}
+      {order.map((key, i) => (
+        <div
+          key={key}
+          id={key === "matters" ? "section-matters" : undefined}
+          className="animate-rise mt-10 md:mt-12"
+          style={{ animationDelay: `${180 + i * 60}ms` }}
+        >
+          {SECTIONS[key]}
+        </div>
+      ))}
     </div>
   );
 }

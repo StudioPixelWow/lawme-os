@@ -5,7 +5,7 @@ import { cx } from "@/design-system/utils/cx";
 import { useShell } from "./shell-provider";
 
 /**
- * עמית — the floating AI companion panel (placeholder).
+ * דינו — the floating AI companion panel (placeholder).
  * Glass, floating at the END edge (left, in RTL — the navigation rail
  * owns the start edge). Slides in from that edge: physical −x because
  * end = left here; an LTR variant would flip the offset. `inert` keeps
@@ -17,7 +17,7 @@ export function AssistantPanel() {
 
   return (
     <aside
-      aria-label="עמית — העמית המשפטי"
+      aria-label="דינו — הדינו המשפטי"
       inert={!assistantOpen}
       className={cx(
         "glass fixed z-40 flex flex-col rounded-xl",
@@ -36,16 +36,16 @@ export function AssistantPanel() {
         />
         <div className="flex-1">
           <p className="text-subheading font-semibold text-foreground">
-            עמית
+            דינו
           </p>
           <p className="text-caption text-foreground-faint">
-            העמית המשפטי של המשרד
+            הדינו המשפטי של המשרד
           </p>
         </div>
         <button
           type="button"
           onClick={() => setAssistantOpen(false)}
-          aria-label="סגירת עמית"
+          aria-label="סגירת דינו"
           className="flex h-8 w-8 items-center justify-center rounded-pill text-foreground-soft transition-colors hover:bg-surface-sunken"
           style={{ transitionDuration: "var(--motion-quick)" }}
         >
@@ -56,17 +56,17 @@ export function AssistantPanel() {
       <div className="flex-1 overflow-y-auto p-5">
         <div className="rounded-md border-s-2 border-accent bg-gold-100 p-4">
           <p className="text-small text-foreground">
-            שלום, אני עמית. בקרוב אדע לסכם תיקים, לנסח טיוטות, לאתר מועדים
+            שלום, אני דינו. בקרוב אדע לסכם תיקים, לנסח טיוטות, לאתר מועדים
             במסמכים ולענות על שאלות — הכול בתוך ההקשר שבו אתם עובדים.
           </p>
           <p className="mt-3 flex items-center gap-1.5 text-micro text-foreground-faint">
             <SparkleGlyph size={11} className="text-gold-600" />
-            עמית · דוגמה לאופן שבו תוכן של עמית יופיע
+            דינו · דוגמה לאופן שבו תוכן של דינו יופיע
           </p>
         </div>
 
         <p className="mt-6 px-1 text-caption text-foreground-faint">
-          עמית תמיד יציע — ואתם תמיד תחליטו. שום פעולה לא תתבצע בלי אישור
+          דינו תמיד יציע — ואתם תמיד תחליטו. שום פעולה לא תתבצע בלי אישור
           שלכם.
         </p>
       </div>
@@ -74,7 +74,7 @@ export function AssistantPanel() {
       <footer className="border-t border-line p-4">
         <input
           disabled
-          placeholder="לכתוב לעמית… (בקרוב)"
+          placeholder="לכתוב לדינו… (בקרוב)"
           className="h-11 w-full rounded-sm bg-surface-raised px-4 text-small text-foreground shadow-hairline outline-none disabled:opacity-60"
         />
       </footer>

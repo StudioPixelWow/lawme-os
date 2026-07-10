@@ -103,10 +103,10 @@ export function ContextDock({
         </div>
       ) : null}
 
-      {/* עמית's findings for this context */}
+      {/* דינו's findings for this context */}
       {insights.length > 0 ? (
         <div>
-          <DockLabel>עמית מצא</DockLabel>
+          <DockLabel>דינו מצא</DockLabel>
           <ul className="mt-2 flex flex-col gap-2.5">
             {insights.map((insight) => (
               <li

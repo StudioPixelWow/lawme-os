@@ -65,7 +65,7 @@ own accent through the semantic status system.
 `MatterSignature`: the procedural **milestone track is the proceeding
 itself** (כתבי טענות → הוכחות → סיכומים → פסק דין), with the matter's
 live position as a gold node, missing-item diamond markers, dependency
-hourglass, deadline-risk breathing dot, and עמית's mark. Headlined by an
+hourglass, deadline-risk breathing dot, and דינו's mark. Headlined by an
 operational state chip — מוכן לדיון / סיכון מועד / ממתין ללקוחה / ממתין
 להחלטת הרשם / פער ראיות — each visually distinct. No generic percentage
 circle.
@@ -75,13 +75,13 @@ circle.
 A floating glass layer (the only permanent glass in the center — live
 context), sticky beside the scene on desktop, a sheet-like expander below
 `xl`. It re-aims itself at the focused object: matter identity, its
-documents, עמית's findings (with source + confidence + action), the
+documents, דינו's findings (with source + confidence + action), the
 gating facts, team, meeting prep when the context has one, and exactly
 one suggested action.
 
 ## 8. Contextual AI
 
-No standalone AI block in the center. עמית appears as the small gold mark
+No standalone AI block in the center. דינו appears as the small gold mark
 inside objects: on prepared drafts, document issues, matter
 recommendations, the finance insight. Depth lives in one collapsed
 **Intelligence Drawer** (navy) at the end: every finding with its why,
@@ -91,7 +91,7 @@ matter, source, confidence and action, plus the day's numbers.
 
 The shelf: each document is a sheet with layered paper edges beneath it,
 a quiet first-lines preview on its face, file-type identity, version,
-review progress, signature state and עמית's issue marker. Hover lifts the
+review progress, signature state and דינו's issue marker. Hover lifts the
 sheet off the shelf (Living Edge + reveal of the note/action). The shelf
 itself catches their weight with the reflection floor. Snap-scrolling
 strip — closer to a premium Finder than a card grid.

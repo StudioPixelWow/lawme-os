@@ -134,7 +134,7 @@ export const HERO_PROVENANCE = "עודכן 07:20 · מקורות: 14 מסמכי�
 
 export const HERO_FACTS: HeroFact[] = [
   { id: "hf-1", text: "חסרים 2 נספחים לכתב התשובה", kind: "missing", action: "בקש מהלקוח" },
-  { id: "hf-2", text: "עמית מצא פסיקה חדשה — ע״א 4881/25", kind: "ai", action: "השווה לתיק" },
+  { id: "hf-2", text: "דינו מצא פסיקה חדשה — ע״א 4881/25", kind: "ai", action: "השווה לתיק" },
   { id: "hf-3", text: "צוות התיק מוכן ומתואם", kind: "team" },
   { id: "hf-4", text: "סיכון אחד דורש בדיקה — מועד הסיכומים", kind: "risk", action: "בדוק עכשיו" },
 ];
@@ -480,7 +480,7 @@ export const AI_INSIGHTS: Insight[] = [
 ];
 
 export const AI_INSIGHTS_META = {
-  generatedBy: "עמית",
+  generatedBy: "דינו",
   updatedAt: "07:20",
 };
 
@@ -509,7 +509,7 @@ export const RECENT_DOCUMENTS: RecentDocument[] = [
     time: "07:12",
     status: "new",
     statusLabel: "התקבל",
-    action: "לקריאה",
+    action: "פתח לבדיקה",
   },
   {
     id: "d-2",
@@ -521,7 +521,7 @@ export const RECENT_DOCUMENTS: RecentDocument[] = [
     time: "06:58",
     status: "progress",
     statusLabel: "טיוטה",
-    action: "לעריכה",
+    action: "השווה גרסאות",
   },
   {
     id: "d-3",
@@ -533,7 +533,7 @@ export const RECENT_DOCUMENTS: RecentDocument[] = [
     time: "אתמול",
     status: "reviewed",
     statusLabel: "נסקר",
-    action: "לחתימות",
+    action: "העבר לאישור",
     aiNote: "סעיף 7 שונה בין v3 ל־v4 — כדאי לוודא מול הלקוחה",
   },
   {
@@ -571,7 +571,7 @@ export type SummaryMetric = {
 };
 
 export const DAILY_SUMMARY = {
-  generatedBy: "עמית",
+  generatedBy: "דינו",
   updatedAt: "07:20",
   sources: "יומן · רישומי זמן · נט המשפט",
   headline: "יום ממוקד: דיון אחד, מועד הגשה אחד, ושלוש החלטות שממתינות רק לך.",
