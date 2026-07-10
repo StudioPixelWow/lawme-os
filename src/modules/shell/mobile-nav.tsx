@@ -31,8 +31,8 @@ export function MobileNav() {
   return (
     <nav
       aria-label="ניווט ראשי"
-      className="glass fixed inset-x-0 bottom-0 z-40 md:hidden"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      className="glass fixed inset-x-4 z-40 rounded-xl md:hidden"
+      style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
     >
       <div className="flex h-16 items-stretch justify-around px-2">
         {NAV_ITEMS.map((item) => {
@@ -54,8 +54,8 @@ export function MobileNav() {
               <span
                 aria-hidden
                 className={cx(
-                  "absolute top-0 h-0.5 w-6 rounded-pill bg-accent transition-opacity",
-                  active ? "opacity-100" : "opacity-0",
+                  "absolute top-1 h-0.5 w-6 rounded-pill bg-accent transition-opacity",
+                  active ? "animate-underline opacity-100" : "opacity-0",
                 )}
               />
               <Glyph size={20} />

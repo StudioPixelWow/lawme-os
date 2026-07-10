@@ -13,19 +13,27 @@ export function MeetingsPanel() {
         linkLabel="ליומן"
       />
       <ul className="mt-5 flex-1 rounded-xl bg-surface-raised shadow-hairline">
-        {MEETINGS.map((meeting, index) => (
+        {MEETINGS.map((meeting, index) => {
+          const firstOfDay =
+            index === 0 || MEETINGS[index - 1].day !== meeting.day;
+          return (
           <li
             key={meeting.id}
-            className={`flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-surface-sunken/50 ${
+            className={`transition-colors hover:bg-surface-sunken/50 ${
               index > 0 ? "border-t border-line/60" : ""
             }`}
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
+            {firstOfDay ? (
+              <p className="px-4 pt-3 text-micro font-medium text-foreground-faint">
+                {meeting.day}
+              </p>
+            ) : null}
+            <div className="flex items-center gap-4 px-4 py-3.5">
             <div className="w-12 shrink-0 text-center">
               <p className="text-small font-semibold tabular-nums text-foreground">
                 {meeting.time}
               </p>
-              <p className="text-micro text-foreground-faint">{meeting.day}</p>
             </div>
             <div className="min-w-0 flex-1 border-s border-line ps-4">
               <p className="truncate text-small font-medium text-foreground">
@@ -40,8 +48,10 @@ export function MeetingsPanel() {
                 </span>
               </p>
             </div>
+            </div>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </section>
   );

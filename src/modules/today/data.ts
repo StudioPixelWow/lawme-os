@@ -11,6 +11,8 @@ export type AttentionItem = {
   id: string;
   title: string;
   detail: string;
+  matter: string;
+  action: string;
   time: string;
   priority: Priority;
 };
@@ -29,24 +31,33 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
     id: "att-1",
     title: "דיון בתיק כהן",
     detail: "בית משפט השלום ת״א · אולם 304 · השופטת ברק־נבו",
+    matter: "כהן נ׳ לוי",
+    action: "לתדריך הדיון",
     time: "11:30",
     priority: "urgent",
   },
   {
     id: "att-2",
     title: "מסמך חדש הגיע",
-    detail: "כתב הגנה מטעם הנתבעת — לוי נ׳ שיכון הצפון",
+    detail: "כתב הגנה מטעם הנתבעת",
+    matter: "לוי נ׳ שיכון הצפון",
+    action: "לצפייה במסמך",
     time: "07:12",
     priority: "today",
   },
   {
     id: "att-3",
     title: "לקוח מצפה לעדכון",
-    detail: "רות אלמוג — 4 ימים ללא מענה בתיק הסכם המייסדים",
+    detail: "4 ימים ללא מענה — רות אלמוג",
+    matter: "הסכם מייסדים — TechLine",
+    action: "לשליחת עדכון",
     time: "מאתמול",
     priority: "waiting",
   },
 ];
+
+/** Static mock "now" for the timeline's day-progress marker. */
+export const TIMELINE_NOW = { label: "10:42", position: 0.38 };
 
 export type AIFinding = {
   id: string;

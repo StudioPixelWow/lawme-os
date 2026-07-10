@@ -25,8 +25,9 @@ const GLYPHS: Record<
 };
 
 /**
- * The vertical navigation rail — pinned to the start edge (right, in RTL).
- * Tablet: icons only. Desktop: icon + word. Mobile: hidden (bottom bar instead).
+ * The floating navigation rail — detached from the start edge (right,
+ * in RTL), raised paper with soft depth. Tablet: icons only.
+ * Desktop: icon + word. Mobile: hidden (floating bottom bar instead).
  */
 export function SideRail() {
   const pathname = usePathname();
@@ -34,7 +35,7 @@ export function SideRail() {
   return (
     <nav
       aria-label="ניווט ראשי"
-      className="fixed start-0 top-16 bottom-0 z-30 hidden w-20 flex-col gap-1 border-e border-line bg-surface px-3 py-6 md:flex lg:w-56"
+      className="fixed start-4 top-20 bottom-4 z-30 hidden w-20 flex-col gap-1 rounded-xl bg-surface-raised/95 px-3 py-5 shadow-float md:flex lg:w-56"
     >
       {NAV_ITEMS.map((item) => {
         const active = pathname.startsWith(item.href);
@@ -46,10 +47,10 @@ export function SideRail() {
             aria-current={active ? "page" : undefined}
             title={item.label}
             className={cx(
-              "relative flex h-11 items-center justify-center gap-3 rounded-md px-3 transition-colors lg:justify-start",
+              "relative flex h-11 items-center justify-center gap-3 rounded-md px-3 transition-all lg:justify-start",
               active
-                ? "bg-surface-sunken text-foreground"
-                : "text-foreground-soft hover:bg-surface-sunken/60 hover:text-foreground",
+                ? "bg-surface-sunken text-foreground shadow-hairline"
+                : "text-foreground-soft hover:-translate-x-px hover:bg-surface-sunken/60 hover:text-foreground",
             )}
             style={{ transitionDuration: "var(--motion-quick)" }}
           >

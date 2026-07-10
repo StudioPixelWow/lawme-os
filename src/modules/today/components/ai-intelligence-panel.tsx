@@ -28,7 +28,13 @@ export function AIIntelligencePanel() {
         </span>
       </div>
 
-      <p className="mt-5 text-small text-ink-100">{AI_STATUS.statusLine}</p>
+      <p className="mt-5 flex items-center gap-2 text-small text-ink-100">
+        <span
+          aria-hidden
+          className="animate-breath h-1.5 w-1.5 shrink-0 rounded-pill bg-gold-400"
+        />
+        {AI_STATUS.statusLine}
+      </p>
       <div className="mt-3 flex items-center gap-3">
         <div
           role="progressbar"
@@ -52,7 +58,7 @@ export function AIIntelligencePanel() {
         {AI_FINDINGS.map((finding) => (
           <div
             key={finding.id}
-            className="rounded-md border border-paper-0/10 bg-ink-800/70 p-3.5 transition-colors hover:border-gold-500/30"
+            className="rounded-md border border-paper-0/10 bg-ink-800/70 p-3.5 transition-all hover:-translate-y-0.5 hover:border-gold-500/30 hover:bg-ink-800"
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
             <dd className="text-title font-semibold tabular-nums text-paper-0">
@@ -71,13 +77,14 @@ export function AIIntelligencePanel() {
       <button
         type="button"
         onClick={() => setAssistantOpen(true)}
-        className="mt-6 flex h-11 w-full items-center justify-center rounded-md border border-gold-500/50 text-small font-medium text-gold-300 transition-colors hover:bg-gold-500/10"
+        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-gold-500/50 text-small font-medium text-gold-300 transition-all hover:border-gold-400 hover:bg-gold-500/10"
         style={{ transitionDuration: "var(--motion-quick)" }}
       >
         לצפייה בכל התובנות
+        <span aria-hidden>←</span>
       </button>
 
-      <p className="mt-4 flex items-center gap-1.5 text-micro text-ink-200">
+      <p className="mt-4 flex items-center gap-1.5 border-t border-paper-0/10 pt-4 text-micro text-ink-200">
         <SparkleGlyph size={11} className="shrink-0 text-gold-400" />
         נוצר על ידי עמית · מקורות: {AI_STATUS.sources}
       </p>

@@ -18,11 +18,23 @@ export function ActiveMattersSection() {
         {ACTIVE_MATTERS.map((matter, index) => (
           <li
             key={matter.id}
-            className={`group px-5 py-3.5 transition-colors hover:bg-surface-sunken/50 ${
+            className={`group relative px-5 py-3.5 transition-colors hover:bg-surface-sunken/50 ${
               index > 0 ? "border-t border-line/60" : ""
             }`}
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
+            <span
+              aria-hidden
+              className={`absolute inset-y-3 start-0 w-0.5 rounded-pill ${
+                matter.tone === "critical"
+                  ? "bg-critical"
+                  : matter.tone === "caution"
+                    ? "bg-caution"
+                    : matter.tone === "positive"
+                      ? "bg-positive"
+                      : "bg-ink-200"
+              }`}
+            />
             <div className="flex items-center justify-between gap-3">
               <p className="truncate text-small font-semibold text-foreground">
                 {matter.name}

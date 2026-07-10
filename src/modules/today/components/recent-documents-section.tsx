@@ -1,4 +1,3 @@
-import { DocumentGlyph } from "@/design-system/icons/glyphs";
 import { DOC_STATUS_LABELS, RECENT_DOCUMENTS } from "../data";
 import { SectionHeading, ToneChip } from "./section-heading";
 
@@ -26,19 +25,18 @@ export function RecentDocumentsSection() {
               }`}
               style={{ transitionDuration: "var(--motion-quick)" }}
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-surface-sunken text-foreground-soft">
-                <DocumentGlyph size={17} />
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-ink-900 font-mono text-micro font-medium text-paper-0"
+                dir="ltr"
+              >
+                {doc.kind === "PDF" ? "PDF" : "DOC"}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-small font-medium text-foreground">
                   {doc.name}
                 </p>
                 <p className="truncate text-micro text-foreground-faint">
-                  {doc.matter} ·{" "}
-                  <span className="font-mono" dir="ltr">
-                    {doc.kind}
-                  </span>{" "}
-                  · {doc.time}
+                  {doc.matter} · {doc.time}
                 </p>
               </div>
               <ToneChip label={status.label} tone={status.tone} />
