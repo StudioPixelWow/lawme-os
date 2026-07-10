@@ -18,7 +18,8 @@ export function SectionHeading({
   return (
     <div className="flex items-baseline justify-between gap-4">
       <div>
-        <h2 className="text-heading font-semibold tracking-tight text-foreground">
+        <h2 className="flex items-center gap-3 text-heading font-semibold tracking-tight text-foreground">
+          <span aria-hidden className="h-4 w-0.5 rounded-pill bg-accent" />
           {title}
         </h2>
         {caption ? (

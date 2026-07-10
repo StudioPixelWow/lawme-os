@@ -84,4 +84,26 @@
       scroll-behavior: auto;
     }
   }
+
+  /* Apple detail: quiet scrollbars that match the paper */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ink-100) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-ink-100);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }

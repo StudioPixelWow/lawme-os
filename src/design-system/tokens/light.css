@@ -48,6 +48,19 @@
     0 4px 14px rgb(10 22 41 / 0.05);
 }
 
+/* A soft champagne light-bloom — placed BEHIND a key surface (the
+   hero's intelligence anchor). Absolutely positioned, never on content. */
+@utility bloom-gold {
+  position: absolute;
+  inset: -3rem -1rem;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, #c9a961 9%, transparent),
+    transparent 70%
+  );
+}
+
 /* Deep navy intelligence surface: radial inner light (top-start sun),
    blue-black depth, warm gold edge reflection, premium inner border,
    deep layered shadow. The material of עמית and the summary. */

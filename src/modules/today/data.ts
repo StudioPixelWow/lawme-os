@@ -203,10 +203,21 @@ export type Matter = {
   status: Status;
   statusLabel: string;
   nextEvent: string;
+  nextTask: string;
   lastUpdate: string;
   /** 0–1 readiness toward the next milestone */
   progress: number;
   action: string;
+  /* ---- Matter Health ---- */
+  risk: "נמוך" | "בינוני" | "גבוה";
+  riskStatus: Status;
+  missingDocs: number;
+  waitingOn: string | null;
+  waitingStatus: Status;
+  team: string[];
+  files: number;
+  workload: string;
+  aiNote: string;
 };
 
 export const ACTIVE_MATTERS: Matter[] = [
@@ -220,9 +231,19 @@ export const ACTIVE_MATTERS: Matter[] = [
     status: "urgent",
     statusLabel: "דיון היום",
     nextEvent: "דיון · 11:30",
+    nextTask: "עדכון תצהיר לפי הפסיקה החדשה",
     lastUpdate: "לפני שעה",
     progress: 0.85,
-    action: "לתדריך",
+    action: "לתדריך הדיון",
+    risk: "בינוני",
+    riskStatus: "today",
+    missingDocs: 0,
+    waitingOn: null,
+    waitingStatus: "completed",
+    team: ["דניאל", "מיכל"],
+    files: 34,
+    workload: "≈4 שעות היום",
+    aiNote: "התדריך מוכן. מומלץ לאזכר את ע״א 4881/25 — מחזק את טענת ההתיישנות.",
   },
   {
     id: "m-2",
@@ -234,9 +255,19 @@ export const ACTIVE_MATTERS: Matter[] = [
     status: "today",
     statusLabel: "הגשה היום",
     nextEvent: "סיכומים · 16:00",
+    nextTask: "השלמת סיכומים — סעיף הליקויים",
     lastUpdate: "07:12",
     progress: 0.7,
     action: "לסיכומים",
+    risk: "גבוה",
+    riskStatus: "risk",
+    missingDocs: 2,
+    waitingOn: "חוות דעת מהנדס",
+    waitingStatus: "waiting",
+    team: ["מיכל"],
+    files: 27,
+    workload: "≈3 שעות עד 16:00",
+    aiNote: "בכתב ההגנה אין מענה לסעיף 14 — כדאי לחדד בסיכומים. חסרים 2 נספחים.",
   },
   {
     id: "m-3",
@@ -248,9 +279,19 @@ export const ACTIVE_MATTERS: Matter[] = [
     status: "progress",
     statusLabel: "בעבודה",
     nextEvent: "שיחת לקוח · 14:00",
+    nextTask: "גרסה 5 להסכם — סעיפי שליטה",
     lastUpdate: "אתמול",
     progress: 0.45,
     action: "לטיוטה",
+    risk: "נמוך",
+    riskStatus: "completed",
+    missingDocs: 1,
+    waitingOn: "אישור הלקוחה לסעיף 7",
+    waitingStatus: "waiting",
+    team: ["דניאל"],
+    files: 12,
+    workload: "≈שעה",
+    aiNote: "הלקוחה ממתינה לעדכון 4 ימים — טיוטת מייל עדכון מוכנה לאישורך.",
   },
   {
     id: "m-4",
@@ -262,9 +303,19 @@ export const ACTIVE_MATTERS: Matter[] = [
     status: "waiting",
     statusLabel: "ממתין לרשם",
     nextEvent: "מעקב · יום ג׳",
+    nextTask: "מעקב מול רשם הירושה",
     lastUpdate: "לפני יומיים",
     progress: 0.9,
     action: "למעקב",
+    risk: "נמוך",
+    riskStatus: "completed",
+    missingDocs: 0,
+    waitingOn: "החלטת הרשם",
+    waitingStatus: "scheduled",
+    team: ["אבי"],
+    files: 8,
+    workload: "ללא פעולה נדרשת",
+    aiNote: "אין פעולה נדרשת. זמן טיפול ממוצע ברשם: 21 יום — צפי החלטה בשבועיים.",
   },
   {
     id: "m-5",
@@ -276,9 +327,19 @@ export const ACTIVE_MATTERS: Matter[] = [
     status: "scheduled",
     statusLabel: "גישור 21.7",
     nextEvent: "ישיבת גישור · 21.7",
+    nextTask: "מסמך עמדה לישיבת הגישור",
     lastUpdate: "לפני 3 ימים",
     progress: 0.5,
     action: "להיערכות",
+    risk: "בינוני",
+    riskStatus: "today",
+    missingDocs: 1,
+    waitingOn: "מסמכי תביעה מהמבטחת",
+    waitingStatus: "waiting",
+    team: ["מיכל", "אבי"],
+    files: 19,
+    workload: "≈שעתיים השבוע",
+    aiNote: "המגשר מונה לאחרונה ב־3 תיקי ביטוח דומים — ניתוח דפוסי פשרה זמין.",
   },
 ];
 

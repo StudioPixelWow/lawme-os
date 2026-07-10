@@ -1,80 +1,121 @@
 import Link from "next/link";
-import { BriefcaseGlyph } from "@/design-system/icons/glyphs";
-import { IconContainer } from "@/design-system/primitives/icon-container";
 import {
-  MicroProgress,
-  StateLine,
-  StatusText,
-} from "@/design-system/primitives/indicators";
+  BriefcaseGlyph,
+  CalendarGlyph,
+  TaskGlyph,
+} from "@/design-system/icons/glyphs";
+import { IconContainer } from "@/design-system/primitives/icon-container";
+import { AIMark, StateLine, StatusText } from "@/design-system/primitives/indicators";
+import { cx } from "@/design-system/utils/cx";
 import { ACTIVE_MATTERS } from "../data";
+import { MatterHealth } from "./matter-health";
 import { SectionHeading } from "./section-heading";
 
 /**
- * תיקים פעילים — a premium operational index: state line, icon,
- * matter, client, practice area, owner, status, next event,
- * readiness. Hover exposes the main next action.
+ * התיקים הפעילים — THE main workspace: a full-width operational
+ * command center. Each matter is a living operational surface:
+ * identity · Matter Health · next hearing/task · עמית's note ·
+ * team, files, workload · one main CTA.
  */
 export function ActiveMattersSection() {
   return (
-    <section aria-label="תיקים פעילים" className="flex h-full flex-col">
+    <section aria-label="התיקים הפעילים">
       <SectionHeading
-        title="תיקים פעילים"
-        caption="5 תיקים · ממוינים לפי דחיפות"
+        title="התיקים הפעילים"
+        caption="5 תיקים · ממוינים לפי מה שדורש אותך קודם"
         href="/matters"
         linkLabel="כל התיקים"
       />
-      <ul className="surface-paper mt-5 flex-1 rounded-xl">
+
+      <div className="surface-paper-raised mt-6 rounded-xl">
         {ACTIVE_MATTERS.map((matter, index) => (
-          <li
+          <article
             key={matter.id}
-            className={`group relative px-5 py-3.5 transition-colors hover:bg-surface-sunken/50 ${
-              index > 0 ? "border-t border-line/60" : ""
-            }`}
+            className={cx(
+              "group relative p-6 transition-colors hover:bg-surface-sunken/40 md:p-7",
+              index > 0 && "border-t border-line/60",
+            )}
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
             <StateLine status={matter.status} />
-            <div className="flex items-center gap-3">
+
+            {/* identity row */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <IconContainer
-                variant={matter.status === "urgent" ? "urgent" : "neutral"}
-                size="sm"
+                variant={matter.status === "urgent" ? "urgent" : "navy"}
+                size="md"
                 interactive
               >
-                <BriefcaseGlyph size={14} />
+                <BriefcaseGlyph size={17} />
               </IconContainer>
-              <p className="min-w-0 flex-1 truncate text-small font-semibold text-foreground">
-                {matter.name}
-              </p>
-              <StatusText status={matter.status}>
-                {matter.statusLabel}
-              </StatusText>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <h3 className="text-subheading font-semibold tracking-tight text-foreground">
+                    {matter.name}
+                  </h3>
+                  <StatusText status={matter.status}>
+                    {matter.statusLabel}
+                  </StatusText>
+                </div>
+                <p className="mt-0.5 truncate text-caption text-foreground-soft">
+                  {matter.client} · {matter.practiceArea} · שלב: {matter.stage}
+                </p>
+              </div>
+              <Link
+                href="/matters"
+                className="hidden h-10 shrink-0 items-center rounded-md bg-ink-900 px-5 text-small font-medium text-paper-0 shadow-raised transition-all hover:-translate-y-px hover:bg-ink-800 hover:shadow-lift sm:inline-flex"
+                style={{ transitionDuration: "var(--motion-quick)" }}
+              >
+                {matter.action}
+              </Link>
             </div>
-            <p className="mt-1.5 truncate text-caption text-foreground-soft">
-              {matter.client} · {matter.practiceArea} · {matter.nextEvent}
+
+            {/* עמית's micro-intelligence line */}
+            <p className="mt-4 flex items-start gap-2 border-s-2 border-accent ps-3 text-small leading-relaxed text-foreground-soft">
+              <AIMark className="mt-1" />
+              <span className="min-w-0">{matter.aiNote}</span>
             </p>
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <span className="flex items-center gap-2 text-micro text-foreground-faint">
-                <span>עו״ד {matter.owner}</span>
-                <span aria-hidden>·</span>
-                <span>{matter.lastUpdate}</span>
-              </span>
-              <span className="flex items-center gap-3">
-                <MicroProgress
-                  value={matter.progress}
-                  status={matter.progress >= 0.8 ? "completed" : "progress"}
-                  label="מוכנות"
-                />
-                <Link
-                  href="/matters"
-                  className="rounded-xs text-micro font-medium text-foreground opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-                  style={{ transitionDuration: "var(--motion-quick)" }}
-                >
-                  {matter.action} ←
-                </Link>
-              </span>
+
+            {/* operational band: health · next · logistics */}
+            <div className="mt-5 flex flex-wrap items-center gap-x-10 gap-y-4">
+              <MatterHealth matter={matter} />
+
+              <dl className="flex min-w-0 flex-col gap-1.5">
+                <div className="flex items-center gap-1.5 text-caption text-foreground-soft">
+                  <CalendarGlyph size={13} className="shrink-0 text-foreground-faint" />
+                  <dt className="text-foreground-faint">הבא:</dt>
+                  <dd className="truncate font-medium text-foreground">
+                    {matter.nextEvent}
+                  </dd>
+                </div>
+                <div className="flex items-center gap-1.5 text-caption text-foreground-soft">
+                  <TaskGlyph size={13} className="shrink-0 text-foreground-faint" />
+                  <dt className="text-foreground-faint">משימה:</dt>
+                  <dd className="truncate">{matter.nextTask}</dd>
+                </div>
+              </dl>
+
+              <div className="ms-auto flex items-center gap-5 text-micro text-foreground-faint">
+                <span className="flex items-center gap-1.5" title={matter.team.join(", ")}>
+                  <span className="flex -space-x-1.5 space-x-reverse" dir="ltr">
+                    {matter.team.map((member) => (
+                      <span
+                        key={member}
+                        className="flex h-6 w-6 items-center justify-center rounded-pill bg-ink-900 text-micro text-paper-0 shadow-seat ring-2 ring-surface-raised"
+                      >
+                        {member[0]}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+                <span className="tabular-nums">{matter.files} קבצים</span>
+                <span>{matter.workload}</span>
+                <span>עדכון {matter.lastUpdate}</span>
+              </div>
             </div>
-          </li>
+          </article>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
