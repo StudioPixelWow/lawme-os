@@ -1,3 +1,5 @@
+import type { Status } from "@/design-system/primitives/indicators";
+
 /**
  * Morning Workspace — typed mock data.
  * Visual-implementation sprint only: realistic Hebrew legal-office
@@ -15,16 +17,15 @@ export type AttentionItem = {
   action: string;
   time: string;
   priority: Priority;
+  kind: "hearing" | "document" | "client";
 };
 
-export const PRIORITY_LABELS: Record<
-  Priority,
-  { label: string; tone: "critical" | "caution" | "neutral" }
-> = {
-  urgent: { label: "דחוף", tone: "critical" },
-  today: { label: "היום", tone: "caution" },
-  waiting: { label: "ממתין", tone: "neutral" },
-};
+export const PRIORITY_LABELS: Record<Priority, { label: string; status: Status }> =
+  {
+    urgent: { label: "דחוף", status: "urgent" },
+    today: { label: "היום", status: "today" },
+    waiting: { label: "ממתין", status: "waiting" },
+  };
 
 export const ATTENTION_ITEMS: AttentionItem[] = [
   {
@@ -35,6 +36,7 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
     action: "לתדריך הדיון",
     time: "11:30",
     priority: "urgent",
+    kind: "hearing",
   },
   {
     id: "att-2",
@@ -44,6 +46,7 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
     action: "לצפייה במסמך",
     time: "07:12",
     priority: "today",
+    kind: "document",
   },
   {
     id: "att-3",
@@ -53,6 +56,7 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
     action: "לשליחת עדכון",
     time: "מאתמול",
     priority: "waiting",
+    kind: "client",
   },
 ];
 
@@ -61,23 +65,54 @@ export const TIMELINE_NOW = { label: "10:42", position: 0.38 };
 
 export type AIFinding = {
   id: string;
+  kind: "precedent" | "opportunity" | "risk" | "ready";
   label: string;
   count: number;
   detail: string;
+  action: string;
 };
 
 export const AI_STATUS = {
-  statusLine: "אני מנתח את המידע הרלוונטי…",
+  statusLine: "ניתוח הבוקר הושלם · מעקב רציף פעיל",
   progress: 72,
+  progressLabel: "קריאת כתב ההגנה שהתקבל",
   updatedAt: "07:20",
   sources: "14 מסמכים · נט המשפט · יומן המשרד",
 };
 
 export const AI_FINDINGS: AIFinding[] = [
-  { id: "f-1", label: "פסק דין חדש", count: 1, detail: "רלוונטי לתיק כהן — ע״א 4881/25" },
-  { id: "f-2", label: "הזדמנויות", count: 2, detail: "פשרה אפשרית · שעות לא מחויבות" },
-  { id: "f-3", label: "סיכונים", count: 1, detail: "מועד הגשה מתקרב — סיכומים" },
-  { id: "f-4", label: "משימות מוכנות", count: 4, detail: "טיוטות ממתינות לאישורך" },
+  {
+    id: "f-1",
+    kind: "precedent",
+    label: "פסק דין חדש",
+    count: 1,
+    detail: "ע״א 4881/25 — מחזק את טענת ההתיישנות בתיק כהן",
+    action: "לניתוח",
+  },
+  {
+    id: "f-2",
+    kind: "opportunity",
+    label: "הזדמנויות",
+    count: 2,
+    detail: "פתח לפשרה · 3.5 שעות שטרם חויבו",
+    action: "לפירוט",
+  },
+  {
+    id: "f-3",
+    kind: "risk",
+    label: "סיכונים",
+    count: 1,
+    detail: "מועד הגשת סיכומים — נותרו 5 שעות",
+    action: "לבדיקה",
+  },
+  {
+    id: "f-4",
+    kind: "ready",
+    label: "משימות מוכנות",
+    count: 4,
+    detail: "טיוטות ורישומי זמן ממתינים לאישורך",
+    action: "לאישור",
+  },
 ];
 
 export type TimelineStatus = "done" | "next" | "upcoming";
@@ -86,10 +121,13 @@ export type TimelineEvent = {
   id: string;
   time: string;
   title: string;
-  kind: string;
+  kind: "internal" | "hearing" | "call" | "deadline" | "meeting";
+  kindLabel: string;
   matter?: string;
   location: string;
   status: TimelineStatus;
+  /** 0–1 preparation readiness (next/upcoming only) */
+  prep?: number;
 };
 
 export const TIMELINE_EVENTS: TimelineEvent[] = [
@@ -97,7 +135,8 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     id: "ev-1",
     time: "08:30",
     title: "סקירת בוקר",
-    kind: "פנימי",
+    kind: "internal",
+    kindLabel: "פנימי",
     location: "המשרד",
     status: "done",
   },
@@ -105,7 +144,8 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     id: "ev-2",
     time: "09:15",
     title: "שיחת צוות",
-    kind: "פנימי",
+    kind: "internal",
+    kindLabel: "פנימי",
     location: "חדר ישיבות",
     status: "done",
   },
@@ -113,34 +153,41 @@ export const TIMELINE_EVENTS: TimelineEvent[] = [
     id: "ev-3",
     time: "11:30",
     title: "דיון בתיק כהן",
-    kind: "דיון",
+    kind: "hearing",
+    kindLabel: "דיון",
     matter: "כהן נ׳ לוי",
     location: "בימ״ש השלום ת״א · אולם 304",
     status: "next",
+    prep: 0.85,
   },
   {
     id: "ev-4",
     time: "14:00",
     title: "שיחת לקוח",
-    kind: "שיחה",
+    kind: "call",
+    kindLabel: "שיחה",
     matter: "אלמוג — הסכם מייסדים",
     location: "טלפון",
     status: "upcoming",
+    prep: 0.4,
   },
   {
     id: "ev-5",
     time: "16:00",
     title: "הגשת מסמכים",
-    kind: "מועד",
+    kind: "deadline",
+    kindLabel: "מועד",
     matter: "לוי נ׳ שיכון הצפון",
     location: "נט המשפט",
     status: "upcoming",
+    prep: 0.7,
   },
   {
     id: "ev-6",
     time: "17:30",
     title: "פגישה עם עו״ד רון",
-    kind: "פגישה",
+    kind: "meeting",
+    kindLabel: "פגישה",
     location: "קפה נמרוד, שד׳ רוטשילד",
     status: "upcoming",
   },
@@ -150,10 +197,16 @@ export type Matter = {
   id: string;
   name: string;
   client: string;
+  practiceArea: string;
+  owner: string;
   stage: string;
+  status: Status;
+  statusLabel: string;
   nextEvent: string;
   lastUpdate: string;
-  tone: "critical" | "caution" | "positive" | "neutral";
+  /** 0–1 readiness toward the next milestone */
+  progress: number;
+  action: string;
 };
 
 export const ACTIVE_MATTERS: Matter[] = [
@@ -161,77 +214,118 @@ export const ACTIVE_MATTERS: Matter[] = [
     id: "m-1",
     name: "כהן נ׳ לוי",
     client: "יעקב כהן",
+    practiceArea: "ליטיגציה",
+    owner: "דניאל",
     stage: "הוכחות",
-    nextEvent: "דיון היום · 11:30",
+    status: "urgent",
+    statusLabel: "דיון היום",
+    nextEvent: "דיון · 11:30",
     lastUpdate: "לפני שעה",
-    tone: "critical",
+    progress: 0.85,
+    action: "לתדריך",
   },
   {
     id: "m-2",
     name: "לוי נ׳ שיכון הצפון",
     client: "משפחת לוי",
+    practiceArea: "מקרקעין",
+    owner: "מיכל",
     stage: "כתבי טענות",
-    nextEvent: "הגשת סיכומים · היום 16:00",
+    status: "today",
+    statusLabel: "הגשה היום",
+    nextEvent: "סיכומים · 16:00",
     lastUpdate: "07:12",
-    tone: "caution",
+    progress: 0.7,
+    action: "לסיכומים",
   },
   {
     id: "m-3",
     name: "הסכם מייסדים — TechLine",
     client: "רות אלמוג",
+    practiceArea: "מסחרי",
+    owner: "דניאל",
     stage: "טיוטה",
-    nextEvent: "שיחת לקוח · היום 14:00",
+    status: "progress",
+    statusLabel: "בעבודה",
+    nextEvent: "שיחת לקוח · 14:00",
     lastUpdate: "אתמול",
-    tone: "neutral",
+    progress: 0.45,
+    action: "לטיוטה",
   },
   {
     id: "m-4",
     name: "מזרחי — צו ירושה",
     client: "דוד מזרחי",
-    stage: "המתנה לרשם",
-    nextEvent: "תזכורת מעקב · יום ג׳",
+    practiceArea: "ירושה",
+    owner: "אבי",
+    stage: "רשם הירושה",
+    status: "waiting",
+    statusLabel: "ממתין לרשם",
+    nextEvent: "מעקב · יום ג׳",
     lastUpdate: "לפני יומיים",
-    tone: "positive",
+    progress: 0.9,
+    action: "למעקב",
   },
   {
     id: "m-5",
     name: "ברקוביץ׳ נ׳ מגדל",
     client: "שרה ברקוביץ׳",
+    practiceArea: "ביטוח",
+    owner: "מיכל",
     stage: "גישור",
+    status: "scheduled",
+    statusLabel: "גישור 21.7",
     nextEvent: "ישיבת גישור · 21.7",
     lastUpdate: "לפני 3 ימים",
-    tone: "neutral",
+    progress: 0.5,
+    action: "להיערכות",
   },
 ];
 
 export type Insight = {
   id: string;
+  category: "precedent" | "risk" | "billing";
+  categoryLabel: string;
   text: string;
   confidence: number;
   source: string;
+  matter: string;
+  impact: "גבוהה" | "בינונית";
   action: string;
 };
 
 export const AI_INSIGHTS: Insight[] = [
   {
     id: "i-1",
-    text: "פסק דין חדש בע״א 4881/25 מחזק את טענת ההתיישנות שלך בתיק כהן — כדאי לאזכר בדיון היום.",
+    category: "precedent",
+    categoryLabel: "תקדים חדש",
+    text: "פסק דין חדש בע״א 4881/25 מחזק את טענת ההתיישנות שלך — כדאי לאזכר בדיון היום.",
     confidence: 92,
     source: "נט המשפט · פסקי דין",
+    matter: "כהן נ׳ לוי",
+    impact: "גבוהה",
     action: "פתח ניתוח מלא",
   },
   {
     id: "i-2",
-    text: "בכתב ההגנה שהתקבל הבוקר אין מענה לסעיף 14 (ליקויי בנייה) — נקודת תורפה אפשרית.",
+    category: "risk",
+    categoryLabel: "נקודת תורפה",
+    text: "בכתב ההגנה שהתקבל הבוקר אין מענה לסעיף 14 (ליקויי בנייה).",
     confidence: 84,
-    source: "כתב הגנה · לוי נ׳ שיכון הצפון",
+    source: "כתב הגנה · עמ׳ 6–9",
+    matter: "לוי נ׳ שיכון הצפון",
+    impact: "גבוהה",
     action: "עבור לסעיף",
   },
   {
     id: "i-3",
-    text: "זוהו 3.5 שעות עבודה מאתמול שטרם חויבו בתיק TechLine.",
+    category: "billing",
+    categoryLabel: "חיוב חסר",
+    text: "זוהו 3.5 שעות עבודה מאתמול שטרם חויבו.",
     confidence: 97,
     source: "יומן פעילות המשרד",
+    matter: "TechLine",
+    impact: "בינונית",
     action: "אשר רישום",
   },
 ];
@@ -245,18 +339,13 @@ export type RecentDocument = {
   id: string;
   name: string;
   matter: string;
-  kind: string;
+  kind: "PDF" | "DOCX";
+  owner: string;
+  version: string;
   time: string;
-  status: "received" | "draft" | "filed";
-};
-
-export const DOC_STATUS_LABELS: Record<
-  RecentDocument["status"],
-  { label: string; tone: "caution" | "neutral" | "positive" }
-> = {
-  received: { label: "התקבל", tone: "caution" },
-  draft: { label: "טיוטה", tone: "neutral" },
-  filed: { label: "הוגש", tone: "positive" },
+  status: Status;
+  statusLabel: string;
+  action: string;
 };
 
 export const RECENT_DOCUMENTS: RecentDocument[] = [
@@ -265,40 +354,60 @@ export const RECENT_DOCUMENTS: RecentDocument[] = [
     name: "כתב הגנה — הנתבעת",
     matter: "לוי נ׳ שיכון הצפון",
     kind: "PDF",
+    owner: "מיכל",
+    version: "v1",
     time: "07:12",
-    status: "received",
+    status: "new",
+    statusLabel: "התקבל",
+    action: "לקריאה",
   },
   {
     id: "d-2",
     name: "טיוטת תגובה לדיון",
     matter: "כהן נ׳ לוי",
     kind: "DOCX",
+    owner: "דניאל",
+    version: "v2",
     time: "06:58",
-    status: "draft",
+    status: "progress",
+    statusLabel: "טיוטה",
+    action: "לעריכה",
   },
   {
     id: "d-3",
     name: "הסכם מייסדים v4",
     matter: "TechLine",
     kind: "DOCX",
+    owner: "דניאל",
+    version: "v4",
     time: "אתמול",
-    status: "draft",
+    status: "reviewed",
+    statusLabel: "נסקר",
+    action: "לחתימות",
   },
   {
     id: "d-4",
     name: "תצהיר עדות ראשית",
     matter: "כהן נ׳ לוי",
     kind: "PDF",
+    owner: "דניאל",
+    version: "v3",
     time: "אתמול",
-    status: "filed",
+    status: "completed",
+    statusLabel: "הוגש",
+    action: "לצפייה",
   },
   {
     id: "d-5",
     name: "בקשה לצו ירושה",
     matter: "מזרחי",
     kind: "PDF",
+    owner: "אבי",
+    version: "v1",
     time: "8.7",
-    status: "filed",
+    status: "signed",
+    statusLabel: "נחתם",
+    action: "לצפייה",
   },
 ];
 
@@ -329,6 +438,7 @@ export type Meeting = {
   title: string;
   with: string;
   location: string;
+  kind: "call" | "meeting";
 };
 
 export const MEETINGS: Meeting[] = [
@@ -339,6 +449,7 @@ export const MEETINGS: Meeting[] = [
     title: "שיחת עדכון",
     with: "רות אלמוג",
     location: "טלפון",
+    kind: "call",
   },
   {
     id: "mt-2",
@@ -347,6 +458,7 @@ export const MEETINGS: Meeting[] = [
     title: "תיאום אסטרטגיה",
     with: "עו״ד מיכל רון",
     location: "קפה נמרוד",
+    kind: "meeting",
   },
   {
     id: "mt-3",
@@ -355,6 +467,7 @@ export const MEETINGS: Meeting[] = [
     title: "פגישת היכרות — לקוח חדש",
     with: "אבי שטרן",
     location: "המשרד",
+    kind: "meeting",
   },
   {
     id: "mt-4",
@@ -363,6 +476,7 @@ export const MEETINGS: Meeting[] = [
     title: "ישיבת צוות שבועית",
     with: "כל המשרד",
     location: "חדר ישיבות",
+    kind: "meeting",
   },
 ];
 
@@ -382,8 +496,38 @@ export const FINANCE_MONTHS: FinanceMonth[] = [
   { month: "יולי", billed: 184, current: true },
 ];
 
-export const FINANCE_TOTALS = [
-  { id: "ft-1", label: "חיוב החודש", value: "₪184,500", trend: "+7.6%" },
-  { id: "ft-2", label: "נגבה החודש", value: "₪152,300", trend: "+4.2%" },
-  { id: "ft-3", label: "חוב פתוח", value: "₪48,200", trend: "−12%" },
+/** Monthly billing goal, ₪ thousands — the subtle target line. */
+export const FINANCE_TARGET = 175;
+
+export type FinanceTotal = {
+  id: string;
+  label: string;
+  value: string;
+  trend: string;
+  /** direction is good → completed; bad → risk; neutral → waiting */
+  trendStatus: Status;
+};
+
+export const FINANCE_TOTALS: FinanceTotal[] = [
+  {
+    id: "ft-1",
+    label: "חיוב החודש",
+    value: "₪184,500",
+    trend: "+7.6%",
+    trendStatus: "completed",
+  },
+  {
+    id: "ft-2",
+    label: "נגבה החודש",
+    value: "₪152,300",
+    trend: "+4.2%",
+    trendStatus: "completed",
+  },
+  {
+    id: "ft-3",
+    label: "חוב פתוח",
+    value: "₪48,200",
+    trend: "−12%",
+    trendStatus: "completed",
+  },
 ];

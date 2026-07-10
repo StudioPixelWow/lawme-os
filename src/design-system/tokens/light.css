@@ -1,0 +1,68 @@
+/* ============================================================
+   Shayish · Light tokens — gradients are lighting, never decoration.
+   One sun: light enters from the top-start corner.
+   Docs: docs/design-system/05-shape-depth-glass.md (+V2 review)
+   ============================================================ */
+
+/* The environmental background: warm ivory with a champagne dawn
+   near the hero (top-start) and an almost-invisible cool depth at
+   the far bottom-end. Radials are huge and near-imperceptible. */
+@utility bg-environment {
+  background-color: var(--color-surface);
+  background-image:
+    radial-gradient(
+      90rem 48rem at 100% -8rem,
+      color-mix(in srgb, #c9a961 5%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      80rem 52rem at -10% 110%,
+      color-mix(in srgb, #0a1629 3.5%, transparent),
+      transparent 70%
+    );
+  background-attachment: fixed;
+}
+
+/* Resting paper with ambient light: soft inner top highlight,
+   hairline edge drawn by shadow (no visible border). Level 1. */
+@utility surface-paper {
+  background-color: var(--color-surface-raised);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.7),
+    0 0 0 1px rgb(10 22 41 / 0.05),
+    0 1px 2px rgb(10 22 41 / 0.04);
+}
+
+/* Raised interactive paper. Level 2 at rest; lifts on hover. */
+@utility surface-paper-raised {
+  background-color: var(--color-surface-raised);
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.55),
+    transparent 3rem
+  );
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.75),
+    0 0 0 1px rgb(10 22 41 / 0.05),
+    0 1px 2px rgb(10 22 41 / 0.05),
+    0 4px 14px rgb(10 22 41 / 0.05);
+}
+
+/* Deep navy intelligence surface: radial inner light (top-start sun),
+   blue-black depth, warm gold edge reflection, premium inner border,
+   deep layered shadow. The material of עמית and the summary. */
+@utility surface-navy {
+  background-color: var(--color-ink-900);
+  background-image:
+    radial-gradient(
+      42rem 26rem at 92% -4rem,
+      rgb(58 76 104 / 0.55),
+      transparent 62%
+    ),
+    linear-gradient(200deg, rgb(18 35 63 / 0.6), rgb(8 17 33 / 0.9));
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.09),
+    inset 0 0 0 1px rgb(201 169 97 / 0.14),
+    0 2px 8px rgb(10 22 41 / 0.12),
+    0 18px 48px rgb(10 22 41 / 0.22);
+}

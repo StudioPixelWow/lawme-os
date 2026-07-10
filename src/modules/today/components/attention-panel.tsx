@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { ClockGlyph } from "@/design-system/icons/glyphs";
+import {
+  ClockGlyph,
+  CourtGlyph,
+  DocumentGlyph,
+  UserGlyph,
+} from "@/design-system/icons/glyphs";
+import { IconContainer } from "@/design-system/primitives/icon-container";
+import { StatusText } from "@/design-system/primitives/indicators";
 import { ATTENTION_ITEMS, PRIORITY_LABELS } from "../data";
-import { ToneChip } from "./section-heading";
 
 const ATTENTION_LINKS: Record<string, string> = {
   "att-1": "/matters",
@@ -9,9 +15,15 @@ const ATTENTION_LINKS: Record<string, string> = {
   "att-3": "/clients",
 };
 
+const KIND_ICON = {
+  hearing: { Glyph: CourtGlyph, variant: "urgent" as const },
+  document: { Glyph: DocumentGlyph, variant: "document" as const },
+  client: { Glyph: UserGlyph, variant: "client" as const },
+};
+
 /**
  * The attention surface — large, elegant cards:
- * time · priority · matter · one concrete action each.
+ * semantic icon · time · priority · matter · one concrete action.
  */
 export function AttentionPanel() {
   return (
@@ -27,28 +39,32 @@ export function AttentionPanel() {
 
       {ATTENTION_ITEMS.map((item) => {
         const priority = PRIORITY_LABELS[item.priority];
+        const { Glyph, variant } = KIND_ICON[item.kind];
         return (
           <article
             key={item.id}
-            className="group rounded-xl bg-surface-raised p-5 shadow-raised transition-all hover:-translate-y-0.5 hover:shadow-float"
+            className="group surface-paper-raised rounded-xl p-5 transition-all hover:-translate-y-0.5 hover:shadow-lift"
             style={{ transitionDuration: "var(--motion-settle)" }}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-start gap-4">
+              <IconContainer variant={variant} size="lg" interactive>
+                <Glyph size={20} />
+              </IconContainer>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <h3 className="text-subheading font-semibold text-foreground">
                     {item.title}
                   </h3>
-                  <ToneChip
-                    label={priority.label}
-                    tone={
-                      priority.tone === "neutral" ? "neutral" : priority.tone
-                    }
-                  />
+                  <StatusText status={priority.status}>
+                    {priority.label}
+                  </StatusText>
                 </div>
-                <p className="mt-1.5 truncate text-small text-foreground-soft">
+                <p className="mt-1 truncate text-small text-foreground-soft">
                   {item.matter}
-                  <span className="text-foreground-faint"> · {item.detail}</span>
+                  <span className="text-foreground-faint">
+                    {" "}
+                    · {item.detail}
+                  </span>
                 </p>
               </div>
               <span className="flex shrink-0 items-center gap-1.5 pt-1 text-small font-medium tabular-nums text-foreground-soft">

@@ -44,6 +44,40 @@
   --color-critical: #a63e3a;
   --color-critical-wash: #f7e7e5;
 
+  /* ---- Status layer — a complete identity per state.
+     Each: ink (text/icon on paper) · wash (tint) · onnavy (dark-surface).
+     Docs: docs/reviews/morning-workspace-v2/CHANGELOG.md ---- */
+  --color-status-urgent: #b54a3c;        /* warm coral, never primary red */
+  --color-status-urgent-wash: #f7e8e4;
+  --color-status-urgent-onnavy: #e8998a;
+  --color-status-today: #a6641f;         /* champagne amber */
+  --color-status-today-wash: #f7edde;
+  --color-status-today-onnavy: #e5b778;
+  --color-status-waiting: #63738c;       /* muted blue-grey, calm */
+  --color-status-waiting-wash: #edf0f4;
+  --color-status-waiting-onnavy: #a9b6c9;
+  --color-status-progress: #3e6a96;      /* refined blue */
+  --color-status-progress-wash: #e8eff5;
+  --color-status-progress-onnavy: #8fb4d9;
+  --color-status-new: #3e8577;           /* soft teal */
+  --color-status-new-wash: #e6f1ee;
+  --color-status-new-onnavy: #86c4b4;
+  --color-status-completed: #356b52;     /* deep elegant green */
+  --color-status-completed-wash: #e9f1ec;
+  --color-status-completed-onnavy: #8ac0a6;
+  --color-status-risk: #a05252;          /* warm desaturated red */
+  --color-status-risk-wash: #f5e9e8;
+  --color-status-risk-onnavy: #da9c93;
+  --color-status-scheduled: #46618c;     /* soft indigo-blue, never purple */
+  --color-status-scheduled-wash: #eaedf5;
+  --color-status-scheduled-onnavy: #9aaed6;
+  --color-status-reviewed: #4a7a80;      /* refined slate green-blue */
+  --color-status-reviewed-wash: #e7f0f1;
+  --color-status-reviewed-onnavy: #93c0c4;
+  --color-status-signed: #2f6e5a;        /* emerald (pairs with gold at use-site) */
+  --color-status-signed-wash: #e8f1ed;
+  --color-status-signed-onnavy: #82c3a9;
+
   /* ---- Aliases — what components actually use ---- */
   --color-surface: var(--color-paper-50);
   --color-surface-raised: var(--color-paper-0);

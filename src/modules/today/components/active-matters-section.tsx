@@ -1,9 +1,18 @@
+import Link from "next/link";
+import { BriefcaseGlyph } from "@/design-system/icons/glyphs";
+import { IconContainer } from "@/design-system/primitives/icon-container";
+import {
+  MicroProgress,
+  StateLine,
+  StatusText,
+} from "@/design-system/primitives/indicators";
 import { ACTIVE_MATTERS } from "../data";
-import { SectionHeading, ToneChip } from "./section-heading";
+import { SectionHeading } from "./section-heading";
 
 /**
- * תיקים פעילים — an editorial index: name, client, stage,
- * next event. Rows, hairlines, no card grid.
+ * תיקים פעילים — a premium operational index: state line, icon,
+ * matter, client, practice area, owner, status, next event,
+ * readiness. Hover exposes the main next action.
  */
 export function ActiveMattersSection() {
   return (
@@ -14,7 +23,7 @@ export function ActiveMattersSection() {
         href="/matters"
         linkLabel="כל התיקים"
       />
-      <ul className="mt-5 flex-1 rounded-xl bg-surface-raised shadow-hairline">
+      <ul className="surface-paper mt-5 flex-1 rounded-xl">
         {ACTIVE_MATTERS.map((matter, index) => (
           <li
             key={matter.id}
@@ -23,30 +32,46 @@ export function ActiveMattersSection() {
             }`}
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
-            <span
-              aria-hidden
-              className={`absolute inset-y-3 start-0 w-0.5 rounded-pill ${
-                matter.tone === "critical"
-                  ? "bg-critical"
-                  : matter.tone === "caution"
-                    ? "bg-caution"
-                    : matter.tone === "positive"
-                      ? "bg-positive"
-                      : "bg-ink-200"
-              }`}
-            />
-            <div className="flex items-center justify-between gap-3">
-              <p className="truncate text-small font-semibold text-foreground">
+            <StateLine status={matter.status} />
+            <div className="flex items-center gap-3">
+              <IconContainer
+                variant={matter.status === "urgent" ? "urgent" : "neutral"}
+                size="sm"
+                interactive
+              >
+                <BriefcaseGlyph size={14} />
+              </IconContainer>
+              <p className="min-w-0 flex-1 truncate text-small font-semibold text-foreground">
                 {matter.name}
               </p>
-              <ToneChip label={matter.stage} tone={matter.tone} />
+              <StatusText status={matter.status}>
+                {matter.statusLabel}
+              </StatusText>
             </div>
-            <p className="mt-1 truncate text-caption text-foreground-soft">
-              {matter.client} · {matter.nextEvent}
+            <p className="mt-1.5 truncate text-caption text-foreground-soft">
+              {matter.client} · {matter.practiceArea} · {matter.nextEvent}
             </p>
-            <p className="mt-0.5 text-micro text-foreground-faint">
-              עדכון אחרון: {matter.lastUpdate}
-            </p>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <span className="flex items-center gap-2 text-micro text-foreground-faint">
+                <span>עו״ד {matter.owner}</span>
+                <span aria-hidden>·</span>
+                <span>{matter.lastUpdate}</span>
+              </span>
+              <span className="flex items-center gap-3">
+                <MicroProgress
+                  value={matter.progress}
+                  status={matter.progress >= 0.8 ? "completed" : "progress"}
+                  label="מוכנות"
+                />
+                <Link
+                  href="/matters"
+                  className="rounded-xs text-micro font-medium text-foreground opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                  style={{ transitionDuration: "var(--motion-quick)" }}
+                >
+                  {matter.action} ←
+                </Link>
+              </span>
+            </div>
           </li>
         ))}
       </ul>

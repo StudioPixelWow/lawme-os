@@ -12,6 +12,7 @@
 @import "../design-system/tokens/radius.css";
 @import "../design-system/tokens/elevation.css";
 @import "../design-system/tokens/glass.css";
+@import "../design-system/tokens/light.css";
 @import "../design-system/tokens/motion.css";
 
 @theme {
@@ -43,6 +44,19 @@
 
   body {
     background-color: var(--color-surface);
+    /* the lit environment: dawn near the hero, cool depth far away */
+    background-image:
+      radial-gradient(
+        90rem 48rem at 100% -8rem,
+        color-mix(in srgb, #c9a961 5%, transparent),
+        transparent 65%
+      ),
+      radial-gradient(
+        80rem 52rem at -10% 110%,
+        color-mix(in srgb, #0a1629 3.5%, transparent),
+        transparent 70%
+      );
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-size: var(--text-body);

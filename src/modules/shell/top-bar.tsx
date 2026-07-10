@@ -35,7 +35,7 @@ export function TopBar() {
         <button
           type="button"
           onClick={() => setCommandOpen(true)}
-          className="group hidden h-10 flex-1 items-center gap-3 rounded-lg bg-surface-raised/70 px-4 text-small text-foreground-faint shadow-hairline transition-all hover:bg-surface-raised hover:shadow-raised sm:flex md:max-w-xl"
+          className="group surface-paper hidden h-10 flex-1 items-center gap-3 rounded-lg px-4 text-small text-foreground-faint transition-all hover:shadow-lift sm:flex md:max-w-xl"
           style={{ transitionDuration: "var(--motion-quick)" }}
         >
           <SearchGlyph size={16} className="shrink-0" />

@@ -38,34 +38,3 @@ export function SectionHeading({
     </div>
   );
 }
-
-/** Small status chip: dot + word — never a loud badge. */
-export function ToneChip({
-  label,
-  tone,
-}: {
-  label: string;
-  tone: "critical" | "caution" | "positive" | "neutral";
-}) {
-  const tones = {
-    critical: "bg-critical-wash text-critical",
-    caution: "bg-caution-wash text-caution",
-    positive: "bg-positive-wash text-positive",
-    neutral: "bg-surface-sunken text-foreground-soft",
-  } as const;
-  const dots = {
-    critical: "bg-critical",
-    caution: "bg-caution",
-    positive: "bg-positive",
-    neutral: "bg-ink-300",
-  } as const;
-
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-1.5 rounded-pill px-2.5 py-0.5 text-micro font-medium ${tones[tone]}`}
-    >
-      <span aria-hidden className={`h-1.5 w-1.5 rounded-pill ${dots[tone]}`} />
-      {label}
-    </span>
-  );
-}

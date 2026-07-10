@@ -13,7 +13,7 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
       aria-label="פתיח הבוקר"
       className="grid grid-cols-1 gap-8 lg:grid-cols-[7fr_5fr] lg:gap-10"
     >
-      <div className="animate-rise flex flex-col pt-2 lg:pt-6">
+      <div className="animate-rise flex min-w-0 flex-col pt-2 lg:pt-6">
         <p className="text-caption font-medium tracking-wide text-foreground-faint">
           {dateLine}
         </p>
@@ -28,7 +28,7 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
         </div>
       </div>
 
-      <div className="animate-rise" style={{ animationDelay: "120ms" }}>
+      <div className="animate-rise min-w-0" style={{ animationDelay: "120ms" }}>
         <AIIntelligencePanel />
       </div>
     </section>

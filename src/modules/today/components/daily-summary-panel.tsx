@@ -9,7 +9,7 @@ export function DailySummaryPanel() {
   return (
     <section
       aria-label="סיכום יומי"
-      className="flex h-full flex-col rounded-xl bg-ink-900 p-6 shadow-float"
+      className="surface-navy flex h-full flex-col rounded-xl p-6"
     >
       <div className="flex items-center gap-2.5">
         <h2 className="text-heading font-semibold text-paper-50">סיכום יומי</h2>

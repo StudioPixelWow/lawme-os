@@ -1,13 +1,28 @@
 "use client";
 
-import { SparkleGlyph } from "@/design-system/icons/glyphs";
+import {
+  AlertGlyph,
+  BookGlyph,
+  SparkleGlyph,
+  TaskGlyph,
+  TrendGlyph,
+} from "@/design-system/icons/glyphs";
+import { IconContainer } from "@/design-system/primitives/icon-container";
+import { AIMark } from "@/design-system/primitives/indicators";
 import { useShell } from "@/modules/shell";
 import { AI_FINDINGS, AI_STATUS } from "../data";
 
+const FINDING_ICON = {
+  precedent: { Glyph: BookGlyph, variant: "info" as const },
+  opportunity: { Glyph: TrendGlyph, variant: "success" as const },
+  risk: { Glyph: AlertGlyph, variant: "urgent" as const },
+  ready: { Glyph: TaskGlyph, variant: "gold" as const },
+};
+
 /**
- * עמית's intelligence surface — a real operating interface on deep navy:
- * status, calm progress, four live findings, provenance, one action.
- * The only dark region of the workspace; gold is data, not decoration.
+ * עמית's intelligence surface — the brain of the office, on deep
+ * lit navy: context, calm progress, four rich findings (icon,
+ * count, explanation, action), provenance, one CTA.
  */
 export function AIIntelligencePanel() {
   const { setAssistantOpen } = useShell();
@@ -15,7 +30,7 @@ export function AIIntelligencePanel() {
   return (
     <section
       aria-label="עמית — מרכז הבינה של המשרד"
-      className="flex h-full flex-col rounded-xl bg-ink-900 p-6 shadow-float"
+      className="surface-navy flex h-full flex-col rounded-xl p-6"
     >
       <div className="flex items-center gap-3">
         <SparkleGlyph size={20} className="text-gold-400" />
@@ -41,7 +56,7 @@ export function AIIntelligencePanel() {
           aria-valuenow={AI_STATUS.progress}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="התקדמות ניתוח הבוקר"
+          aria-label={AI_STATUS.progressLabel}
           className="h-1 flex-1 overflow-hidden rounded-pill bg-ink-700"
         >
           <div
@@ -53,26 +68,45 @@ export function AIIntelligencePanel() {
           {AI_STATUS.progress}%
         </span>
       </div>
+      <p className="mt-1.5 text-micro text-ink-200">
+        {AI_STATUS.progressLabel}
+      </p>
 
-      <dl className="mt-6 grid grid-cols-2 gap-3">
-        {AI_FINDINGS.map((finding) => (
-          <div
-            key={finding.id}
-            className="rounded-md border border-paper-0/10 bg-ink-800/70 p-3.5 transition-all hover:-translate-y-0.5 hover:border-gold-500/30 hover:bg-ink-800"
-            style={{ transitionDuration: "var(--motion-quick)" }}
-          >
-            <dd className="text-title font-semibold tabular-nums text-paper-0">
-              {finding.count}
-            </dd>
-            <dt className="mt-1 text-small font-medium text-ink-100">
-              {finding.label}
-            </dt>
-            <p className="mt-1 text-micro leading-relaxed text-ink-200">
-              {finding.detail}
-            </p>
-          </div>
-        ))}
-      </dl>
+      <ul className="mt-6 flex flex-1 flex-col gap-2.5">
+        {AI_FINDINGS.map((finding) => {
+          const { Glyph, variant } = FINDING_ICON[finding.kind];
+          return (
+            <li
+              key={finding.id}
+              className="group flex items-center gap-3.5 rounded-md border border-paper-0/10 bg-ink-800/60 p-3.5 transition-all hover:-translate-y-px hover:border-gold-500/30 hover:bg-ink-800"
+              style={{ transitionDuration: "var(--motion-quick)" }}
+            >
+              <IconContainer variant={variant} surface="navy" interactive>
+                <Glyph size={17} />
+              </IconContainer>
+              <div className="min-w-0 flex-1">
+                <p className="flex min-w-0 items-baseline gap-2 text-small font-semibold text-paper-0">
+                  <span className="truncate">{finding.label}</span>
+                  <span className="shrink-0 text-subheading font-semibold tabular-nums text-gold-300">
+                    {finding.count}
+                  </span>
+                </p>
+                <p className="mt-0.5 truncate text-micro leading-relaxed text-ink-200">
+                  {finding.detail}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAssistantOpen(true)}
+                className="shrink-0 rounded-xs text-micro font-medium text-ink-200 transition-colors hover:text-gold-300"
+                style={{ transitionDuration: "var(--motion-quick)" }}
+              >
+                {finding.action} ←
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
       <button
         type="button"
@@ -85,7 +119,7 @@ export function AIIntelligencePanel() {
       </button>
 
       <p className="mt-4 flex items-center gap-1.5 border-t border-paper-0/10 pt-4 text-micro text-ink-200">
-        <SparkleGlyph size={11} className="shrink-0 text-gold-400" />
+        <AIMark surface="navy" />
         נוצר על ידי עמית · מקורות: {AI_STATUS.sources}
       </p>
     </section>

@@ -1,30 +1,37 @@
 /* ============================================================
-   Shayish · Glass tokens — THE single glass recipe
-   Glass = ephemeral intelligence: command bar, עמית panel,
-   sticky context headers, overlay scrims. Content is never glass.
-   Docs: docs/design-system/05-shape-depth-glass.md
+   Shayish · Glass tokens — THE single glass recipe.
+   Real Apple-grade glass: translucency, controlled blur, colour
+   pickup, a thin luminous inner edge, layered light and depth.
+   Glass = the live layer: top bar, rail, command bar, עמית panel,
+   the active timeline moment, floating controls. Content is never
+   glass. Docs: docs/design-system/05-shape-depth-glass.md
    ============================================================ */
 
 :root {
-  --glass-bg: color-mix(in srgb, #fbf9f5 72%, transparent);
+  --glass-bg: color-mix(in srgb, #fbf9f5 68%, transparent);
   --glass-bg-fallback: color-mix(in srgb, #fffefc 96%, transparent);
-  --glass-blur: 20px;
-  --glass-saturate: 1.4;
+  --glass-blur: 24px;
+  --glass-saturate: 1.5;
 }
 
 /* The only sanctioned way to render glass. */
 @utility glass {
   background-color: var(--glass-bg-fallback);
-  /* catch-light: a crisp top edge + a soft wash of light falling in */
+  /* layered light: luminous inner edge → top catch-light → soft
+     inner wash → hairline seat → depth; bottom picks up a hint of
+     the navy beneath (the "reflection"). */
   box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.65),
-    inset 0 16px 32px -20px rgb(255 255 255 / 0.55),
+    inset 0 0 0 1px rgb(255 255 255 / 0.38),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.75),
+    inset 0 18px 36px -24px rgb(255 255 255 / 0.6),
+    inset 0 -14px 28px -22px rgb(10 22 41 / 0.14),
     0 0 0 1px rgb(10 22 41 / 0.05),
     0 12px 40px rgb(10 22 41 / 0.1);
 
   @supports (backdrop-filter: blur(1px)) {
     background-color: var(--glass-bg);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur))
+      saturate(var(--glass-saturate));
     backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   }
 }

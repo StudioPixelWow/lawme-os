@@ -123,3 +123,106 @@ export function PinGlyph({ size, ...rest }: GlyphProps) {
     </svg>
   );
 }
+
+export function UserGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <circle cx="12" cy="8.5" r="3.3" />
+      <path d="M5.5 19.5c.7-3.5 3.2-5.3 6.5-5.3s5.8 1.8 6.5 5.3" />
+    </svg>
+  );
+}
+
+/** בית משפט — institution columns. No gavels, no scales-of-justice cliché. */
+export function CourtGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="m12 3.5 8 4H4l8-4Z" />
+      <path d="M6 10.5V17M10 10.5V17M14 10.5V17M18 10.5V17" />
+      <path d="M4.5 20.5h15M5.5 17.5h13" />
+    </svg>
+  );
+}
+
+export function PhoneGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M7.5 4h3l1 4-2 1.4a11 11 0 0 0 5.1 5.1L16 12.5l4 1v3a2 2 0 0 1-2.2 2A14.8 14.8 0 0 1 5.5 6.2 2 2 0 0 1 7.5 4Z" />
+    </svg>
+  );
+}
+
+export function AlertGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M12 4 3.5 19h17L12 4Z" />
+      <path d="M12 10v4.2M12 16.8v.2" />
+    </svg>
+  );
+}
+
+/** Trend "forward-up" — drawn up-toward-left because forward = left in RTL. */
+export function TrendGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M20 17 14 10.5l-3.5 3L4 7" />
+      <path d="M8.5 7H4v4.5" />
+    </svg>
+  );
+}
+
+export function TaskGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <circle cx="12" cy="12" r="8.2" />
+      <path d="m8.5 12.2 2.4 2.4 4.6-5" />
+    </svg>
+  );
+}
+
+export function CheckGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="m5.5 12.5 4.2 4.2 8.8-9.4" />
+    </svg>
+  );
+}
+
+/** Signature pen. */
+export function PenGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="m14.5 5.5 4 4L8 20H4v-4L14.5 5.5Z" />
+      <path d="m12.5 7.5 4 4" />
+    </svg>
+  );
+}
+
+/** Precedent / knowledge. */
+export function BookGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M12 6.5c-1.6-1.4-3.8-2-7-2v13c3.2 0 5.4.6 7 2 1.6-1.4 3.8-2 7-2v-13c-3.2 0-5.4.6-7 2Z" />
+      <path d="M12 6.5v13" />
+    </svg>
+  );
+}
+
+export function HourglassGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M7 4h10M7 20h10" />
+      <path d="M8 4c0 3.2 1.5 5 4 8-2.5 3-4 4.8-4 8M16 4c0 3.2-1.5 5-4 8 2.5 3 4 4.8 4 8" />
+    </svg>
+  );
+}
+
+/** Billing / hours. */
+export function LedgerGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <rect x="5" y="3.5" width="14" height="17" rx="2" />
+      <path d="M9 8h6M9 12h6M9 16h3.5" />
+    </svg>
+  );
+}

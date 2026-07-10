@@ -35,7 +35,7 @@ export function SideRail() {
   return (
     <nav
       aria-label="ניווט ראשי"
-      className="fixed start-4 top-20 bottom-4 z-30 hidden w-20 flex-col gap-1 rounded-xl bg-surface-raised/95 px-3 py-5 shadow-float md:flex lg:w-56"
+      className="glass fixed start-4 top-20 bottom-4 z-30 hidden w-20 flex-col gap-1 rounded-xl px-3 py-5 md:flex lg:w-56"
     >
       {NAV_ITEMS.map((item) => {
         const active = pathname.startsWith(item.href);
@@ -49,7 +49,7 @@ export function SideRail() {
             className={cx(
               "relative flex h-11 items-center justify-center gap-3 rounded-md px-3 transition-all lg:justify-start",
               active
-                ? "bg-surface-sunken text-foreground shadow-hairline"
+                ? "bg-gold-100/50 text-foreground shadow-gold-glow"
                 : "text-foreground-soft hover:-translate-x-px hover:bg-surface-sunken/60 hover:text-foreground",
             )}
             style={{ transitionDuration: "var(--motion-quick)" }}
