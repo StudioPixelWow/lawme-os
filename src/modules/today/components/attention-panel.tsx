@@ -7,6 +7,7 @@ import {
 } from "@/design-system/icons/glyphs";
 import { IconContainer } from "@/design-system/primitives/icon-container";
 import { StatusText } from "@/design-system/primitives/indicators";
+import { cx } from "@/design-system/utils/cx";
 import { ATTENTION_ITEMS, PRIORITY_LABELS } from "../data";
 
 const ATTENTION_LINKS: Record<string, string> = {
@@ -22,68 +23,76 @@ const KIND_ICON = {
 };
 
 /**
- * The attention surface — large, elegant cards:
- * semantic icon · time · priority · matter · one concrete action.
+ * המסלול — the morning as an operational sequence, not stacked
+ * rectangles: numbered stations on one connected line, in the
+ * order עמית recommends walking them.
  */
 export function AttentionPanel() {
   return (
-    <div className="flex flex-col gap-4">
+    <div>
       <div className="flex items-baseline justify-between px-1">
         <h2 className="text-small font-semibold text-foreground">
-          דורש את תשומת לבך
+          המסלול שלך הבוקר
         </h2>
         <span className="text-micro text-foreground-faint">
-          {ATTENTION_ITEMS.length} פריטים · לפי דחיפות
+          {ATTENTION_ITEMS.length} תחנות · לפי סדר מומלץ
         </span>
       </div>
 
-      {ATTENTION_ITEMS.map((item) => {
-        const priority = PRIORITY_LABELS[item.priority];
-        const { Glyph, variant } = KIND_ICON[item.kind];
-        return (
-          <article
-            key={item.id}
-            className="group surface-paper-raised rounded-xl p-6 transition-all hover:-translate-y-0.5 hover:shadow-lift"
-            style={{ transitionDuration: "var(--motion-settle)" }}
-          >
-            <div className="flex items-start gap-5">
-              <IconContainer variant={variant} size="lg" interactive>
-                <Glyph size={20} />
-              </IconContainer>
-              <div className="min-w-0 flex-1">
+      <ol className="mt-4">
+        {ATTENTION_ITEMS.map((item, index) => {
+          const priority = PRIORITY_LABELS[item.priority];
+          const { Glyph, variant } = KIND_ICON[item.kind];
+          const last = index === ATTENTION_ITEMS.length - 1;
+          return (
+            <li key={item.id} className="relative flex gap-4">
+              {/* the route line */}
+              <div className="flex flex-col items-center">
+                <IconContainer variant={variant} size="md" interactive>
+                  <Glyph size={16} />
+                </IconContainer>
+                {!last ? (
+                  <span aria-hidden className="w-px flex-1 bg-line" />
+                ) : null}
+              </div>
+
+              <div
+                className={cx(
+                  "group min-w-0 flex-1 pt-1",
+                  !last && "pb-6",
+                )}
+              >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <h3 className="text-subheading font-semibold text-foreground">
+                  <span className="text-micro font-semibold tabular-nums text-foreground-faint">
+                    {index + 1}
+                  </span>
+                  <h3 className="text-body font-semibold text-foreground">
                     {item.title}
                   </h3>
                   <StatusText status={priority.status}>
                     {priority.label}
                   </StatusText>
-                </div>
-                <p className="mt-1 truncate text-small text-foreground-soft">
-                  {item.matter}
-                  <span className="text-foreground-faint">
-                    {" "}
-                    · {item.detail}
+                  <span className="ms-auto flex shrink-0 items-center gap-1 text-caption tabular-nums text-foreground-soft">
+                    <ClockGlyph size={12} className="text-foreground-faint" />
+                    {item.time}
                   </span>
+                </div>
+                <p className="mt-1 truncate text-caption text-foreground-soft">
+                  {item.matter}
+                  <span className="text-foreground-faint"> · {item.detail}</span>
                 </p>
+                <Link
+                  href={ATTENTION_LINKS[item.id] ?? "/matters"}
+                  className="mt-1.5 inline-block rounded-xs text-caption font-medium text-foreground transition-colors hover:text-gold-700"
+                  style={{ transitionDuration: "var(--motion-quick)" }}
+                >
+                  {item.action} ←
+                </Link>
               </div>
-              <span className="flex shrink-0 items-center gap-1.5 pt-1 text-small font-medium tabular-nums text-foreground-soft">
-                <ClockGlyph size={14} className="text-foreground-faint" />
-                {item.time}
-              </span>
-            </div>
-            <div className="mt-5 border-t border-line/50 pt-3.5">
-              <Link
-                href={ATTENTION_LINKS[item.id] ?? "/matters"}
-                className="rounded-xs text-small font-medium text-foreground transition-colors group-hover:text-gold-700"
-                style={{ transitionDuration: "var(--motion-quick)" }}
-              >
-                {item.action} ←
-              </Link>
-            </div>
-          </article>
-        );
-      })}
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

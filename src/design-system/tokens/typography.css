@@ -9,7 +9,7 @@
 
 @theme {
   /* The workspace hero — one per product surface (בוקר טוב, דניאל) */
-  --text-hero: clamp(2.75rem, 2rem + 3vw, 4.25rem);
+  --text-hero: clamp(2.75rem, 2rem + 3.2vw, 4.5rem);
   --text-hero--line-height: 1.05;
   --text-hero--letter-spacing: -0.02em;
   --text-hero--font-weight: 700;

@@ -63,6 +63,58 @@ export const ATTENTION_ITEMS: AttentionItem[] = [
 /** Static mock "now" for the timeline's day-progress marker. */
 export const TIMELINE_NOW = { label: "10:42", position: 0.38 };
 
+/* ============================================================
+   Dynamic hero — the day-aware opening experience.
+   The hero adapts to the shape of the day: a hearing day leads
+   with the hearing; a calm day leads with drafts and clients;
+   a high-load day narrows to three priorities; a quiet day turns
+   inspirational. Today's mock is a hearing day.
+   ============================================================ */
+
+export type HeroMode = "hearing" | "calm" | "high-load" | "quiet";
+
+export const HERO_DAY: {
+  mode: HeroMode;
+  signature: string;
+  aiLine: string;
+} = {
+  mode: "hearing",
+  signature: "יום דיונים · המיקוד: כהן נ׳ לוי",
+  aiLine:
+    "יום ממוקד־דיון. ההיערכות כמעט הושלמה — נותרו שני נספחים וסקירת הפסיקה החדשה, והדרך פנויה עד 11:30.",
+};
+
+export type HeroChecklistState = "ready" | "suggested" | "missing";
+
+export const HERO_FOCUS = {
+  countdown: "בעוד 48 דק׳",
+  time: "11:30",
+  title: "דיון הוכחות — כהן נ׳ לוי",
+  location: "בימ״ש השלום ת״א · אולם 304 · השופטת ברק־נבו",
+  readiness: 0.85,
+  checklist: [
+    { id: "hc-1", label: "תדריך הדיון", state: "ready" as HeroChecklistState },
+    {
+      id: "hc-2",
+      label: "תצהיר עדות מעודכן",
+      state: "ready" as HeroChecklistState,
+    },
+    {
+      id: "hc-3",
+      label: "אזכור ע״א 4881/25 בטיעון",
+      state: "suggested" as HeroChecklistState,
+    },
+    {
+      id: "hc-4",
+      label: "2 נספחים לכתב התשובה",
+      state: "missing" as HeroChecklistState,
+    },
+  ],
+  documents: ["תצהיר עדות ראשית", "כתב הגנה — הנתבעת"],
+  team: ["דניאל", "מיכל"],
+  cta: "פתח את תדריך הדיון",
+};
+
 export type AIFinding = {
   id: string;
   kind: "precedent" | "opportunity" | "risk" | "ready";

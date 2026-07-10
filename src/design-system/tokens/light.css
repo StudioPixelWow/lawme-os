@@ -48,6 +48,35 @@
     0 4px 14px rgb(10 22 41 / 0.05);
 }
 
+/* The hero stage — the signature opening surface of LawME.
+   Layered light on premium ivory: dawn falling from the top-start,
+   an almost-invisible cool depth at the far corner, a crisp inner
+   top highlight and a deep, soft seat in the environment. */
+@utility surface-hero {
+  background-color: var(--color-paper-0);
+  background-image:
+    radial-gradient(
+      64rem 36rem at 96% -6rem,
+      color-mix(in srgb, #c9a961 8%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      48rem 30rem at -8% 112%,
+      color-mix(in srgb, #0a1629 4%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      205deg,
+      color-mix(in srgb, #fffefc 92%, transparent),
+      color-mix(in srgb, #fbf9f5 96%, transparent)
+    );
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.85),
+    inset 0 0 0 1px rgb(10 22 41 / 0.04),
+    0 2px 8px rgb(10 22 41 / 0.04),
+    0 28px 72px rgb(10 22 41 / 0.09);
+}
+
 /* A soft champagne light-bloom — placed BEHIND a key surface (the
    hero's intelligence anchor). Absolutely positioned, never on content. */
 @utility bloom-gold {
