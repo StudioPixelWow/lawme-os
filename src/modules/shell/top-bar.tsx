@@ -15,8 +15,8 @@ export function TopBar() {
   const { setCommandOpen, assistantOpen, setAssistantOpen } = useShell();
 
   return (
-    <header className="glass sticky top-0 z-40">
-      <div className="flex h-16 w-full items-center gap-3 px-4 md:gap-6 md:px-8">
+    <header className="glass fixed inset-x-3 top-3 z-40 rounded-xl md:inset-x-8 md:top-5 lg:inset-x-10">
+      <div className="flex h-16 w-full items-center gap-3 px-4 md:gap-7 md:px-6">
         <Link
           href="/today"
           aria-label="LawME — היום"
@@ -35,7 +35,7 @@ export function TopBar() {
         <button
           type="button"
           onClick={() => setCommandOpen(true)}
-          className="group surface-paper hidden h-10 flex-1 items-center gap-3 rounded-lg px-4 text-small text-foreground-faint transition-all hover:shadow-lift sm:flex md:max-w-xl"
+          className="group surface-paper mx-auto hidden h-11 flex-1 items-center gap-3 rounded-lg px-5 text-small text-foreground-faint transition-all hover:shadow-lift sm:flex md:max-w-2xl"
           style={{ transitionDuration: "var(--motion-quick)" }}
         >
           <SearchGlyph size={16} className="shrink-0" />

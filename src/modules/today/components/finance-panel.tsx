@@ -106,7 +106,7 @@ export function FinancePanel() {
               <dt className="text-micro text-foreground-faint">
                 {total.label}
               </dt>
-              <dd className="mt-0.5 text-small font-semibold tabular-nums text-foreground">
+              <dd className="mt-1 text-subheading font-semibold tracking-tight tabular-nums text-foreground">
                 {total.value}
               </dd>
               <StatusText status={total.trendStatus} className="mt-0.5">

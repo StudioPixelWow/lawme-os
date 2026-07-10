@@ -55,7 +55,7 @@ export function DailyTimeline() {
         <div aria-hidden className="absolute inset-x-2 top-1 hidden xl:block">
           <div className="relative h-px w-full bg-line">
             <div
-              className="absolute inset-y-0 start-0 bg-ink-300"
+              className="absolute inset-y-0 start-0 bg-gold-500/70 shadow-gold-breath"
               style={{ width: `${TIMELINE_NOW.position * 100}%` }}
             />
           </div>
@@ -72,7 +72,7 @@ export function DailyTimeline() {
           </span>
         </div>
 
-        <ol className="scrollbar-none flex snap-x snap-mandatory gap-4 overflow-x-auto pt-6 pb-1 xl:grid xl:grid-cols-6 xl:overflow-visible xl:pt-8">
+        <ol className="scrollbar-none flex snap-x snap-mandatory gap-4 overflow-x-auto pt-6 pb-2 xl:grid xl:grid-cols-6 xl:overflow-visible xl:pt-8">
           {TIMELINE_EVENTS.map((event) => {
             const next = event.status === "next";
             const done = event.status === "done";
@@ -89,7 +89,7 @@ export function DailyTimeline() {
                     next
                       ? "bg-gold-500 shadow-gold-breath"
                       : done
-                        ? "bg-ink-300"
+                        ? "bg-gold-600/60"
                         : "border border-ink-200 bg-surface",
                   )}
                 />
@@ -104,7 +104,7 @@ export function DailyTimeline() {
                   tabIndex={0}
                   aria-label={`${event.time} · ${event.title}`}
                   className={cx(
-                    "h-full rounded-lg p-4 transition-all",
+                    "h-full rounded-lg p-4 transition-all xl:p-4.5",
                     next
                       ? "glass border-s-2 border-accent shadow-gold-glow xl:-translate-y-1"
                       : done
@@ -129,7 +129,7 @@ export function DailyTimeline() {
                     </span>
                     {next ? (
                       <span className="min-w-0 truncate rounded-pill bg-gold-100 px-2 py-0.5 text-micro font-medium text-gold-700">
-                        בעוד 48 דק׳
+                        48 דק׳
                       </span>
                     ) : (
                       <StatusText status={done ? "completed" : kind.status}>

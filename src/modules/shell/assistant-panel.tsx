@@ -21,7 +21,7 @@ export function AssistantPanel() {
       inert={!assistantOpen}
       className={cx(
         "glass fixed z-40 flex flex-col rounded-xl",
-        "end-3 top-20 bottom-20 w-[min(24rem,calc(100vw-1.5rem))] md:bottom-6 md:end-6",
+        "end-3 top-24 bottom-20 w-[min(24rem,calc(100vw-1.5rem))] md:top-28 md:bottom-6 md:end-6",
         "ease-settle transition-all",
         assistantOpen
           ? "translate-x-0 opacity-100"

@@ -11,19 +11,19 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
   return (
     <section
       aria-label="פתיח הבוקר"
-      className="grid grid-cols-1 gap-8 lg:grid-cols-[7fr_5fr] lg:gap-10"
+      className="grid grid-cols-1 gap-8 lg:grid-cols-[7fr_5fr] lg:gap-12"
     >
       <div className="animate-rise flex min-w-0 flex-col pt-2 lg:pt-6">
-        <p className="text-caption font-medium tracking-wide text-foreground-faint">
+        <p className="text-caption font-medium tracking-wider text-foreground-faint">
           {dateLine}
         </p>
         <h1 className="mt-4 text-hero text-balance text-foreground">
           בוקר טוב, דניאל.
         </h1>
-        <p className="mt-3 text-subheading text-foreground-soft">
+        <p className="mt-4 text-subheading text-foreground-soft">
           הנה מה שחשוב היום.
         </p>
-        <div className="mt-12 flex-1">
+        <div className="mt-14 flex-1">
           <AttentionPanel />
         </div>
       </div>

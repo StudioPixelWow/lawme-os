@@ -30,7 +30,7 @@ export function AIIntelligencePanel() {
   return (
     <section
       aria-label="עמית — מרכז הבינה של המשרד"
-      className="surface-navy flex h-full flex-col rounded-xl p-6"
+      className="surface-navy flex h-full flex-col rounded-xl p-7"
     >
       <div className="flex items-center gap-3">
         <SparkleGlyph size={20} className="text-gold-400" />
@@ -43,7 +43,7 @@ export function AIIntelligencePanel() {
         </span>
       </div>
 
-      <p className="mt-5 flex items-center gap-2 text-small text-ink-100">
+      <p className="mt-6 flex items-center gap-2 text-small text-ink-100">
         <span
           aria-hidden
           className="animate-breath h-1.5 w-1.5 shrink-0 rounded-pill bg-gold-400"
@@ -72,13 +72,13 @@ export function AIIntelligencePanel() {
         {AI_STATUS.progressLabel}
       </p>
 
-      <ul className="mt-6 flex flex-1 flex-col gap-2.5">
+      <ul className="mt-7 flex flex-1 flex-col gap-3">
         {AI_FINDINGS.map((finding) => {
           const { Glyph, variant } = FINDING_ICON[finding.kind];
           return (
             <li
               key={finding.id}
-              className="group flex items-center gap-3.5 rounded-md border border-paper-0/10 bg-ink-800/60 p-3.5 transition-all hover:-translate-y-px hover:border-gold-500/30 hover:bg-ink-800"
+              className="group flex items-center gap-4 rounded-md border border-paper-0/10 bg-ink-800/60 p-4 transition-all hover:-translate-y-px hover:border-gold-500/30 hover:bg-ink-800"
               style={{ transitionDuration: "var(--motion-quick)" }}
             >
               <IconContainer variant={variant} surface="navy" interactive>
@@ -111,7 +111,7 @@ export function AIIntelligencePanel() {
       <button
         type="button"
         onClick={() => setAssistantOpen(true)}
-        className="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-gold-500/50 text-small font-medium text-gold-300 transition-all hover:border-gold-400 hover:bg-gold-500/10"
+        className="mt-7 flex h-11 w-full items-center justify-center gap-2 rounded-md border border-gold-500/50 text-small font-medium text-gold-300 transition-all hover:border-gold-400 hover:bg-gold-500/10"
         style={{ transitionDuration: "var(--motion-quick)" }}
       >
         לצפייה בכל התובנות

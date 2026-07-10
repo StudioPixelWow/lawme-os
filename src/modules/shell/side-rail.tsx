@@ -35,7 +35,7 @@ export function SideRail() {
   return (
     <nav
       aria-label="ניווט ראשי"
-      className="glass fixed start-4 top-20 bottom-4 z-30 hidden w-20 flex-col gap-1 rounded-xl px-3 py-5 md:flex lg:w-56"
+      className="glass fixed start-4 top-28 bottom-4 z-30 hidden w-20 flex-col gap-1.5 rounded-xl px-3 py-5 md:flex lg:start-6 lg:w-56"
     >
       {NAV_ITEMS.map((item) => {
         const active = pathname.startsWith(item.href);

@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
       <TopBar />
       <SideRail />
-      <div className="md:ps-28 lg:ps-64">
+      <div className="pt-20 md:ps-28 md:pt-24 lg:ps-72">
         <main id="main" className="pb-28 md:pb-0">
           {children}
         </main>

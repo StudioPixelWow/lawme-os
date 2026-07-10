@@ -43,10 +43,10 @@ export function AttentionPanel() {
         return (
           <article
             key={item.id}
-            className="group surface-paper-raised rounded-xl p-5 transition-all hover:-translate-y-0.5 hover:shadow-lift"
+            className="group surface-paper-raised rounded-xl p-6 transition-all hover:-translate-y-0.5 hover:shadow-lift"
             style={{ transitionDuration: "var(--motion-settle)" }}
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-5">
               <IconContainer variant={variant} size="lg" interactive>
                 <Glyph size={20} />
               </IconContainer>
@@ -72,7 +72,7 @@ export function AttentionPanel() {
                 {item.time}
               </span>
             </div>
-            <div className="mt-4 border-t border-line/60 pt-3">
+            <div className="mt-5 border-t border-line/50 pt-3.5">
               <Link
                 href={ATTENTION_LINKS[item.id] ?? "/matters"}
                 className="rounded-xs text-small font-medium text-foreground transition-colors group-hover:text-gold-700"

@@ -25,12 +25,12 @@ export default function TodayPage() {
     <Workspace width="wide">
       <MorningHero dateLine={<TodayDate />} />
 
-      <div className="animate-rise mt-14" style={{ animationDelay: "200ms" }}>
+      <div className="animate-rise mt-16 md:mt-20" style={{ animationDelay: "200ms" }}>
         <DailyTimeline />
       </div>
 
       <div
-        className="animate-rise mt-14 grid grid-cols-1 gap-8 lg:grid-cols-3"
+        className="animate-rise mt-16 grid grid-cols-1 gap-8 md:mt-20 lg:grid-cols-3"
         style={{ animationDelay: "280ms" }}
       >
         <ActiveMattersSection />
@@ -39,7 +39,7 @@ export default function TodayPage() {
       </div>
 
       <div
-        className="animate-rise mt-14 grid grid-cols-1 gap-8 lg:grid-cols-3"
+        className="animate-rise mt-16 grid grid-cols-1 gap-8 md:mt-20 lg:grid-cols-3"
         style={{ animationDelay: "360ms" }}
       >
         <DailySummaryPanel />
