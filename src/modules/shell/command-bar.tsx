@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchGlyph, SparkleGlyph } from "@/design-system/icons/glyphs";
+import { Kbd } from "@/design-system/primitives/kbd";
 import { cx } from "@/design-system/utils/cx";
 import { NAV_ITEMS } from "@/config/navigation";
 import { useShell } from "./shell-provider";
@@ -119,6 +120,15 @@ function CommandDialog() {
             </span>
           </button>
         </div>
+
+        <footer className="flex items-center gap-4 border-t border-line px-5 py-2.5 text-micro text-foreground-faint">
+          <span className="flex items-center gap-1.5">
+            <Kbd>↵</Kbd> ניווט
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Kbd>Esc</Kbd> סגירה
+          </span>
+        </footer>
       </div>
     </div>
   );

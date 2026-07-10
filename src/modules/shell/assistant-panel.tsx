@@ -6,9 +6,10 @@ import { useShell } from "./shell-provider";
 
 /**
  * עמית — the floating AI companion panel (placeholder).
- * Glass, floating at the start edge. The conversation, tools and
- * context-awareness arrive in a later sprint; the presence,
- * material and choreography are final.
+ * Glass, floating at the start edge; slides in from that edge
+ * (physical +x here because the start edge is the right edge in RTL —
+ * an LTR variant would flip this offset). `inert` keeps its controls
+ * out of the tab order while closed.
  * Docs: docs/design-system/11-ai-visual-language.md
  */
 export function AssistantPanel() {
@@ -17,19 +18,22 @@ export function AssistantPanel() {
   return (
     <aside
       aria-label="עמית — העמית המשפטי"
-      aria-hidden={!assistantOpen}
+      inert={!assistantOpen}
       className={cx(
         "glass fixed z-40 flex flex-col rounded-xl",
         "start-3 top-18 bottom-3 w-[min(24rem,calc(100vw-1.5rem))] md:start-6 md:bottom-6",
         "ease-settle transition-all",
         assistantOpen
           ? "translate-x-0 opacity-100"
-          : "pointer-events-none translate-x-6 opacity-0",
+          : "pointer-events-none translate-x-8 opacity-0",
       )}
       style={{ transitionDuration: "var(--motion-scene)" }}
     >
       <header className="flex items-center gap-3 border-b border-line px-5 py-4">
-        <SparkleGlyph size={18} className="animate-breath text-gold-600" />
+        <SparkleGlyph
+          size={18}
+          className={cx("text-gold-600", assistantOpen && "animate-breath")}
+        />
         <div className="flex-1">
           <p className="font-display text-subheading font-medium text-foreground">
             עמית
@@ -42,7 +46,8 @@ export function AssistantPanel() {
           type="button"
           onClick={() => setAssistantOpen(false)}
           aria-label="סגירת עמית"
-          className="flex h-8 w-8 items-center justify-center rounded-pill text-foreground-soft transition-colors duration-150 hover:bg-surface-sunken"
+          className="flex h-8 w-8 items-center justify-center rounded-pill text-foreground-soft transition-colors hover:bg-surface-sunken"
+          style={{ transitionDuration: "var(--motion-quick)" }}
         >
           <CloseGlyph size={16} />
         </button>
@@ -59,6 +64,11 @@ export function AssistantPanel() {
             עמית · דוגמה לאופן שבו תוכן של עמית יופיע
           </p>
         </div>
+
+        <p className="mt-6 px-1 text-caption text-foreground-faint">
+          עמית תמיד יציע — ואתם תמיד תחליטו. שום פעולה לא תתבצע בלי אישור
+          שלכם.
+        </p>
       </div>
 
       <footer className="border-t border-line p-4">

@@ -27,6 +27,15 @@
   outline-offset: 2px;
 }
 
+/* Scrollable chrome (the rail nav) hides its scrollbar. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

@@ -10,13 +10,13 @@ export default function Loading() {
       <span className="sr-only" role="status">
         טוען…
       </span>
-      <div className="h-14 w-64 animate-pulse rounded-sm bg-paper-200" />
+      <div className="h-14 w-64 animate-pulse rounded-sm bg-paper-200/80" />
       <div className="mt-5 h-6 w-96 max-w-full animate-pulse rounded-xs bg-paper-100" />
 
       {[0, 1].map((chapter) => (
         <div key={chapter} className="mt-section">
-          <div className="h-9 w-48 animate-pulse rounded-sm bg-paper-200" />
-          <div className="mt-8 h-44 animate-pulse rounded-lg bg-paper-100" />
+          <div className="h-9 w-48 animate-pulse rounded-sm bg-paper-200/80" />
+          <div className="mt-8 h-52 animate-pulse rounded-xl bg-paper-100/70" />
         </div>
       ))}
     </Workspace>

@@ -15,8 +15,10 @@
 /* The only sanctioned way to render glass. */
 @utility glass {
   background-color: var(--glass-bg-fallback);
+  /* catch-light: a crisp top edge + a soft wash of light falling in */
   box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.6),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.65),
+    inset 0 16px 32px -20px rgb(255 255 255 / 0.55),
     0 0 0 1px rgb(10 22 41 / 0.05),
     0 12px 40px rgb(10 22 41 / 0.1);
 

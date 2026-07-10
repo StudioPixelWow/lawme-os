@@ -20,6 +20,21 @@
   /* Entrance choreography — settle in from 10px, once per view */
   --animate-rise: rise var(--motion-reveal, 700ms) var(--ease-settle) both;
 
+  /* The active-nav gold hairline draws itself in */
+  --animate-underline: underline-in var(--motion-settle, 280ms)
+    var(--ease-settle) both;
+
+  @keyframes underline-in {
+    from {
+      transform: scaleX(0);
+      opacity: 0;
+    }
+    to {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+  }
+
   @keyframes rise {
     from {
       opacity: 0;

@@ -15,9 +15,11 @@ export function PageHeader({
 }) {
   return (
     <header className="animate-rise">
-      <h1 className="font-display text-display text-foreground">{title}</h1>
+      <h1 className="font-display text-display text-balance text-foreground">
+        {title}
+      </h1>
       {context ? (
-        <p className="mt-4 max-w-reading text-subheading text-foreground-soft">
+        <p className="mt-5 max-w-reading text-subheading text-pretty text-foreground-soft">
           {context}
         </p>
       ) : null}
