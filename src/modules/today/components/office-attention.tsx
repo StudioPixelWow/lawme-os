@@ -27,15 +27,6 @@ const ICONS: Record<OfficeAttentionItem["icon"], ReactNode> = {
   message: <BellGlyph size={15} />,
 };
 
-const FIGURE_TEXT: Record<string, string> = {
-  urgent: "text-status-urgent",
-  today: "text-status-today",
-  waiting: "text-status-waiting",
-  progress: "text-status-progress",
-  new: "text-status-new",
-  scheduled: "text-foreground",
-};
-
 function scrollTo(target: string) {
   document
     .getElementById(`section-${target}`)
@@ -63,7 +54,7 @@ export function OfficeAttentionStrip() {
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-sm",
                   critical
                     ? "bg-gold-500/15 text-gold-700"
-                    : "bg-surface-sunken text-foreground-soft",
+                    : "bg-surface-sunken text-foreground-faint",
                 )}
               >
                 {ICONS[item.icon]}
@@ -73,29 +64,27 @@ export function OfficeAttentionStrip() {
                   <span
                     className={cx(
                       "text-subheading font-bold tracking-tight tabular-nums",
-                      FIGURE_TEXT[item.status] ?? "text-foreground",
+                      critical ? "text-status-urgent" : "text-foreground",
                     )}
                   >
                     {item.figure}
                   </span>
                   <span
                     className={cx(
-                      "text-caption leading-tight font-medium",
-                      critical ? "text-foreground" : "text-foreground-soft",
+                      "text-caption leading-tight",
+                      critical
+                        ? "font-medium text-foreground"
+                        : "text-foreground-soft",
                     )}
                   >
                     {item.text}
                   </span>
                 </span>
-                <span className="mt-0.5 block text-micro text-foreground-faint">
-                  {critical
-                    ? risksOpen
-                      ? "סגור את פירוט הסיכונים"
-                      : `אחראית: ${item.owner} · פתח פירוט`
-                    : item.owner
-                      ? `אחראי: ${item.owner}`
-                      : "עבור למקטע ←"}
-                </span>
+                {critical ? (
+                  <span className="mt-0.5 block text-micro text-foreground-faint">
+                    {risksOpen ? "סגור פירוט" : `אחראית: ${item.owner} · פתח פירוט`}
+                  </span>
+                ) : null}
               </span>
             </>
           );

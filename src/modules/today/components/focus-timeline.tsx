@@ -48,7 +48,7 @@ function RailNode({
       aria-label={`${event.time} ${event.title}`}
       data-live={active || undefined}
       className={cx(
-        "living-edge flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-start transition-all",
+        "living-edge group flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-start transition-all",
         active
           ? "glass shadow-gold-glow"
           : "hover:bg-surface-sunken/60",
@@ -84,6 +84,19 @@ function RailNode({
         >
           {event.title}
         </span>
+        {/* the preparation appears on hover */}
+        {typeof event.prep === "number" ? (
+          <span
+            className="block h-0 overflow-hidden opacity-0 transition-all group-hover:mt-1 group-hover:h-auto group-hover:opacity-100"
+            style={{ transitionDuration: "var(--motion-quick)" }}
+          >
+            <MicroProgress
+              value={event.prep}
+              status={event.prep >= 0.8 ? "completed" : "progress"}
+              label="מוכנות"
+            />
+          </span>
+        ) : null}
       </span>
     </button>
   );

@@ -61,7 +61,7 @@ export function DinoOffice() {
                 <li
                   key={insight.id}
                   className={cx(
-                    "glass-navy relative rounded-lg p-4",
+                    "glass-navy group relative rounded-lg p-4",
                     evidenceOpen && "md:col-span-2 xl:col-span-1",
                   )}
                 >
@@ -96,12 +96,19 @@ export function DinoOffice() {
                     ))}
                   </p>
 
-                  {/* the evidence drawer */}
+                  {/* the evidence — full on click, a glimpse on hover */}
                   {evidenceOpen ? (
                     <p className="animate-rise mt-3 rounded-md border-s-2 border-gold-500/70 bg-ink-950/40 p-3 text-micro leading-relaxed text-ink-100">
                       ראיות: {insight.evidence}
                     </p>
-                  ) : null}
+                  ) : (
+                    <p
+                      className="mt-0 max-h-0 overflow-hidden text-micro leading-relaxed text-ink-200 opacity-0 transition-all group-hover:mt-2.5 group-hover:max-h-16 group-hover:opacity-100"
+                      style={{ transitionDuration: "var(--motion-quick)" }}
+                    >
+                      ראיות: {insight.evidence}
+                    </p>
+                  )}
 
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                     <button

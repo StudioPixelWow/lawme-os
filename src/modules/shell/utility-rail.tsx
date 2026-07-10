@@ -174,16 +174,7 @@ export function UtilityRail() {
                 className="living-edge flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-caption text-foreground-soft transition-colors hover:text-foreground"
                 style={{ transitionDuration: "var(--motion-quick)" }}
               >
-                <span
-                  className={cx(
-                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-sm",
-                    c.channel === "whatsapp"
-                      ? "bg-status-completed-wash text-status-completed"
-                      : c.channel === "email"
-                        ? "bg-status-progress-wash text-status-progress"
-                        : "bg-status-scheduled-wash text-status-scheduled",
-                  )}
-                >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-surface-sunken text-foreground-faint">
                   {c.channel === "whatsapp" ? (
                     <ChatGlyph size={13} />
                   ) : c.channel === "email" ? (

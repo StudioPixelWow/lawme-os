@@ -19,7 +19,7 @@ const CHANNEL_ICON: Record<CommChannel, ReactNode> = {
  * selection away. Answer, approve, move on.
  */
 export function ClientWaiting() {
-  const [selected, setSelected] = useState<string>(CLIENT_COMMS[0].id);
+  const [selected, setSelected] = useState<string>("");
 
   return (
     <section id="section-clients" aria-label="לקוחות שממתינים">
@@ -47,14 +47,7 @@ export function ClientWaiting() {
                   className="flex w-full flex-wrap items-center gap-x-4 gap-y-2 rounded-xl px-5 py-4 text-start"
                 >
                   <span
-                    className={cx(
-                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-pill",
-                      comm.channel === "whatsapp"
-                        ? "bg-status-completed-wash text-status-completed"
-                        : comm.channel === "email"
-                          ? "bg-status-progress-wash text-status-progress"
-                          : "bg-status-scheduled-wash text-status-scheduled",
-                    )}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-surface-sunken text-foreground-soft"
                     title={comm.channelLabel}
                   >
                     {CHANNEL_ICON[comm.channel]}

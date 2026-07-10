@@ -6,11 +6,12 @@ import { cx } from "@/design-system/utils/cx";
 import { TEAM_CAPACITY } from "../office";
 import { SectionHeading } from "./section-heading";
 
+/* two-accent rule: only genuine overload speaks in color */
 const LOAD_FILL: Record<string, string> = {
   urgent: "bg-status-urgent",
-  risk: "bg-status-risk",
-  scheduled: "bg-status-scheduled",
-  completed: "bg-status-completed",
+  risk: "bg-status-urgent/80",
+  scheduled: "bg-ink-500/70",
+  completed: "bg-ink-500/50",
 };
 
 /** The capacity gauge — a machined bar with the 80% overload tick. */
@@ -85,11 +86,11 @@ export function TeamWorkload() {
                       aria-hidden
                       className={cx(
                         "absolute -bottom-0.5 -start-0.5 h-3 w-3 rounded-pill ring-2 ring-surface-raised",
-                        member.state === "available"
-                          ? "bg-status-completed"
-                          : member.state === "in-hearing"
-                            ? "bg-status-scheduled"
-                            : "bg-status-urgent",
+                        member.state === "overloaded" || member.state === "blocked"
+                          ? "bg-status-urgent"
+                          : member.state === "available"
+                            ? "bg-ink-300"
+                            : "bg-ink-500",
                       )}
                     />
                   </span>
@@ -107,9 +108,15 @@ export function TeamWorkload() {
                   <span className="text-heading font-bold tracking-tight tabular-nums text-foreground">
                     {pct}%
                   </span>
-                  <StatusText status={member.status} className="text-micro">
-                    {member.stateLabel}
-                  </StatusText>
+                  {member.status === "urgent" || member.status === "risk" ? (
+                    <StatusText status="urgent" className="text-micro">
+                      {member.stateLabel}
+                    </StatusText>
+                  ) : (
+                    <span className="text-micro font-medium text-foreground-faint">
+                      {member.stateLabel}
+                    </span>
+                  )}
                 </span>
                 <CapacityGauge load={member.load} status={member.status} />
 
@@ -121,7 +128,7 @@ export function TeamWorkload() {
                     </span>
                   ) : null}
                   {member.overdueTasks > 0 ? (
-                    <span className="font-medium text-status-risk">
+                    <span className="font-medium text-status-urgent">
                       {member.overdueTasks} באיחור
                     </span>
                   ) : null}
@@ -137,7 +144,7 @@ export function TeamWorkload() {
             <span className="font-semibold">{active.name}</span>
             <span className="text-foreground-soft"> — {active.line}</span>
             {active.blocker ? (
-              <span className="mt-0.5 block text-caption text-status-risk">
+              <span className="mt-0.5 block text-caption text-status-urgent">
                 חסימה: {active.blocker}
               </span>
             ) : null}

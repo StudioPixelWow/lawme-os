@@ -28,7 +28,7 @@ function FeaturedMatter({
     <article
       data-live={selected || undefined}
       className={cx(
-        "living-edge surface-paper-raised relative flex min-w-0 flex-col rounded-xl p-6 md:p-8",
+        "living-edge surface-paper-raised relative flex min-w-0 flex-col rounded-xl p-6 md:p-7",
         selected && "context-halo",
       )}
     >
@@ -70,12 +70,12 @@ function FeaturedMatter({
       </div>
 
       {/* the health signature — the proceeding, visualized */}
-      <div className="mt-7">
+      <div className="mt-5">
         <MatterSignature matter={matter} />
       </div>
 
       {/* the irreversible facts */}
-      <dl className="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3">
+      <dl className="mt-5 flex flex-wrap items-center gap-x-7 gap-y-2.5 border-t border-line/50 pt-4">
         <div className="flex items-center gap-2 text-small">
           <CalendarGlyph size={14} className="shrink-0 text-foreground-faint" />
           <dt className="text-foreground-faint">האירוע הבא:</dt>
@@ -116,13 +116,13 @@ function FeaturedMatter({
       </dl>
 
       {/* דינו's recommendation */}
-      <p className="mt-5 flex max-w-3xl items-start gap-2 border-s-2 border-accent ps-3 text-small leading-relaxed text-pretty text-foreground-soft">
+      <p className="mt-4 flex max-w-3xl items-start gap-2 border-s-2 border-accent ps-3 text-small leading-relaxed text-pretty text-foreground-soft">
         <AIMark className="mt-1 shrink-0" />
         <span className="min-w-0">{matter.aiNote}</span>
       </p>
 
       {/* progressive disclosure */}
-      <details className="group/details mt-5">
+      <details className="group/details mt-4">
         <summary
           className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-xs text-caption font-medium text-foreground-faint transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
           style={{ transitionDuration: "var(--motion-quick)" }}
