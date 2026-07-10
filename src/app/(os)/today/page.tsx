@@ -25,9 +25,10 @@ export default function TodayPage() {
     <Workspace width="wide">
       <MorningHero dateLine={<TodayDate />} />
 
-      {/* the bridge: the mission flows into the work */}
-      <div aria-hidden className="flex justify-center">
-        <span className="h-10 w-px bg-gold-400/60 md:h-12" />
+      {/* the surface catches the hero's light; the meridian flows on */}
+      <div aria-hidden className="reflection-floor mx-6 -mt-1 h-8 rounded-b-xl md:mx-10" />
+      <div aria-hidden className="-mt-2 flex justify-center">
+        <span className="h-8 w-px bg-gold-400/60 md:h-10" />
       </div>
 
       {/* the work — THE main product area */}

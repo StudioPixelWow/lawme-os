@@ -34,7 +34,8 @@ export function ActiveMattersSection() {
             <article
               key={matter.id}
               className={cx(
-                "group relative p-7 transition-colors hover:bg-surface-sunken/40 md:p-8",
+                "group relative p-7 transition-colors hover:bg-surface-sunken/40",
+                missionMatter ? "bg-gold-100/25 md:p-9" : "md:p-8",
                 index > 0 && "border-t border-line/60",
               )}
               style={{ transitionDuration: "var(--motion-quick)" }}
@@ -115,27 +116,41 @@ export function ActiveMattersSection() {
                 <span className="min-w-0">{matter.aiNote}</span>
               </p>
 
-              {/* secondary actions — hover only */}
-              <div
-                className="mt-4 flex gap-5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100"
-                style={{ transitionDuration: "var(--motion-quick)" }}
-              >
-                <Link
-                  href="/documents"
-                  className="rounded-xs text-micro font-medium text-foreground-soft hover:text-foreground"
+              {/* progressive disclosure — secondary details on demand */}
+              <details className="group/details mt-4">
+                <summary
+                  className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-xs text-micro font-medium text-foreground-faint transition-colors hover:text-foreground [&::-webkit-details-marker]:hidden"
+                  style={{ transitionDuration: "var(--motion-quick)" }}
                 >
-                  {matter.files} קבצים ←
-                </Link>
-                <Link
-                  href="/calendar"
-                  className="rounded-xs text-micro font-medium text-foreground-soft hover:text-foreground"
-                >
-                  {matter.workload} ←
-                </Link>
-                <span className="text-micro text-foreground-faint">
-                  עדכון {matter.lastUpdate}
-                </span>
-              </div>
+                  פרטים נוספים
+                  <span
+                    aria-hidden
+                    className="transition-transform group-open/details:rotate-90"
+                  >
+                    ‹
+                  </span>
+                </summary>
+                <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                  <Link
+                    href="/documents"
+                    className="rounded-xs text-micro font-medium text-foreground-soft hover:text-foreground"
+                  >
+                    {matter.files} קבצים ←
+                  </Link>
+                  <Link
+                    href="/calendar"
+                    className="rounded-xs text-micro font-medium text-foreground-soft hover:text-foreground"
+                  >
+                    {matter.workload} ←
+                  </Link>
+                  <span className="text-micro text-foreground-faint">
+                    עדכון אחרון: {matter.lastUpdate}
+                  </span>
+                  <span className="text-micro text-foreground-faint">
+                    צוות: {matter.team.join(", ")}
+                  </span>
+                </div>
+              </details>
             </article>
           );
         })}

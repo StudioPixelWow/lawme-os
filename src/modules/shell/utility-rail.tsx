@@ -73,7 +73,7 @@ export function UtilityRail() {
   return (
     <aside
       aria-label="לוח היום"
-      className="fixed inset-y-0 end-0 z-20 hidden w-72 flex-col overflow-y-auto border-s border-line/70 bg-surface-raised/80 px-5 py-5 xl:flex"
+      className="surface-paper fixed inset-y-0 end-0 z-20 hidden w-72 flex-col overflow-y-auto border-s border-line/70 px-5 py-5 xl:flex"
     >
       <button
         type="button"

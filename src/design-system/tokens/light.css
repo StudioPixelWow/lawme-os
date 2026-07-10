@@ -11,14 +11,14 @@
   background-color: var(--color-surface);
   background-image:
     radial-gradient(
-      90rem 48rem at 100% -8rem,
-      color-mix(in srgb, #c9a961 5%, transparent),
-      transparent 65%
+      110rem 60rem at 112% -12rem,
+      color-mix(in srgb, #c9a961 6%, transparent),
+      transparent 60%
     ),
     radial-gradient(
-      80rem 52rem at -10% 110%,
-      color-mix(in srgb, #0a1629 3.5%, transparent),
-      transparent 70%
+      90rem 56rem at -12% 115%,
+      color-mix(in srgb, #0a1629 4%, transparent),
+      transparent 68%
     );
   background-attachment: fixed;
 }
@@ -50,14 +50,17 @@
 
 /* The permanent navy sidebar — the product anchor. */
 @utility surface-sidebar {
-  background-color: #070f1e;
+  background-color: #060e1c;
   background-image:
     radial-gradient(
-      40rem 20rem at 85% -6rem,
-      rgb(251 249 245 / 0.07),
-      transparent 60%
+      44rem 22rem at 90% -8rem,
+      rgb(251 249 245 / 0.08),
+      transparent 58%
     ),
-    linear-gradient(195deg, #101f3a 0%, #0a1629 45%, #070f1e 100%);
+    linear-gradient(200deg, #17294a 0%, #0d1c36 42%, #091528 74%, #060e1c 100%);
+  box-shadow:
+    inset -1px 0 0 0 rgb(201 169 97 / 0.1),
+    inset 0 1px 0 0 rgb(255 255 255 / 0.08);
 }
 
 /* The dark hero environment — LawME's iconic entry. Deep navy with
@@ -117,6 +120,19 @@
     inset 0 0 0 1px rgb(10 22 41 / 0.04),
     0 2px 8px rgb(10 22 41 / 0.04),
     0 28px 72px rgb(10 22 41 / 0.09);
+}
+
+/* The floor reflection — a faint sheen beneath a raised dark
+   surface, as if the desk catches its light. Purely atmospheric. */
+@utility reflection-floor {
+  pointer-events: none;
+  background-image: linear-gradient(
+    to bottom,
+    color-mix(in srgb, #0a1629 7%, transparent),
+    color-mix(in srgb, #c9a961 3%, transparent) 45%,
+    transparent 100%
+  );
+  filter: blur(6px);
 }
 
 /* A soft champagne light-bloom — placed BEHIND a key surface (the
