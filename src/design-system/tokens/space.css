@@ -14,7 +14,8 @@
   --spacing-element: 1.5rem; /* 24px — between related elements */
   --spacing-tight: 0.75rem;  /* 12px — label→value, icon→text */
 
-  /* Measures — max-w-page / max-w-reading */
+  /* Measures — max-w-page / max-w-wide / max-w-reading */
   --container-page: 68rem;    /* the workspace canvas */
+  --container-wide: 82rem;    /* dense operational workspaces (היום) */
   --container-reading: 42rem; /* prose measure */
 }

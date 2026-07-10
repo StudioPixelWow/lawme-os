@@ -1,46 +1,51 @@
 import type { Metadata } from "next";
 import { Workspace } from "@/design-system/patterns/workspace";
-import { PageHeader } from "@/design-system/patterns/page-header";
-import { SectionChapter } from "@/design-system/patterns/section-chapter";
-import { Placeholder } from "@/design-system/patterns/placeholder";
+import {
+  ActiveMattersSection,
+  AIInsightsSection,
+  DailySummaryPanel,
+  DailyTimeline,
+  FinancePanel,
+  MeetingsPanel,
+  MorningHero,
+  RecentDocumentsSection,
+} from "@/modules/today";
 import { TodayDate } from "./today-date";
 
 export const metadata: Metadata = { title: "היום" };
 
-/** היום — the morning brief. Sprint 0: the editorial skeleton, ready for life. */
+/**
+ * היום — the Morning Workspace.
+ * Hero (greeting + attention + עמית) → daily timeline →
+ * operational sections → intelligence summary, meetings, finance.
+ * Visual implementation with typed mock data (src/modules/today/data.ts).
+ */
 export default function TodayPage() {
   return (
-    <Workspace>
-      <PageHeader title="בוקר טוב" context={<TodayDate />} />
+    <Workspace width="wide">
+      <MorningHero dateLine={<TodayDate />} />
 
-      <SectionChapter title="דורש את תשומת לבך" index={0}>
-        <Placeholder
-          headline="כאן יופיע מה שחשוב באמת"
-          line="עמית ימיין עבורך את המועדים, הדיונים והמשימות שדורשים החלטה — לפי דחיפות אמיתית, לא לפי רעש."
-        />
-      </SectionChapter>
+      <div className="animate-rise mt-14" style={{ animationDelay: "200ms" }}>
+        <DailyTimeline />
+      </div>
 
-      <SectionChapter title="הדיונים הקרובים" index={1}>
-        <Placeholder
-          headline="השבוע שלך בבתי המשפט"
-          line="דיונים, מועדים והתייצבויות — עם סטטוס היערכות לכל אחד."
-        />
-      </SectionChapter>
+      <div
+        className="animate-rise mt-14 grid grid-cols-1 gap-8 lg:grid-cols-3"
+        style={{ animationDelay: "280ms" }}
+      >
+        <ActiveMattersSection />
+        <AIInsightsSection />
+        <RecentDocumentsSection />
+      </div>
 
-      <SectionChapter title="תנועה בתיקים" index={2}>
-        <Placeholder
-          headline="מה קרה מאז אתמול"
-          line="מסמכים שהתקבלו, החלטות שנחתמו, משימות שהושלמו — סיפור קצר על כל תיק שזז."
-        />
-      </SectionChapter>
-
-      <SectionChapter title="הטיוטות של עמית" index={3}>
-        <Placeholder
-          ai
-          headline="עמית יכין, אתם תחליטו"
-          line="סיכומים, טיוטות ורישומי זמן שעמית הכין וממתינים לאישור שלך."
-        />
-      </SectionChapter>
+      <div
+        className="animate-rise mt-14 grid grid-cols-1 gap-8 lg:grid-cols-3"
+        style={{ animationDelay: "360ms" }}
+      >
+        <DailySummaryPanel />
+        <MeetingsPanel />
+        <FinancePanel />
+      </div>
     </Workspace>
   );
 }

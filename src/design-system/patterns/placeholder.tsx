@@ -25,9 +25,7 @@ export function Placeholder({
           : "bg-surface-sunken/60",
       )}
     >
-      <p className="font-display text-heading font-normal text-balance text-foreground">
-        {headline}
-      </p>
+      <p className="text-heading text-balance text-foreground">{headline}</p>
       <p className="mx-auto mt-3 max-w-reading text-small text-pretty text-foreground-soft">
         {line}
       </p>

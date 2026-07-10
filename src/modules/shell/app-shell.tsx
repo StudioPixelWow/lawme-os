@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
 import { ShellProvider } from "./shell-provider";
-import { TopRail } from "./top-rail";
+import { TopBar } from "./top-bar";
+import { SideRail } from "./side-rail";
+import { MobileNav } from "./mobile-nav";
 import { CommandBar } from "./command-bar";
 import { AssistantPanel } from "./assistant-panel";
 
 /**
  * The LawME application shell:
- * skip-link → top rail → scrolling canvas → command bar → עמית.
+ * skip-link → top bar → start-edge rail (desktop/tablet) → scrolling
+ * canvas → bottom bar (mobile) → command bar → עמית.
  * Mounted once by the (os) route-group layout; navigation between
  * OS pages never re-mounts it.
  */
@@ -19,8 +22,14 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         דילוג לתוכן הראשי
       </a>
-      <TopRail />
-      <main id="main">{children}</main>
+      <TopBar />
+      <SideRail />
+      <div className="md:ps-20 lg:ps-56">
+        <main id="main" className="pb-24 md:pb-0">
+          {children}
+        </main>
+      </div>
+      <MobileNav />
       <CommandBar />
       <AssistantPanel />
     </ShellProvider>

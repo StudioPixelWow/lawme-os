@@ -4,10 +4,10 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="flex min-h-screen animate-rise flex-col items-center justify-center px-6 text-center">
-      <p className="font-display text-display text-foreground-faint" dir="ltr">
+      <p className="text-display font-semibold text-foreground-faint" dir="ltr">
         404
       </p>
-      <h1 className="mt-6 font-display text-title text-balance text-foreground">
+      <h1 className="mt-6 text-title font-semibold tracking-tight text-balance text-foreground">
         הדף הזה לא נמצא
       </h1>
       <p className="mt-4 max-w-reading text-body text-pretty text-foreground-soft">

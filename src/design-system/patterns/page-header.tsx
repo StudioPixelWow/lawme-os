@@ -15,7 +15,7 @@ export function PageHeader({
 }) {
   return (
     <header className="animate-rise">
-      <h1 className="font-display text-display text-balance text-foreground">
+      <h1 className="text-display font-semibold tracking-tight text-balance text-foreground">
         {title}
       </h1>
       {context ? (

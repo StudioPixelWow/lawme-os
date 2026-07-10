@@ -6,10 +6,10 @@ import { useShell } from "./shell-provider";
 
 /**
  * עמית — the floating AI companion panel (placeholder).
- * Glass, floating at the start edge; slides in from that edge
- * (physical +x here because the start edge is the right edge in RTL —
- * an LTR variant would flip this offset). `inert` keeps its controls
- * out of the tab order while closed.
+ * Glass, floating at the END edge (left, in RTL — the navigation rail
+ * owns the start edge). Slides in from that edge: physical −x because
+ * end = left here; an LTR variant would flip the offset. `inert` keeps
+ * its controls out of the tab order while closed.
  * Docs: docs/design-system/11-ai-visual-language.md
  */
 export function AssistantPanel() {
@@ -21,11 +21,11 @@ export function AssistantPanel() {
       inert={!assistantOpen}
       className={cx(
         "glass fixed z-40 flex flex-col rounded-xl",
-        "start-3 top-18 bottom-3 w-[min(24rem,calc(100vw-1.5rem))] md:start-6 md:bottom-6",
+        "end-3 top-20 bottom-20 w-[min(24rem,calc(100vw-1.5rem))] md:bottom-6 md:end-6",
         "ease-settle transition-all",
         assistantOpen
           ? "translate-x-0 opacity-100"
-          : "pointer-events-none translate-x-8 opacity-0",
+          : "pointer-events-none -translate-x-8 opacity-0",
       )}
       style={{ transitionDuration: "var(--motion-scene)" }}
     >
@@ -35,7 +35,7 @@ export function AssistantPanel() {
           className={cx("text-gold-600", assistantOpen && "animate-breath")}
         />
         <div className="flex-1">
-          <p className="font-display text-subheading font-medium text-foreground">
+          <p className="text-subheading font-semibold text-foreground">
             עמית
           </p>
           <p className="text-caption text-foreground-faint">

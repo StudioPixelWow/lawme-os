@@ -18,7 +18,7 @@ export function SectionChapter({
       className="mt-section animate-rise"
       style={{ animationDelay: `${80 + index * 70}ms` } as CSSProperties}
     >
-      <h2 className="font-display text-title text-balance text-foreground">
+      <h2 className="text-title font-semibold tracking-tight text-balance text-foreground">
         {title}
       </h2>
       <div className="mt-8">{children}</div>

@@ -21,7 +21,7 @@ export default function OsError({
 
   return (
     <Workspace className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <h1 className="font-display text-title text-balance text-foreground">
+      <h1 className="text-title font-semibold tracking-tight text-balance text-foreground">
         משהו השתבש
       </h1>
       <p className="mt-4 max-w-reading text-body text-pretty text-foreground-soft">
