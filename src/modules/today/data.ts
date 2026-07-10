@@ -71,18 +71,73 @@ export const TIMELINE_NOW = { label: "10:42", position: 0.38 };
    inspirational. Today's mock is a hearing day.
    ============================================================ */
 
-export type HeroMode = "hearing" | "calm" | "high-load" | "quiet";
+export type HeroMode = "hearing" | "high-load" | "calm" | "quiet";
 
-export const HERO_DAY: {
-  mode: HeroMode;
+export type HeroFact = {
+  id: string;
+  text: string;
+  kind: "missing" | "ai" | "team" | "risk" | "ready";
+  action?: string;
+};
+
+export type HeroModeContent = {
   signature: string;
   aiLine: string;
-} = {
-  mode: "hearing",
-  signature: "יום דיונים · המיקוד: כהן נ׳ לוי",
-  aiLine:
-    "יום ממוקד־דיון. ההיערכות כמעט הושלמה — נותרו שני נספחים וסקירת הפסיקה החדשה, והדרך פנויה עד 11:30.",
+  missionLabel: string;
+  mission: string;
+  cta: string;
 };
+
+/**
+ * The dynamic hero — typed scenarios for four day shapes.
+ * No settings UI yet; HERO_ACTIVE_MODE selects the rendered one.
+ */
+export const HERO_MODES: Record<HeroMode, HeroModeContent> = {
+  hearing: {
+    signature: "יום דיונים · המיקוד: כהן נ׳ לוי",
+    aiLine:
+      "יום ממוקד־דיון. ההיערכות כמעט הושלמה — נותרו שני נספחים וסקירת הפסיקה החדשה, והדרך פנויה עד 11:30.",
+    missionLabel: "המשימה המרכזית שלך היום",
+    mission:
+      "להגיע לדיון בתיק כהן כשכל חומר הראיות, הפסיקה והטיוטות — מוכנים.",
+    cta: "התחל הכנה לדיון",
+  },
+  "high-load": {
+    signature: "יום עמוס · שלוש עדיפויות בלבד",
+    aiLine:
+      "העומס גבוה. צמצמתי את הבוקר לשלוש עדיפויות קריטיות — כל השאר מסודר וממתין.",
+    missionLabel: "שלוש העדיפויות של היום",
+    mission: "לסגור את שלושת הצווארים: סיכומים, תצהיר, ותשובה ללקוח.",
+    cta: "פתח את רשימת העדיפויות",
+  },
+  calm: {
+    signature: "יום משרד רגוע",
+    aiLine:
+      "בוקר נינוח. אין מועדים בוערים — זמן טוב לטיוטות שממתינות ולעדכוני לקוחות.",
+    missionLabel: "המיקוד המומלץ להיום",
+    mission: "לאשר את שלוש הטיוטות הממתינות ולעדכן שני לקוחות.",
+    cta: "פתח את הטיוטות",
+  },
+  quiet: {
+    signature: "בוקר שקט",
+    aiLine:
+      "הכול תחת שליטה. לא זוהו סיכונים דחופים — ותקדים חדש עשוי לחזק שניים מהתיקים הפעילים.",
+    missionLabel: "הזדמנות הבוקר",
+    mission: "לבחון תקדים חדש שעשוי לחזק שני תיקים פעילים.",
+    cta: "פתח את הניתוח",
+  },
+};
+
+export const HERO_ACTIVE_MODE: HeroMode = "hearing";
+
+export const HERO_PROVENANCE = "עודכן 07:20 · מקורות: 14 מסמכים · נט המשפט · יומן המשרד";
+
+export const HERO_FACTS: HeroFact[] = [
+  { id: "hf-1", text: "חסרים 2 נספחים לכתב התשובה", kind: "missing", action: "בקש מהלקוח" },
+  { id: "hf-2", text: "עמית מצא פסיקה חדשה — ע״א 4881/25", kind: "ai", action: "השווה לתיק" },
+  { id: "hf-3", text: "צוות התיק מוכן ומתואם", kind: "team" },
+  { id: "hf-4", text: "סיכון אחד דורש בדיקה — מועד הסיכומים", kind: "risk", action: "בדוק עכשיו" },
+];
 
 export type HeroChecklistState = "ready" | "suggested" | "missing";
 
@@ -92,27 +147,8 @@ export const HERO_FOCUS = {
   title: "דיון הוכחות — כהן נ׳ לוי",
   location: "בימ״ש השלום ת״א · אולם 304 · השופטת ברק־נבו",
   readiness: 0.85,
-  checklist: [
-    { id: "hc-1", label: "תדריך הדיון", state: "ready" as HeroChecklistState },
-    {
-      id: "hc-2",
-      label: "תצהיר עדות מעודכן",
-      state: "ready" as HeroChecklistState,
-    },
-    {
-      id: "hc-3",
-      label: "אזכור ע״א 4881/25 בטיעון",
-      state: "suggested" as HeroChecklistState,
-    },
-    {
-      id: "hc-4",
-      label: "2 נספחים לכתב התשובה",
-      state: "missing" as HeroChecklistState,
-    },
-  ],
   documents: ["תצהיר עדות ראשית", "כתב הגנה — הנתבעת"],
   team: ["דניאל", "מיכל"],
-  cta: "פתח את תדריך הדיון",
 };
 
 export type AIFinding = {
@@ -459,6 +495,7 @@ export type RecentDocument = {
   status: Status;
   statusLabel: string;
   action: string;
+  aiNote?: string;
 };
 
 export const RECENT_DOCUMENTS: RecentDocument[] = [
@@ -497,6 +534,7 @@ export const RECENT_DOCUMENTS: RecentDocument[] = [
     status: "reviewed",
     statusLabel: "נסקר",
     action: "לחתימות",
+    aiNote: "סעיף 7 שונה בין v3 ל־v4 — כדאי לוודא מול הלקוחה",
   },
   {
     id: "d-4",
@@ -552,6 +590,12 @@ export type Meeting = {
   with: string;
   location: string;
   kind: "call" | "meeting";
+  matter?: string;
+  /** 0–1 preparation completeness */
+  prep: number;
+  docsNeeded?: string;
+  aiPrep: string;
+  action: string;
 };
 
 export const MEETINGS: Meeting[] = [
@@ -563,6 +607,11 @@ export const MEETINGS: Meeting[] = [
     with: "רות אלמוג",
     location: "טלפון",
     kind: "call",
+      matter: "TechLine — הסכם מייסדים",
+    prep: 0.6,
+    docsNeeded: "טיוטת מייל עדכון",
+    aiPrep: "4 ימים ללא מענה — טיוטת עדכון מוכנה לאישור לפני השיחה.",
+    action: "פתח טיוטה",
   },
   {
     id: "mt-2",
@@ -572,6 +621,10 @@ export const MEETINGS: Meeting[] = [
     with: "עו״ד מיכל רון",
     location: "קפה נמרוד",
     kind: "meeting",
+      prep: 0.4,
+    docsNeeded: "סיכום סטטוס תיקים משותפים",
+    aiPrep: "שני תיקים משותפים פעילים — הכנתי סיכום סטטוס קצר.",
+    action: "פתח סיכום",
   },
   {
     id: "mt-3",
@@ -581,6 +634,10 @@ export const MEETINGS: Meeting[] = [
     with: "אבי שטרן",
     location: "המשרד",
     kind: "meeting",
+      prep: 0.9,
+    docsNeeded: "בדיקת ניגוד עניינים",
+    aiPrep: "בדיקת ניגוד עניינים הושלמה — נקי. שאלון היכרות מוכן.",
+    action: "פתח שאלון",
   },
   {
     id: "mt-4",
@@ -590,6 +647,9 @@ export const MEETINGS: Meeting[] = [
     with: "כל המשרד",
     location: "חדר ישיבות",
     kind: "meeting",
+      prep: 0.5,
+    aiPrep: "3 החלטות צוות פתוחות מהשבוע שעבר — מסודרות לפי דחיפות.",
+    action: "פתח סדר יום",
   },
 ];
 
@@ -611,6 +671,15 @@ export const FINANCE_MONTHS: FinanceMonth[] = [
 
 /** Monthly billing goal, ₪ thousands — the subtle target line. */
 export const FINANCE_TARGET = 175;
+
+export const FINANCE_FORECAST = "צפי סוף חודש: ₪206K · מעל היעד";
+
+export const FINANCE_AI_INSIGHT = {
+  text: "נמצאו 3.5 שעות עבודה מאתמול שלא חויבו (TechLine).",
+  action: "בדוק ורשום",
+  updatedAt: "07:20",
+  source: "יומן פעילות המשרד",
+};
 
 export type FinanceTotal = {
   id: string;

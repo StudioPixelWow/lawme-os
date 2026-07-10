@@ -1,6 +1,7 @@
 /** Public API of the today module — the Morning Workspace. */
 export { MorningHero } from "./components/morning-hero";
-export { AttentionPanel } from "./components/attention-panel";
+export { TodayMission } from "./components/today-mission";
+export { SupportingPriorities } from "./components/supporting-priorities";
 export { AIIntelligencePanel } from "./components/ai-intelligence-panel";
 export { DailyTimeline } from "./components/daily-timeline";
 export { ActiveMattersSection } from "./components/active-matters-section";

@@ -20,10 +20,12 @@ const RING_STROKE: Record<string, string> = {
 export function HealthRing({
   value,
   status,
+  surface = "light",
 }: {
   /** 0–1 */
   value: number;
   status: Status;
+  surface?: "light" | "navy";
 }) {
   const pct = Math.round(value * 100);
   const dash = (value * CIRC).toFixed(1);
@@ -46,7 +48,7 @@ export function HealthRing({
           cy={RING.size / 2}
           r={RING.r}
           strokeWidth={RING.stroke}
-          className="stroke-surface-sunken"
+          className={surface === "navy" ? "stroke-paper-0/15" : "stroke-surface-sunken"}
         />
         <circle
           cx={RING.size / 2}
@@ -59,7 +61,7 @@ export function HealthRing({
           className={cx(RING_STROKE[status] ?? "stroke-status-progress")}
         />
       </svg>
-      <span className="absolute text-micro font-semibold tabular-nums text-foreground">
+      <span className={cx("absolute text-micro font-semibold tabular-nums", surface === "navy" ? "text-paper-0" : "text-foreground")}>
         {pct}%
       </span>
     </span>
@@ -89,9 +91,18 @@ export function MatterHealth({ matter }: { matter: Matter }) {
         <div className="flex items-center gap-1.5">
           <DocumentGlyph size={12} className="shrink-0 text-foreground-faint" />
           {matter.missingDocs > 0 ? (
-            <StatusText status="today">
-              {matter.missingDocs} מסמכים חסרים
-            </StatusText>
+            <span className="flex items-center gap-2">
+              <StatusText status="today">
+                {matter.missingDocs} מסמכים חסרים
+              </StatusText>
+              <button
+                type="button"
+                className="rounded-xs text-micro font-medium text-foreground-soft transition-colors hover:text-gold-700"
+                style={{ transitionDuration: "var(--motion-quick)" }}
+              >
+                בקש מהלקוח ←
+              </button>
+            </span>
           ) : (
             <StatusText status="completed">כל המסמכים בתיק</StatusText>
           )}
