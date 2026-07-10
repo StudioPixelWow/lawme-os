@@ -3,7 +3,6 @@ import { Workspace } from "@/design-system/patterns/workspace";
 import {
   ActiveMattersSection,
   AIInsightsSection,
-  AIIntelligencePanel,
   DailySummaryPanel,
   DailyTimeline,
   FinancePanel,
@@ -28,7 +27,7 @@ export default function TodayPage() {
 
       {/* the bridge: the mission continues into the day's timeline */}
       <div aria-hidden className="flex justify-center">
-        <span className="h-12 w-px bg-gold-400/60 md:h-16" />
+        <span className="h-16 w-px bg-gold-400/60 md:h-24" />
       </div>
 
       {/* the day */}
@@ -37,27 +36,23 @@ export default function TodayPage() {
       </div>
 
       {/* the work — THE main workspace */}
-      <div className="animate-rise mt-20 md:mt-28" style={{ animationDelay: "300ms" }}>
+      <div className="animate-rise mt-24 md:mt-36" style={{ animationDelay: "300ms" }}>
         <ActiveMattersSection />
       </div>
 
       {/* contextual intelligence */}
-      <div
-        className="animate-rise mt-20 grid grid-cols-1 gap-8 md:mt-28 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
-        style={{ animationDelay: "360ms" }}
-      >
-        <AIIntelligencePanel />
+      <div className="animate-rise mt-24 md:mt-36" style={{ animationDelay: "360ms" }}>
         <AIInsightsSection />
       </div>
 
       {/* documents — a workspace, not a list */}
-      <div className="animate-rise mt-20 md:mt-28" style={{ animationDelay: "420ms" }}>
+      <div className="animate-rise mt-24 md:mt-32" style={{ animationDelay: "420ms" }}>
         <RecentDocumentsSection />
       </div>
 
       {/* meeting preparation + daily summary */}
       <div
-        className="animate-rise mt-20 grid grid-cols-1 gap-8 md:mt-28 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
+        className="animate-rise mt-24 grid grid-cols-1 gap-8 md:mt-32 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
         style={{ animationDelay: "480ms" }}
       >
         <MeetingsPanel />
@@ -65,7 +60,7 @@ export default function TodayPage() {
       </div>
 
       {/* the business */}
-      <div className="animate-rise mt-20 md:mt-28" style={{ animationDelay: "540ms" }}>
+      <div className="animate-rise mt-24 md:mt-32" style={{ animationDelay: "540ms" }}>
         <FinancePanel />
       </div>
     </Workspace>

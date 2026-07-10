@@ -1,21 +1,21 @@
 import Link from "next/link";
-import {
-  BriefcaseGlyph,
-  CalendarGlyph,
-  TaskGlyph,
-} from "@/design-system/icons/glyphs";
+import { BriefcaseGlyph, CalendarGlyph, TaskGlyph } from "@/design-system/icons/glyphs";
 import { IconContainer } from "@/design-system/primitives/icon-container";
-import { AIMark, StateLine, StatusText } from "@/design-system/primitives/indicators";
+import {
+  AIMark,
+  StateLine,
+  StatusText,
+} from "@/design-system/primitives/indicators";
 import { cx } from "@/design-system/utils/cx";
 import { ACTIVE_MATTERS } from "../data";
 import { MatterHealth } from "./matter-health";
 import { SectionHeading } from "./section-heading";
 
 /**
- * התיקים הפעילים — THE main workspace: a full-width operational
- * command center. Each matter is a living operational surface:
- * identity · Matter Health · next hearing/task · עמית's note ·
- * team, files, workload · one main CTA.
+ * התיקים הפעילים — the full-width command center. Each matter is a
+ * premium operational dossier in three layers: identity → health →
+ * action. The matter tied to today's mission carries the gold
+ * meridian at its start edge.
  */
 export function ActiveMattersSection() {
   return (
@@ -28,93 +28,117 @@ export function ActiveMattersSection() {
       />
 
       <div className="surface-paper-raised mt-6 rounded-xl">
-        {ACTIVE_MATTERS.map((matter, index) => (
-          <article
-            key={matter.id}
-            className={cx(
-              "group relative p-6 transition-colors hover:bg-surface-sunken/40 md:p-7",
-              index > 0 && "border-t border-line/60",
-            )}
-            style={{ transitionDuration: "var(--motion-quick)" }}
-          >
-            <StateLine status={matter.status} />
+        {ACTIVE_MATTERS.map((matter, index) => {
+          const missionMatter = matter.id === "m-1";
+          return (
+            <article
+              key={matter.id}
+              className={cx(
+                "group relative p-7 transition-colors hover:bg-surface-sunken/40 md:p-8",
+                index > 0 && "border-t border-line/60",
+              )}
+              style={{ transitionDuration: "var(--motion-quick)" }}
+            >
+              {missionMatter ? (
+                <span
+                  aria-hidden
+                  className="absolute inset-y-6 start-0 w-0.5 rounded-pill bg-gold-500"
+                  title="המשימה של היום"
+                />
+              ) : (
+                <StateLine status={matter.status} />
+              )}
 
-            {/* identity row */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <IconContainer
-                variant={matter.status === "urgent" ? "urgent" : "navy"}
-                size="md"
-                interactive
-              >
-                <BriefcaseGlyph size={17} />
-              </IconContainer>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <h3 className="text-subheading font-semibold tracking-tight text-foreground">
-                    {matter.name}
-                  </h3>
-                  <StatusText status={matter.status}>
-                    {matter.statusLabel}
-                  </StatusText>
+              {/* layer 1 — identity */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <IconContainer
+                  variant={missionMatter ? "gold" : "navy"}
+                  size="md"
+                  interactive
+                >
+                  <BriefcaseGlyph size={17} />
+                </IconContainer>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <h3 className="text-subheading font-semibold tracking-tight text-foreground">
+                      {matter.name}
+                    </h3>
+                    <StatusText status={matter.status}>
+                      {matter.statusLabel}
+                    </StatusText>
+                  </div>
+                  <p className="mt-1 truncate text-caption text-foreground-soft">
+                    {matter.client} · {matter.practiceArea} · {matter.stage} ·
+                    עו״ד {matter.owner}
+                  </p>
                 </div>
-                <p className="mt-0.5 truncate text-caption text-foreground-soft">
-                  {matter.client} · {matter.practiceArea} · שלב: {matter.stage}
-                </p>
+                {/* layer 3 — the action */}
+                <Link
+                  href="/matters"
+                  className="hidden h-10 shrink-0 items-center rounded-md bg-ink-900 px-5 text-small font-medium text-paper-0 shadow-raised transition-all hover:-translate-y-px hover:bg-ink-800 hover:shadow-lift sm:inline-flex"
+                  style={{ transitionDuration: "var(--motion-quick)" }}
+                >
+                  {matter.action}
+                </Link>
               </div>
-              <Link
-                href="/matters"
-                className="hidden h-10 shrink-0 items-center rounded-md bg-ink-900 px-5 text-small font-medium text-paper-0 shadow-raised transition-all hover:-translate-y-px hover:bg-ink-800 hover:shadow-lift sm:inline-flex"
+
+              {/* layer 2 — health */}
+              <div className="mt-6 flex flex-wrap items-center gap-x-12 gap-y-5">
+                <MatterHealth matter={matter} />
+                <dl className="flex min-w-0 flex-col gap-2">
+                  <div className="flex items-center gap-2 text-caption">
+                    <CalendarGlyph
+                      size={13}
+                      className="shrink-0 text-foreground-faint"
+                    />
+                    <dt className="text-foreground-faint">הבא:</dt>
+                    <dd className="truncate font-medium text-foreground">
+                      {matter.nextEvent}
+                    </dd>
+                  </div>
+                  <div className="flex items-center gap-2 text-caption">
+                    <TaskGlyph
+                      size={13}
+                      className="shrink-0 text-foreground-faint"
+                    />
+                    <dt className="text-foreground-faint">משימה:</dt>
+                    <dd className="truncate text-foreground-soft">
+                      {matter.nextTask}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              {/* עמית's note — quiet, meridian-marked */}
+              <p className="mt-5 flex max-w-3xl items-start gap-2 border-s-2 border-accent ps-3 text-small leading-relaxed text-pretty text-foreground-soft">
+                <AIMark className="mt-1 shrink-0" />
+                <span className="min-w-0">{matter.aiNote}</span>
+              </p>
+
+              {/* secondary actions — hover only */}
+              <div
+                className="mt-4 flex gap-5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100"
                 style={{ transitionDuration: "var(--motion-quick)" }}
               >
-                {matter.action}
-              </Link>
-            </div>
-
-            {/* עמית's micro-intelligence line */}
-            <p className="mt-4 flex items-start gap-2 border-s-2 border-accent ps-3 text-small leading-relaxed text-foreground-soft">
-              <AIMark className="mt-1" />
-              <span className="min-w-0">{matter.aiNote}</span>
-            </p>
-
-            {/* operational band: health · next · logistics */}
-            <div className="mt-5 flex flex-wrap items-center gap-x-10 gap-y-4">
-              <MatterHealth matter={matter} />
-
-              <dl className="flex min-w-0 flex-col gap-1.5">
-                <div className="flex items-center gap-1.5 text-caption text-foreground-soft">
-                  <CalendarGlyph size={13} className="shrink-0 text-foreground-faint" />
-                  <dt className="text-foreground-faint">הבא:</dt>
-                  <dd className="truncate font-medium text-foreground">
-                    {matter.nextEvent}
-                  </dd>
-                </div>
-                <div className="flex items-center gap-1.5 text-caption text-foreground-soft">
-                  <TaskGlyph size={13} className="shrink-0 text-foreground-faint" />
-                  <dt className="text-foreground-faint">משימה:</dt>
-                  <dd className="truncate">{matter.nextTask}</dd>
-                </div>
-              </dl>
-
-              <div className="ms-auto flex items-center gap-5 text-micro text-foreground-faint">
-                <span className="flex items-center gap-1.5" title={matter.team.join(", ")}>
-                  <span className="flex -space-x-1.5 space-x-reverse" dir="ltr">
-                    {matter.team.map((member) => (
-                      <span
-                        key={member}
-                        className="flex h-6 w-6 items-center justify-center rounded-pill bg-ink-900 text-micro text-paper-0 shadow-seat ring-2 ring-surface-raised"
-                      >
-                        {member[0]}
-                      </span>
-                    ))}
-                  </span>
+                <Link
+                  href="/documents"
+                  className="rounded-xs text-micro font-medium text-foreground-soft hover:text-foreground"
+                >
+                  {matter.files} קבצים ←
+                </Link>
+                <Link
+                  href="/calendar"
+                  className="rounded-xs text-micro font-medium text-foreground-soft hover:text-foreground"
+                >
+                  {matter.workload} ←
+                </Link>
+                <span className="text-micro text-foreground-faint">
+                  עדכון {matter.lastUpdate}
                 </span>
-                <span className="tabular-nums">{matter.files} קבצים</span>
-                <span>{matter.workload}</span>
-                <span>עדכון {matter.lastUpdate}</span>
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
     </section>
   );

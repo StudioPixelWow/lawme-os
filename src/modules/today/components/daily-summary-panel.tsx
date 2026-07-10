@@ -9,43 +9,34 @@ export function DailySummaryPanel() {
   return (
     <section
       aria-label="סיכום יומי"
-      className="surface-navy flex h-full flex-col rounded-xl p-6"
+      className="surface-paper-raised flex h-full flex-col rounded-xl border-s-2 border-accent p-6 md:p-7"
     >
-      <div className="flex items-center gap-2.5">
-        <h2 className="text-heading font-semibold text-paper-50">סיכום יומי</h2>
-        <span className="rounded-pill border border-gold-500/40 px-2 py-0.5 text-micro font-medium text-gold-400">
-          LawME Intelligence
-        </span>
-      </div>
+      <h2 className="text-heading font-semibold tracking-tight text-foreground">
+        סיכום יומי
+      </h2>
 
-      <p className="mt-4 text-small leading-relaxed text-ink-100">
+      <p className="mt-3 max-w-reading text-small leading-relaxed text-pretty text-foreground-soft">
         {DAILY_SUMMARY.headline}
       </p>
 
-      <dl className="mt-6 flex flex-1 flex-col gap-5">
+      <dl className="mt-6 flex flex-1 flex-col justify-center gap-4">
         {DAILY_SUMMARY.metrics.map((metric) => (
-          <div key={metric.id}>
-            <div className="flex items-baseline justify-between gap-3">
-              <dt className="text-caption text-ink-200">{metric.label}</dt>
-              <dd className="text-subheading font-semibold tabular-nums text-paper-0">
-                {metric.value}
-              </dd>
-            </div>
-            <div
-              aria-hidden
-              className="mt-2 h-1 overflow-hidden rounded-pill bg-ink-700"
-            >
-              <div
-                className="h-full rounded-pill bg-gold-500"
-                style={{ width: `${Math.round(metric.ratio * 100)}%` }}
-              />
-            </div>
+          <div
+            key={metric.id}
+            className="flex items-baseline justify-between gap-4"
+          >
+            <dt className="text-caption text-foreground-soft">
+              {metric.label}
+            </dt>
+            <dd className="text-heading font-semibold tracking-tight tabular-nums text-foreground">
+              {metric.value}
+            </dd>
           </div>
         ))}
       </dl>
 
-      <p className="mt-6 flex items-center gap-1.5 text-micro text-ink-200">
-        <SparkleGlyph size={11} className="shrink-0 text-gold-400" />
+      <p className="mt-6 flex items-center gap-1.5 border-t border-line/60 pt-4 text-micro text-foreground-faint">
+        <SparkleGlyph size={11} className="shrink-0 text-gold-600" />
         נוצר על ידי {DAILY_SUMMARY.generatedBy} · עודכן {DAILY_SUMMARY.updatedAt} ·{" "}
         {DAILY_SUMMARY.sources}
       </p>

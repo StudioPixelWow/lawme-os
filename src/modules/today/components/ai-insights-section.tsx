@@ -33,66 +33,84 @@ const INSIGHT_LINKS: Record<string, string> = {
   "i-3": "/matters",
 };
 
+function InsightCard({
+  insight,
+  featured = false,
+}: {
+  insight: Insight;
+  featured?: boolean;
+}) {
+  const cat = CATEGORY[insight.category];
+  return (
+    <article
+      className={`group flex h-full flex-col rounded-md border-s-2 border-accent bg-gold-100/60 transition-all hover:-translate-y-px hover:shadow-lift ${
+        featured ? "p-6 md:p-7" : "p-5"
+      }`}
+      style={{ transitionDuration: "var(--motion-quick)" }}
+    >
+      <div className="flex items-center gap-2.5">
+        <IconContainer
+          variant={cat.variant}
+          size={featured ? "md" : "sm"}
+          interactive
+        >
+          <cat.Glyph size={featured ? 17 : 14} />
+        </IconContainer>
+        <p className="min-w-0 flex-1 truncate text-small font-semibold text-foreground">
+          {insight.categoryLabel}
+          <span className="ms-2 font-normal text-foreground-faint">
+            {insight.matter}
+          </span>
+        </p>
+        <StatusText status={cat.status}>השפעה {insight.impact}</StatusText>
+      </div>
+      <p
+        className={`mt-3 leading-relaxed text-pretty text-foreground ${
+          featured ? "max-w-2xl text-subheading" : "text-small"
+        }`}
+      >
+        {insight.text}
+      </p>
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-4">
+        <Link
+          href={INSIGHT_LINKS[insight.id] ?? "/matters"}
+          className="rounded-xs text-small font-medium text-foreground transition-colors hover:text-gold-700"
+          style={{ transitionDuration: "var(--motion-quick)" }}
+        >
+          {insight.action} ←
+        </Link>
+        <ConfidenceBar value={insight.confidence} className="ms-auto" />
+        <span className="truncate text-micro text-foreground-faint">
+          {insight.source}
+        </span>
+      </div>
+    </article>
+  );
+}
+
 /**
- * תובנות AI — categorized, gold-marked findings: icon, explanation,
- * confidence, source, related matter, impact, one action each.
+ * מה עמית מצא — one featured finding, two quiet supporting ones.
+ * Asymmetric by design; the intelligence area, not an analytics grid.
  */
 export function AIInsightsSection() {
+  const [featured, ...rest] = AI_INSIGHTS;
   return (
-    <section aria-label="תובנות AI" className="flex h-full flex-col">
+    <section aria-label="תובנות AI">
       <SectionHeading
-        title="תובנות AI"
-        caption={`נוצר על ידי ${AI_INSIGHTS_META.generatedBy} · עודכן ${AI_INSIGHTS_META.updatedAt}`}
+        title="מה עמית מצא הבוקר"
+        caption={`עודכן ${AI_INSIGHTS_META.updatedAt} · מבוסס על מסמכי המשרד ונט המשפט`}
       />
-      <div className="mt-5 flex flex-1 flex-col gap-3">
-        {AI_INSIGHTS.map((insight) => {
-          const cat = CATEGORY[insight.category];
-          return (
-            <article
-              key={insight.id}
-              className="group rounded-md border-s-2 border-accent bg-gold-100/60 p-4 transition-all hover:-translate-y-px hover:shadow-lift"
-              style={{ transitionDuration: "var(--motion-quick)" }}
-            >
-              <div className="flex items-center gap-2.5">
-                <IconContainer variant={cat.variant} size="sm" interactive>
-                  <cat.Glyph size={14} />
-                </IconContainer>
-                <p className="flex-1 truncate text-small font-semibold text-foreground">
-                  {insight.categoryLabel}
-                  <span className="ms-2 font-normal text-foreground-faint">
-                    {insight.matter}
-                  </span>
-                </p>
-                <StatusText status={cat.status}>
-                  השפעה {insight.impact}
-                </StatusText>
-              </div>
-              <p className="mt-2.5 text-small leading-relaxed text-foreground">
-                {insight.text}
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                <ConfidenceBar value={insight.confidence} />
-                <span className="min-w-0 flex-1 truncate text-end text-micro text-foreground-faint">
-                  {insight.source}
-                </span>
-              </div>
-              <div className="mt-3 flex items-center justify-between border-t border-gold-300/50 pt-2.5">
-                <Link
-                  href={INSIGHT_LINKS[insight.id] ?? "/matters"}
-                  className="rounded-xs text-small font-medium text-foreground transition-colors hover:text-gold-700"
-                  style={{ transitionDuration: "var(--motion-quick)" }}
-                >
-                  {insight.action} ←
-                </Link>
-                <AIMark />
-              </div>
-            </article>
-          );
-        })}
+      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <InsightCard insight={featured} featured />
+        <div className="flex flex-col gap-5">
+          {rest.map((insight) => (
+            <InsightCard key={insight.id} insight={insight} />
+          ))}
+        </div>
       </div>
-      <p className="mt-3 flex items-center gap-1.5 text-micro text-foreground-faint">
+      <p className="mt-4 flex items-center gap-1.5 text-micro text-foreground-faint">
         <AIMark />
-        מבוסס על מסמכי המשרד ונט המשפט · עמית עשוי לטעות — בדוק לפני הסתמכות
+        עמית עשוי לטעות — בדוק לפני הסתמכות
       </p>
     </section>
   );

@@ -1,15 +1,16 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
+import { DocumentGlyph } from "@/design-system/icons/glyphs";
 import { AIMark } from "@/design-system/primitives/indicators";
-import { HERO_ACTIVE_MODE, HERO_MODES, HERO_PROVENANCE } from "../data";
-import { SupportingPriorities } from "./supporting-priorities";
-import { TodayMission } from "./today-mission";
+import { HERO_ACTIVE_MODE, HERO_FOCUS, HERO_MODES } from "../data";
+import { HealthRing } from "./matter-health";
 
 /**
- * The hero — LawME's iconic entry: a deep navy environment lit by
- * one sun from the top-start, with warm ivory light and champagne
- * reflections. One composition: greeting → עמית's read of the day →
- * Today's Mission (glass, dominant) → quiet supporting priorities.
- * Day-aware via HERO_MODES; today renders the hearing-day mode.
+ * The hero — one authored composition on precision-machined navy.
+ * No cards inside. One focal point (the mission line), one readiness
+ * accent, two quiet facts, one edge-lit champagne action.
+ * Answers only: what matters today · how ready am I · what next ·
+ * what LawME already prepared. Everything else lives below the fold.
  */
 export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
   const mode = HERO_MODES[HERO_ACTIVE_MODE];
@@ -17,50 +18,96 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
   return (
     <section
       aria-label="פתיח הבוקר"
-      className="surface-hero-dark relative overflow-hidden rounded-xl px-6 py-10 md:px-12 md:py-14"
+      className="surface-hero-dark relative overflow-hidden rounded-xl px-6 py-10 md:px-14 md:py-14"
     >
-      {/* the day signature */}
+      {/* quiet header line */}
       <div className="animate-rise flex flex-wrap items-center gap-x-4 gap-y-1">
         <p className="text-caption font-medium tracking-wider text-ink-200">
           {dateLine}
         </p>
-        <span aria-hidden className="hidden h-3 w-px bg-paper-0/20 sm:block" />
-        <p className="flex items-center gap-1.5 text-caption font-medium text-gold-300">
-          <span
-            aria-hidden
-            className="animate-breath h-1.5 w-1.5 rounded-pill bg-gold-400"
-          />
+        <span aria-hidden className="hidden h-3 w-px bg-paper-0/15 sm:block" />
+        <p className="text-caption font-medium text-gold-300">
           {mode.signature}
         </p>
       </div>
 
       {/* the greeting */}
-      <div className="animate-rise mt-6" style={{ animationDelay: "80ms" }}>
-        <h1 className="text-hero text-balance text-paper-0">
-          בוקר טוב, דניאל.
-        </h1>
-        <p className="mt-5 flex max-w-reading items-start gap-2.5 text-subheading leading-relaxed text-pretty text-ink-100">
-          <AIMark surface="navy" className="mt-2 shrink-0" />
-          <span>
-            {mode.aiLine}
-            <span className="mt-1.5 block text-micro text-ink-200">
-              {HERO_PROVENANCE}
-            </span>
-          </span>
-        </p>
-      </div>
-
-      {/* the mission — the dominant element */}
-      <div
-        className="animate-rise mt-10 md:mt-12"
-        style={{ animationDelay: "180ms" }}
+      <h1
+        className="animate-rise mt-8 text-hero text-balance text-paper-0"
+        style={{ animationDelay: "80ms" }}
       >
-        <TodayMission />
+        בוקר טוב, דניאל.
+      </h1>
+
+      {/* THE focal point — the mission line */}
+      <div className="animate-rise mt-7" style={{ animationDelay: "160ms" }}>
+        <p className="text-title font-semibold tracking-tight text-balance text-paper-0">
+          דיון בתיק כהן{" "}
+          <span className="text-gold-300">{HERO_FOCUS.countdown}</span>
+          <span className="text-ink-200"> · </span>
+          <time className="tabular-nums">{HERO_FOCUS.time}</time>
+        </p>
+        <p className="mt-2 text-small text-ink-200">{HERO_FOCUS.location}</p>
       </div>
 
-      {/* quiet supporting priorities */}
-      <div className="animate-rise" style={{ animationDelay: "260ms" }}>
-        <SupportingPriorities />
+      {/* the supporting cluster — readiness + two facts, no containers */}
+      <div
+        className="animate-rise mt-9 flex flex-wrap items-center gap-x-8 gap-y-5"
+        style={{ animationDelay: "240ms" }}
+      >
+        <span className="flex items-center gap-3">
+          <HealthRing
+            value={HERO_FOCUS.readiness}
+            status="completed"
+            surface="navy"
+          />
+          <span className="text-small font-medium text-paper-0">
+            מוכנות לדיון
+          </span>
+        </span>
+
+        <span aria-hidden className="hidden h-8 w-px bg-paper-0/12 md:block" />
+
+        <span className="flex min-w-0 items-center gap-2.5 text-small text-ink-100">
+          <DocumentGlyph size={14} className="shrink-0 text-status-today-onnavy" />
+          חסרים 2 נספחים
+          <button
+            type="button"
+            className="shrink-0 rounded-xs font-medium text-gold-300 transition-colors hover:text-gold-200"
+            style={{ transitionDuration: "var(--motion-quick)" }}
+          >
+            בקש מהלקוח ←
+          </button>
+        </span>
+
+        <span className="flex min-w-0 items-center gap-2.5 text-small text-ink-100">
+          <AIMark surface="navy" className="shrink-0" />
+          עמית מצא פסיקה חדשה — ע״א 4881/25
+          <button
+            type="button"
+            className="shrink-0 rounded-xs font-medium text-gold-300 transition-colors hover:text-gold-200"
+            style={{ transitionDuration: "var(--motion-quick)" }}
+          >
+            השווה לתיק ←
+          </button>
+        </span>
+      </div>
+
+      {/* one action */}
+      <div
+        className="animate-rise mt-11 flex flex-wrap items-center gap-5"
+        style={{ animationDelay: "320ms" }}
+      >
+        <Link
+          href="/matters"
+          className="inline-flex h-12 items-center rounded-md border border-gold-400/70 px-8 text-body font-semibold text-gold-200 shadow-gold-glow transition-all hover:-translate-y-px hover:border-gold-300 hover:bg-gold-500/10"
+          style={{ transitionDuration: "var(--motion-quick)" }}
+        >
+          {mode.cta}
+        </Link>
+        <p className="text-micro text-ink-200">
+          עמית סידר את החומרים לפי סדר הטיעון · עודכן 07:20
+        </p>
       </div>
     </section>
   );
