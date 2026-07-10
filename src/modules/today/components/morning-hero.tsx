@@ -18,7 +18,7 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
   return (
     <section
       aria-label="פתיח הבוקר"
-      className="surface-hero-dark relative overflow-hidden rounded-xl px-6 py-10 md:px-14 md:py-14"
+      className="surface-hero-dark relative overflow-hidden rounded-xl px-6 py-8 md:px-10 md:py-9"
     >
       {/* quiet header line */}
       <div className="animate-rise flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -33,15 +33,15 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
 
       {/* the greeting */}
       <h1
-        className="animate-rise mt-8 text-hero text-balance text-paper-0"
+        className="animate-rise mt-5 text-display font-bold tracking-tight text-balance text-paper-0"
         style={{ animationDelay: "80ms" }}
       >
         בוקר טוב, דניאל.
       </h1>
 
       {/* THE focal point — the mission line */}
-      <div className="animate-rise mt-7" style={{ animationDelay: "160ms" }}>
-        <p className="text-title font-semibold tracking-tight text-balance text-paper-0">
+      <div className="animate-rise mt-4" style={{ animationDelay: "160ms" }}>
+        <p className="text-heading font-semibold tracking-tight text-balance text-paper-0">
           דיון בתיק כהן{" "}
           <span className="text-gold-300">{HERO_FOCUS.countdown}</span>
           <span className="text-ink-200"> · </span>
@@ -52,7 +52,7 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
 
       {/* the supporting cluster — readiness + two facts, no containers */}
       <div
-        className="animate-rise mt-9 flex flex-wrap items-center gap-x-8 gap-y-5"
+        className="animate-rise mt-6 flex flex-wrap items-center gap-x-7 gap-y-4"
         style={{ animationDelay: "240ms" }}
       >
         <span className="flex items-center gap-3">
@@ -95,12 +95,12 @@ export function MorningHero({ dateLine }: { dateLine: ReactNode }) {
 
       {/* one action */}
       <div
-        className="animate-rise mt-11 flex flex-wrap items-center gap-5"
+        className="animate-rise mt-7 flex flex-wrap items-center gap-5"
         style={{ animationDelay: "320ms" }}
       >
         <Link
           href="/matters"
-          className="inline-flex h-12 items-center rounded-md border border-gold-400/70 px-8 text-body font-semibold text-gold-200 shadow-gold-glow transition-all hover:-translate-y-px hover:border-gold-300 hover:bg-gold-500/10"
+          className="inline-flex h-11 items-center rounded-md border border-gold-400/70 px-7 text-small font-semibold text-gold-200 shadow-gold-glow transition-all hover:-translate-y-px hover:border-gold-300 hover:bg-gold-500/10"
           style={{ transitionDuration: "var(--motion-quick)" }}
         >
           {mode.cta}

@@ -19,9 +19,9 @@ export function Workspace({
   return (
     <div
       className={cx(
-        "mx-auto w-full px-6 pb-40 md:px-10",
+        "mx-auto w-full px-5 pb-24 md:px-8",
         width === "wide"
-          ? "max-w-wide pt-6 md:pt-10"
+          ? "max-w-wide pt-5 md:pt-8"
           : "max-w-page pt-10 md:pt-16",
         className,
       )}

@@ -2,16 +2,16 @@ import type { ReactNode } from "react";
 import { ShellProvider } from "./shell-provider";
 import { TopBar } from "./top-bar";
 import { SideRail } from "./side-rail";
+import { UtilityRail } from "./utility-rail";
 import { MobileNav } from "./mobile-nav";
 import { CommandBar } from "./command-bar";
 import { AssistantPanel } from "./assistant-panel";
 
 /**
- * The LawME application shell:
- * skip-link → top bar → start-edge rail (desktop/tablet) → scrolling
- * canvas → bottom bar (mobile) → command bar → עמית.
- * Mounted once by the (os) route-group layout; navigation between
- * OS pages never re-mounts it.
+ * The LawME three-zone workspace:
+ * permanent navy sidebar (start) · central working canvas ·
+ * persistent utility rail (end) — with an integrated top bar
+ * spanning the canvas. Mobile: bottom navigation, no side zones.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -22,10 +22,11 @@ export function AppShell({ children }: { children: ReactNode }) {
       >
         דילוג לתוכן הראשי
       </a>
-      <TopBar />
       <SideRail />
-      <div className="pt-20 md:ps-28 md:pt-24 lg:ps-72">
-        <main id="main" className="pb-28 md:pb-0">
+      <TopBar />
+      <UtilityRail />
+      <div className="pt-16 md:ps-20 lg:ps-64 xl:pe-72">
+        <main id="main" className="pb-28 md:pb-8">
           {children}
         </main>
       </div>

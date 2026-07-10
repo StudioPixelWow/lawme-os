@@ -48,6 +48,18 @@
     0 4px 14px rgb(10 22 41 / 0.05);
 }
 
+/* The permanent navy sidebar — the product anchor. */
+@utility surface-sidebar {
+  background-color: #070f1e;
+  background-image:
+    radial-gradient(
+      40rem 20rem at 85% -6rem,
+      rgb(251 249 245 / 0.07),
+      transparent 60%
+    ),
+    linear-gradient(195deg, #101f3a 0%, #0a1629 45%, #070f1e 100%);
+}
+
 /* The dark hero environment — LawME's iconic entry. Deep navy with
    one sun: warm ivory light entering from the top-start, a champagne
    reflection under it, blue-black gradient depth and a refined

@@ -1,13 +1,17 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
 import {
+  BookGlyph,
   BriefcaseGlyph,
   CalendarGlyph,
   DocumentGlyph,
+  GearGlyph,
   HomeGlyph,
+  LedgerGlyph,
   UsersGlyph,
 } from "@/design-system/icons/glyphs";
 import { cx } from "@/design-system/utils/cx";
@@ -24,10 +28,17 @@ const GLYPHS: Record<
   document: DocumentGlyph,
 };
 
+/** Visual placeholders — no routes exist for these yet (visual sprint). */
+const SECONDARY = [
+  { label: "כספים", Glyph: LedgerGlyph },
+  { label: "ידע ותקדימים", Glyph: BookGlyph },
+];
+
 /**
- * The floating navigation rail — detached from the start edge (right,
- * in RTL), raised paper with soft depth. Tablet: icons only.
- * Desktop: icon + word. Mobile: hidden (floating bottom bar instead).
+ * The permanent navy sidebar — LawME's product anchor, fixed to the
+ * start edge (right, RTL). Deep navy with a soft top light, gold
+ * illuminated active state, logo plate, profile, main + secondary
+ * navigation, settings at the bottom. Tablet: icon mode.
  */
 export function SideRail() {
   const pathname = usePathname();
@@ -35,42 +46,101 @@ export function SideRail() {
   return (
     <nav
       aria-label="ניווט ראשי"
-      className="glass fixed start-4 top-28 bottom-4 z-30 hidden w-20 flex-col gap-1.5 rounded-xl px-3 py-5 md:flex lg:start-6 lg:w-56"
+      className="surface-sidebar fixed inset-y-0 start-0 z-40 hidden w-20 flex-col border-e border-paper-0/10 md:flex lg:w-64"
     >
-      {NAV_ITEMS.map((item) => {
-        const active = pathname.startsWith(item.href);
-        const Glyph = GLYPHS[item.icon];
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={active ? "page" : undefined}
-            title={item.label}
-            className={cx(
-              "relative flex h-11 items-center justify-center gap-3 rounded-md px-3 transition-all lg:justify-start",
-              active
-                ? "bg-gold-100/50 text-foreground shadow-gold-glow"
-                : "text-foreground-soft hover:-translate-x-px hover:bg-surface-sunken/60 hover:text-foreground",
-            )}
-            style={{ transitionDuration: "var(--motion-quick)" }}
-          >
-            <span
-              aria-hidden
-              className={cx(
-                "absolute start-0 h-5 w-0.5 rounded-pill bg-accent transition-opacity",
-                active ? "animate-underline opacity-100" : "opacity-0",
-              )}
-            />
-            <Glyph size={20} className="shrink-0" />
-            <span className="hidden text-small font-medium lg:inline">
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
+      {/* logo plate */}
+      <div className="flex justify-center px-4 pt-6 lg:justify-start lg:px-5">
+        <Link
+          href="/today"
+          aria-label="LawME — היום"
+          className="flex items-center justify-center rounded-md bg-paper-0 p-2 shadow-raised lg:px-4"
+        >
+          <Image
+            src="/brand/lawme-logo.png"
+            alt="LawME"
+            width={72}
+            height={48}
+            priority
+            className="h-9 w-auto lg:h-11"
+          />
+        </Link>
+      </div>
 
-      <div className="mt-auto hidden px-3 lg:block">
-        <p className="text-micro text-foreground-faint">
+      {/* profile */}
+      <div className="mt-6 flex items-center justify-center gap-3 border-y border-paper-0/8 px-4 py-4 lg:justify-start lg:px-5">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-gold-500/15 text-small font-semibold text-gold-300 shadow-seat">
+          ד
+        </span>
+        <span className="hidden min-w-0 lg:block">
+          <span className="block truncate text-small font-semibold text-paper-0">
+            עו״ד דניאל לוי
+          </span>
+          <span className="block truncate text-micro text-ink-200">
+            שותף מנהל
+          </span>
+        </span>
+      </div>
+
+      {/* main navigation */}
+      <div className="mt-4 flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 lg:px-4">
+        {NAV_ITEMS.map((item) => {
+          const active = pathname.startsWith(item.href);
+          const Glyph = GLYPHS[item.icon];
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              title={item.label}
+              className={cx(
+                "relative flex h-12 items-center justify-center gap-3.5 rounded-md px-3 text-body transition-all lg:justify-start lg:px-4",
+                active
+                  ? "bg-gold-500/15 font-semibold text-gold-200"
+                  : "font-medium text-ink-100 hover:-translate-x-px hover:bg-paper-0/8 hover:text-paper-0",
+              )}
+              style={{ transitionDuration: "var(--motion-quick)" }}
+            >
+              <span
+                aria-hidden
+                className={cx(
+                  "absolute start-0 h-6 w-0.5 rounded-pill bg-gold-400 transition-opacity",
+                  active ? "animate-underline opacity-100" : "opacity-0",
+                )}
+              />
+              <Glyph size={22} className="shrink-0" />
+              <span className="hidden lg:inline">{item.label}</span>
+            </Link>
+          );
+        })}
+
+        {/* secondary navigation */}
+        <p className="mt-6 hidden px-4 text-micro font-medium tracking-wider text-ink-300 lg:block">
+          בקרוב
+        </p>
+        <div className="mt-1 flex flex-col gap-1">
+          {SECONDARY.map((item) => (
+            <span
+              key={item.label}
+              title={`${item.label} · בקרוב`}
+              className="flex h-11 cursor-default items-center justify-center gap-3.5 rounded-md px-3 text-small font-medium text-ink-300/70 lg:justify-start lg:px-4"
+            >
+              <item.Glyph size={20} className="shrink-0" />
+              <span className="hidden lg:inline">{item.label}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* settings — bottom */}
+      <div className="border-t border-paper-0/8 px-3 py-4 lg:px-4">
+        <span
+          title="הגדרות · בקרוב"
+          className="flex h-11 cursor-default items-center justify-center gap-3.5 rounded-md px-3 text-small font-medium text-ink-200 lg:justify-start lg:px-4"
+        >
+          <GearGlyph size={20} className="shrink-0" />
+          <span className="hidden lg:inline">הגדרות המשרד</span>
+        </span>
+        <p className="mt-2 hidden px-4 text-micro text-ink-300 lg:block">
           LawME · מערכת ההפעלה המשפטית
         </p>
       </div>
