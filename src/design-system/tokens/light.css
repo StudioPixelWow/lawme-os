@@ -135,6 +135,49 @@
   filter: blur(6px);
 }
 
+/* ── Signature element B: the Context Halo ──────────────────
+   A restrained environmental light behind THE currently focused
+   operational object. Not a glow effect — the room's light leaning
+   toward the work. Apply to the focused object's wrapper only. */
+@utility context-halo {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    /* horizontal reach stays inside the workspace padding (20px) */
+    inset: -1.75rem -1.25rem;
+    pointer-events: none;
+    z-index: -1;
+    border-radius: 2rem;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, #c9a961 8%, transparent) 0%,
+      color-mix(in srgb, #c9a961 3%, transparent) 55%,
+      transparent 100%
+    );
+  }
+}
+
+/* ── Signature element C: the Living Edge ───────────────────
+   Interactive premium surfaces receive a hairline champagne edge
+   only on hover, keyboard focus, or live state — never constantly. */
+@utility living-edge {
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+  transition-property: outline-color, box-shadow, transform;
+  transition-duration: var(--motion-quick);
+  transition-timing-function: var(--ease-settle);
+  &:hover {
+    outline-color: color-mix(in srgb, #c9a961 40%, transparent);
+  }
+  &:focus-within {
+    outline-color: color-mix(in srgb, #c9a961 45%, transparent);
+  }
+  &[data-live="true"] {
+    outline-color: color-mix(in srgb, #c9a961 55%, transparent);
+  }
+}
+
 /* A soft champagne light-bloom — placed BEHIND a key surface (the
    hero's intelligence anchor). Absolutely positioned, never on content. */
 @utility bloom-gold {
