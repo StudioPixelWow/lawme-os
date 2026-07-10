@@ -12,10 +12,17 @@ export type IconContainerVariant =
   | "document"
   | "finance"
   | "ai"
+  | "dino"
   | "client"
-  | "calendar";
+  | "calendar"
+  | "matter"
+  | "court"
+  | "hearing"
+  | "research"
+  | "team"
+  | "communication";
 
-export type IconContainerSize = "sm" | "md" | "lg";
+export type IconContainerSize = "sm" | "md" | "lg" | "xl";
 
 /**
  * Per-variant material: background wash, icon ink, and (via the
@@ -35,6 +42,13 @@ const LIGHT: Record<IconContainerVariant, string> = {
   ai: "bg-gold-100 text-gold-600",
   client: "bg-status-waiting-wash text-status-waiting",
   calendar: "bg-status-scheduled-wash text-status-scheduled",
+  dino: "bg-gold-100 text-gold-600",
+  matter: "bg-ink-900 text-paper-0",
+  court: "bg-surface-sunken text-ink-700",
+  hearing: "bg-status-urgent-wash text-status-urgent",
+  research: "bg-surface-sunken text-ink-700",
+  team: "bg-surface-sunken text-ink-700",
+  communication: "bg-surface-sunken text-ink-700",
 };
 
 const NAVY: Record<IconContainerVariant, string> = {
@@ -50,12 +64,20 @@ const NAVY: Record<IconContainerVariant, string> = {
   ai: "bg-gold-500/15 text-gold-400",
   client: "bg-status-waiting-onnavy/15 text-status-waiting-onnavy",
   calendar: "bg-status-scheduled-onnavy/15 text-status-scheduled-onnavy",
+  dino: "bg-gold-500/15 text-gold-400",
+  matter: "bg-paper-0/10 text-paper-0",
+  court: "bg-paper-0/10 text-ink-100",
+  hearing: "bg-status-urgent-onnavy/15 text-status-urgent-onnavy",
+  research: "bg-paper-0/10 text-ink-100",
+  team: "bg-paper-0/10 text-ink-100",
+  communication: "bg-paper-0/10 text-ink-100",
 };
 
 const SIZES: Record<IconContainerSize, string> = {
   sm: "h-7 w-7 rounded-xs",
   md: "h-9 w-9 rounded-md",
   lg: "h-11 w-11 rounded-md",
+  xl: "h-14 w-14 rounded-lg",
 };
 
 /**
@@ -83,7 +105,9 @@ export function IconContainer({
     <span
       aria-hidden
       className={cx(
-        "flex shrink-0 items-center justify-center shadow-seat",
+        "relative flex shrink-0 items-center justify-center overflow-hidden shadow-seat",
+        // inner top highlight — the seat is a small physical control
+        "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:rounded-[inherit] before:bg-linear-to-b before:from-white/25 before:to-transparent",
         SIZES[size],
         surface === "navy" ? NAVY[variant] : LIGHT[variant],
         interactive &&

@@ -44,6 +44,18 @@ export function OfficeAttentionStrip() {
 
   return (
     <section aria-label="תשומת הלב של המשרד">
+      <div className="mb-2.5 flex items-baseline justify-between gap-4 px-1">
+        <h2 className="text-caption font-semibold tracking-wide text-foreground-soft">
+          מה דורש את תשומת הלב שלך היום
+        </h2>
+        <button
+          type="button"
+          className="shrink-0 rounded-xs text-micro font-semibold text-gold-700 transition-colors hover:text-gold-600"
+          style={{ transitionDuration: "var(--motion-quick)" }}
+        >
+          פתח את הרשימה המלאה ←
+        </button>
+      </div>
       <div className="surface-paper flex flex-wrap items-stretch gap-y-1 rounded-xl px-2 py-1.5">
         {OFFICE_ATTENTION.map((item, i) => {
           const critical = item.severity === "critical";

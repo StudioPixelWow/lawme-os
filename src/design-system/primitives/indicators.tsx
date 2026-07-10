@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SparkleGlyph } from "../icons/glyphs";
+import { DinoGlyph } from "../icons/glyphs";
 import { cx } from "../utils/cx";
 
 export type Status =
@@ -233,8 +233,10 @@ export function ConfidenceBar({
 }
 
 /**
- * The AI mark — דינו's small, consistent signature.
- * The ONLY sparkle in the product; never decorative.
+ * DinoMark — דינו's meridian seal. The single intelligence mark in
+ * the product: an instrument ring threaded by the meridian. Used only
+ * where דינו generated, prepared, verified or recommends. Never
+ * decorative; champagne gold on every surface.
  */
 export function AIMark({
   surface = "light",
@@ -244,8 +246,8 @@ export function AIMark({
   className?: string;
 }) {
   return (
-    <SparkleGlyph
-      size={11}
+    <DinoGlyph
+      size={12}
       aria-label="הוכן על ידי דינו"
       role="img"
       className={cx(
@@ -256,3 +258,6 @@ export function AIMark({
     />
   );
 }
+
+/** Alias — the product name for the intelligence mark. */
+export const DinoMark = AIMark;

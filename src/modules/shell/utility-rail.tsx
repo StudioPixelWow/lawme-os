@@ -2,16 +2,12 @@
 
 import {
   BellGlyph,
-  ChatGlyph,
   CourtGlyph,
-  MailGlyph,
   PhoneGlyph,
   SearchGlyph,
   TaskGlyph,
 } from "@/design-system/icons/glyphs";
 import { IconContainer } from "@/design-system/primitives/icon-container";
-import { AIMark } from "@/design-system/primitives/indicators";
-import { COMM_DRAFTS_WAITING, COMM_SUMMARY } from "@/modules/today/office";
 import { cx } from "@/design-system/utils/cx";
 import {
   MINI_CALENDAR,
@@ -96,7 +92,7 @@ export function UtilityRail() {
       {/* the next commitments — the live block */}
       <div className="mt-6 border-t border-line/60 pt-5">
         <p className="text-micro font-semibold tracking-wide text-foreground-faint">
-          הבא בתור
+          היום הקרוב
         </p>
         <ul className="mt-3 flex flex-col gap-3">
           {NEXT_COMMITMENTS.map((item, index) => (
@@ -146,7 +142,7 @@ export function UtilityRail() {
       {/* reminders */}
       <div className="mt-6 border-t border-line/60 pt-5">
         <p className="text-micro font-semibold tracking-wide text-foreground-faint">
-          תזכורות
+          התזכורות שלי
         </p>
         <ul className="mt-2.5 flex flex-col gap-2">
           {REMINDERS.map((reminder) => (
@@ -161,46 +157,10 @@ export function UtilityRail() {
         </ul>
       </div>
 
-      {/* communication intelligence — channels awaiting the office */}
-      <div className="mt-6 border-t border-line/60 pt-5">
-        <p className="text-micro font-semibold tracking-wide text-foreground-faint">
-          תקשורת ממתינה
-        </p>
-        <ul className="mt-2.5 flex flex-col gap-2">
-          {COMM_SUMMARY.map((c) => (
-            <li key={c.id}>
-              <button
-                type="button"
-                className="living-edge flex w-full items-center gap-2 rounded-md px-1.5 py-1 text-caption text-foreground-soft transition-colors hover:text-foreground"
-                style={{ transitionDuration: "var(--motion-quick)" }}
-              >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm bg-surface-sunken text-foreground-faint">
-                  {c.channel === "whatsapp" ? (
-                    <ChatGlyph size={13} />
-                  ) : c.channel === "email" ? (
-                    <MailGlyph size={13} />
-                  ) : (
-                    <PhoneGlyph size={13} />
-                  )}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-start">{c.label}</span>
-                <span className="shrink-0 font-semibold tabular-nums text-foreground">
-                  {c.count}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-2 flex items-center gap-1.5 text-micro text-foreground-faint">
-          <AIMark />
-          {COMM_DRAFTS_WAITING}
-        </p>
-      </div>
-
       {/* notifications */}
       <div className="mt-6 border-t border-line/60 pt-5">
         <p className="text-micro font-semibold tracking-wide text-foreground-faint">
-          התראות אחרונות
+          התראות מערכת
         </p>
         <ul className="mt-2.5 flex flex-col gap-2.5">
           {NOTIFICATIONS.map((n) => (
@@ -223,7 +183,7 @@ export function UtilityRail() {
       {/* team availability */}
       <div className="mt-auto border-t border-line/60 pt-5">
         <p className="text-micro font-semibold tracking-wide text-foreground-faint">
-          הצוות עכשיו
+          נוכחות צוות
         </p>
         <ul className="mt-3 flex items-center gap-3">
           {TEAM.map((member) => (

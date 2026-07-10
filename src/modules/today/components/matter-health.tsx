@@ -11,6 +11,9 @@ const RING_STROKE: Record<string, string> = {
   progress: "stroke-status-progress",
   today: "stroke-status-today",
   urgent: "stroke-status-urgent",
+  waiting: "stroke-status-waiting",
+  risk: "stroke-status-risk",
+  scheduled: "stroke-status-scheduled",
 };
 
 /**

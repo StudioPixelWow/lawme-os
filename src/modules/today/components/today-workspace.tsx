@@ -1,26 +1,21 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { AIMark } from "@/design-system/primitives/indicators";
 import { DEFAULT_FOCUS, eventById, focusedMatter, type FocusRef } from "../focus";
-import { ACTIVE_ROLE, ROLE_SECTIONS } from "../office";
-import { ClientWaiting } from "./client-waiting";
-import { ContextDock } from "./context-dock";
-import { CourtUpdates } from "./court-updates";
 import { DinoOffice } from "./dino-office";
-import { DocumentShelf } from "./document-shelf";
-import { FinanceStrip } from "./finance-strip";
-import { LeadStrip } from "./lead-strip";
 import { MatterBoard } from "./matter-board";
 import { OfficeAttentionStrip } from "./office-attention";
-import { TeamWorkload } from "./team-workload";
 import { TodayFocus } from "./today-focus";
+import { WorkspaceLaunchers } from "./workspace-launchers";
 
 /**
- * The central workspace orchestrator — the live operational map of
- * the firm. One focus drives the transformation; the section order
- * follows the active office role (Partner mode today); modules
- * expand only when the day's scenario justifies it. Esc returns one
- * focus level.
+ * The Morning Workspace — the approved V10 composition. A small
+ * number of large product objects: the Today Focus briefing, one
+ * office attention strip, the mixed Active Matters composition, the
+ * workspace launchers, and דינו's compact intelligence footer.
+ * Everything else lives in the rails, drawers and dedicated
+ * workspaces. One focus state; Esc returns to the day's default.
  */
 export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
   const [focus, setFocus] = useState<FocusRef>(DEFAULT_FOCUS);
@@ -38,84 +33,46 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
   const focusedEvent =
     (focus.kind === "event" ? eventById(focus.id) : undefined) ??
     eventById(DEFAULT_FOCUS.id)!;
-  const dockMatter = focusedMatter(focus) ?? focusedMatter(DEFAULT_FOCUS)!;
+  const selectedMatter = focusedMatter(focus) ?? focusedMatter(DEFAULT_FOCUS)!;
   const isDefault =
     focus.kind === DEFAULT_FOCUS.kind && focus.id === DEFAULT_FOCUS.id;
 
-  /* the role-ordered office sections (focus + attention always lead) */
-  const SECTIONS: Record<string, ReactNode> = {
-    matters: (
-      <MatterBoard
-        selectedId={dockMatter.id}
-        onSelect={(id) => setFocus({ kind: "matter", id })}
-      />
-    ),
-    team: <TeamWorkload />,
-    clients: <ClientWaiting />,
-    court: <CourtUpdates />,
-    documents: <DocumentShelf />,
-    leads: <LeadStrip />,
-    finance: <FinanceStrip />,
-    dino: <DinoOffice />,
-  };
-  const order = ROLE_SECTIONS[ACTIVE_ROLE].filter((key) => SECTIONS[key]);
-
   return (
     <div>
-      {/* ── the first viewport: the scene + its live context ── */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
-        <TodayFocus
-          dateLine={dateLine}
-          focusedEvent={focusedEvent}
-          onSelectEvent={(id) => setFocus({ kind: "event", id })}
-          isDefault={isDefault}
-        />
+      {/* 1 · the briefing */}
+      <TodayFocus
+        dateLine={dateLine}
+        focusedEvent={focusedEvent}
+        onSelectEvent={(id) => setFocus({ kind: "event", id })}
+        isDefault={isDefault}
+      />
 
-        {/* desktop: a docked floating layer beside the scene */}
-        <ContextDock
-          key={`dock-${dockMatter.id}`}
-          matter={dockMatter}
-          className="hidden xl:flex xl:sticky xl:top-24"
-        />
-
-        {/* smaller widths: the dock becomes a sheet-like expander */}
-        <details className="group/dock xl:hidden">
-          <summary
-            className="living-edge surface-paper flex cursor-pointer list-none items-center gap-3 rounded-xl px-5 py-3.5 text-small font-semibold text-foreground [&::-webkit-details-marker]:hidden"
-            style={{ transitionDuration: "var(--motion-quick)" }}
-          >
-            <span
-              aria-hidden
-              className="h-2 w-2 rounded-pill bg-gold-500 shadow-gold-breath"
-            />
-            ההקשר הפעיל · {dockMatter.name}
-            <span
-              aria-hidden
-              className="ms-auto text-foreground-faint transition-transform group-open/dock:rotate-90"
-            >
-              ‹
-            </span>
-          </summary>
-          <ContextDock matter={dockMatter} className="mt-3" />
-        </details>
-      </div>
-
-      {/* ── the office attention strip — the health of the firm ── */}
-      <div className="animate-rise mt-6" style={{ animationDelay: "120ms" }}>
+      {/* 2 · the office attention strip */}
+      <div className="animate-rise mt-8" style={{ animationDelay: "120ms" }}>
         <OfficeAttentionStrip />
       </div>
 
-      {/* ── the office, in the active role's priority order ── */}
-      {order.map((key, i) => (
-        <div
-          key={key}
-          id={key === "matters" ? "section-matters" : undefined}
-          className="animate-rise mt-10 md:mt-12"
-          style={{ animationDelay: `${180 + i * 60}ms` }}
-        >
-          {SECTIONS[key]}
-        </div>
-      ))}
+      {/* 3 · the work */}
+      <div className="animate-rise mt-10 md:mt-12" style={{ animationDelay: "200ms" }}>
+        <MatterBoard
+          selectedId={selectedMatter.id}
+          onSelect={(id) => setFocus({ kind: "matter", id })}
+        />
+      </div>
+
+      {/* 4 · the doors to the dedicated workspaces */}
+      <div className="animate-rise mt-10 md:mt-12" style={{ animationDelay: "280ms" }}>
+        <WorkspaceLaunchers />
+      </div>
+
+      {/* 5 · דינו — the compact intelligence footer */}
+      <div className="animate-rise mt-10 md:mt-12" style={{ animationDelay: "360ms" }}>
+        <DinoOffice />
+        <p className="mt-4 flex items-center justify-center gap-2 text-micro text-foreground-faint">
+          <AIMark />
+          דינו תמיד לצידך — אינטליגנציה משפטית ומשרדית
+        </p>
+      </div>
     </div>
   );
 }

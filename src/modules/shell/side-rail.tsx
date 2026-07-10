@@ -5,13 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
 import {
-  BookGlyph,
   BriefcaseGlyph,
   CalendarGlyph,
+  DinoGlyph,
   DocumentGlyph,
   GearGlyph,
   HomeGlyph,
   LedgerGlyph,
+  PlusGlyph,
+  ReportGlyph,
+  ResearchGlyph,
   UsersGlyph,
 } from "@/design-system/icons/glyphs";
 import { cx } from "@/design-system/utils/cx";
@@ -30,8 +33,11 @@ const GLYPHS: Record<
 
 /** Visual placeholders — no routes exist for these yet (visual sprint). */
 const SECONDARY = [
-  { label: "כספים", Glyph: LedgerGlyph },
-  { label: "ידע ותקדימים", Glyph: BookGlyph },
+  { label: "מחקר משפטי", Glyph: ResearchGlyph },
+  { label: "דינו", Glyph: DinoGlyph },
+  { label: "פיננסים", Glyph: LedgerGlyph },
+  { label: "צוות", Glyph: UsersGlyph },
+  { label: "דוחות", Glyph: ReportGlyph },
 ];
 
 /**
@@ -131,17 +137,26 @@ export function SideRail() {
         </div>
       </div>
 
-      {/* settings — bottom */}
+      {/* primary action + settings — bottom */}
       <div className="border-t border-paper-0/8 px-3 py-4 lg:px-4">
+        <button
+          type="button"
+          title="פעולה חדשה"
+          className="flex h-11 w-full items-center justify-center gap-2.5 rounded-md bg-paper-0/10 px-3 text-small font-semibold text-paper-0 shadow-seat transition-all hover:-translate-y-px hover:bg-paper-0/15 hover:shadow-lift lg:justify-start lg:px-4"
+          style={{ transitionDuration: "var(--motion-quick)" }}
+        >
+          <PlusGlyph size={18} className="shrink-0 text-gold-300" />
+          <span className="hidden lg:inline">פעולה חדשה</span>
+        </button>
         <span
           title="הגדרות · בקרוב"
-          className="flex h-11 cursor-default items-center justify-center gap-3.5 rounded-md px-3 text-small font-medium text-ink-200 lg:justify-start lg:px-4"
+          className="mt-1.5 flex h-11 cursor-default items-center justify-center gap-3.5 rounded-md px-3 text-small font-medium text-ink-200 lg:justify-start lg:px-4"
         >
           <GearGlyph size={20} className="shrink-0" />
           <span className="hidden lg:inline">הגדרות המשרד</span>
         </span>
         <p className="mt-2 hidden px-4 text-micro text-ink-300 lg:block">
-          LawME · מערכת ההפעלה המשפטית
+          LawME OS · גרסה 0.9
         </p>
       </div>
     </nav>

@@ -161,8 +161,8 @@ export function milestoneTrack(matter: Matter): MilestoneTrack {
 
 export const BOARD = {
   featured: ACTIVE_MATTERS[0],
-  supporting: ACTIVE_MATTERS.slice(1, 3),
-  queue: ACTIVE_MATTERS.slice(3),
+  supporting: ACTIVE_MATTERS.slice(1, 4),
+  queue: ACTIVE_MATTERS.slice(4),
 };
 
 /** Prepared-work objects for the Today Focus scene (hearing day). */

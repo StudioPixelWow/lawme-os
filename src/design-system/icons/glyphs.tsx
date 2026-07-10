@@ -255,3 +255,184 @@ export function MailGlyph({ size, ...rest }: GlyphProps) {
     </svg>
   );
 }
+
+/* ============================================================
+   V10 — the premium legal icon set. Same 24px grid, 1.5 stroke,
+   rounded caps, currentColor. Outlined language; fills only for
+   live/selected states. RTL-safe (no directional arrows here).
+   ============================================================ */
+
+/** דינו — the meridian seal. LawME's intelligence mark: an
+ *  instrument ring threaded by the gold meridian. Not a sparkle,
+ *  not a mascot — a system symbol. */
+export function DinoGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <circle cx="12" cy="12" r="7.5" />
+      <path d="M12 3v18" />
+      <circle cx="12" cy="8.2" r="1.7" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** מחקר משפטי — a magnifier over text lines. */
+export function ResearchGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M4.5 5.5H15M4.5 9.5h6M4.5 13.5h5" />
+      <circle cx="15.5" cy="13.5" r="4" />
+      <path d="m18.5 16.5 2.5 2.5" />
+    </svg>
+  );
+}
+
+/** חתימה — a signature baseline with the pen's stroke. */
+export function SignatureGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M4 17c2.2 0 2.6-5.5 4.6-5.5 1.6 0 .9 3.6 2.3 3.6 1.5 0 1.7-2 3.1-2 .9 0 1 1.2 2 1.2.8 0 1.4-.4 2-.9" />
+      <path d="M4 20.5h16" />
+    </svg>
+  );
+}
+
+/** הגשה — filing into the court's tray. */
+export function FilingGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M4 13.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4.5" />
+      <path d="M4 13.5h4.5c.4 1.6 1.7 2.5 3.5 2.5s3.1-.9 3.5-2.5H20" />
+      <path d="M12 3.5V11M8.8 8l3.2 3 3.2-3" />
+    </svg>
+  );
+}
+
+/** דיון / שופט — the bench with the ruling line. */
+export function BenchGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M4 20h16" />
+      <rect x="5" y="12.5" width="14" height="4" rx="1" />
+      <circle cx="12" cy="7" r="2.6" />
+    </svg>
+  );
+}
+
+/** חקיקה / צו — the scroll. */
+export function LegislationGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M7 4h11a2 2 0 0 1 2 2v1.5h-4" />
+      <path d="M16 6v12.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V18h10" />
+      <path d="M7.5 9.5h5M7.5 13h5" />
+    </svg>
+  );
+}
+
+/** ראיה — the sealed exhibit. */
+export function EvidenceGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <rect x="4.5" y="6.5" width="15" height="13" rx="2" />
+      <path d="M9 6.5V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5" />
+      <circle cx="12" cy="13" r="2.6" />
+      <path d="M12 10.4V9" />
+    </svg>
+  );
+}
+
+/** השוואת גרסאות — two sheets, mirrored. */
+export function CompareGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M12 3v18" />
+      <path d="M9.5 5.5H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3.5" />
+      <path d="M14.5 5.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-3.5" />
+    </svg>
+  );
+}
+
+/** היסטוריה — time turning back. */
+export function HistoryGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M5.5 12a6.5 6.5 0 1 1 1.9 4.6" />
+      <path d="M5.5 12H9M5.5 12 4 9.5" />
+      <path d="M12 8.5V12l2.3 1.4" />
+    </svg>
+  );
+}
+
+/** תצוגה מקדימה — the calm eye. */
+export function PreviewGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M3.5 12S6.5 6.5 12 6.5 20.5 12 20.5 12 17.5 17.5 12 17.5 3.5 12 3.5 12Z" />
+      <circle cx="12" cy="12" r="2.6" />
+    </svg>
+  );
+}
+
+/** מקרקעין — the building. */
+export function BuildingGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M5.5 20.5V5a1.5 1.5 0 0 1 1.5-1.5h6A1.5 1.5 0 0 1 14.5 5v15.5" />
+      <path d="M14.5 9.5H17a1.5 1.5 0 0 1 1.5 1.5v9.5" />
+      <path d="M4 20.5h16" />
+      <path d="M8.5 7h3M8.5 10.5h3M8.5 14h3" />
+    </svg>
+  );
+}
+
+/** ביטוח / אבטחה — the shield. */
+export function ShieldGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M12 3.5 5 6v5.5c0 4.6 3 7.6 7 9 4-1.4 7-4.4 7-9V6l-7-2.5Z" />
+      <path d="m9 12 2.2 2.2L15.5 10" />
+    </svg>
+  );
+}
+
+/** נעילה — attorney-client privilege. */
+export function LockGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <rect x="5.5" y="10.5" width="13" height="9.5" rx="2" />
+      <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
+      <path d="M12 14.5v2" />
+    </svg>
+  );
+}
+
+/** שיתוף — handing outward. */
+export function ShareGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <circle cx="6.5" cy="12" r="2.3" />
+      <circle cx="17" cy="6" r="2.3" />
+      <circle cx="17" cy="18" r="2.3" />
+      <path d="m8.6 10.9 6.3-3.7M8.6 13.1l6.3 3.7" />
+    </svg>
+  );
+}
+
+/** דוחות — the ruled report. */
+export function ReportGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <rect x="4.5" y="3.5" width="15" height="17" rx="2" />
+      <path d="M8.5 16v-4M12 16V8.5M15.5 16v-2.5" />
+    </svg>
+  );
+}
+
+/** פעולה חדשה. */
+export function PlusGlyph({ size, ...rest }: GlyphProps) {
+  return (
+    <svg {...base(size)} {...rest}>
+      <path d="M12 5.5v13M5.5 12h13" />
+    </svg>
+  );
+}
