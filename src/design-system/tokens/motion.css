@@ -1,0 +1,68 @@
+/* ============================================================
+   Shayish · Motion tokens — "gravity and ink"
+   Settle, don't bounce. Small distances. One choreography per view.
+   Docs: docs/design-system/06-motion.md
+   ============================================================ */
+
+@theme {
+  --ease-*: initial;
+
+  /* Decisive start, gentle landing — the default */
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Leaving elements accelerate away */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* Ambient, long reveals */
+  --ease-drift: cubic-bezier(0.33, 0, 0.67, 1);
+
+  /* The gold breath — AI thinking, the only ambient motion */
+  --animate-breath: breath 2.4s ease-in-out infinite;
+
+  /* Entrance choreography — settle in from 10px, once per view */
+  --animate-rise: rise var(--motion-reveal, 700ms) var(--ease-settle) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes breath {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+}
+
+:root {
+  --motion-instant: 80ms;  /* hover, press, toggles */
+  --motion-quick: 160ms;   /* chips, checkboxes, tooltips */
+  --motion-settle: 280ms;  /* cards, list items, accordion */
+  --motion-scene: 450ms;   /* panels, sheets, command bar, pages */
+  --motion-reveal: 700ms;  /* scroll-chapter reveals */
+  --motion-breath: 2400ms; /* gold AI breath only */
+}
+
+/* Reduced motion is first-class: collapse everything centrally. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-instant: 1ms;
+    --motion-quick: 1ms;
+    --motion-settle: 1ms;
+    --motion-scene: 1ms;
+    --motion-reveal: 1ms;
+    --motion-breath: 1ms;
+  }
+
+  .animate-breath {
+    animation: none;
+  }
+}

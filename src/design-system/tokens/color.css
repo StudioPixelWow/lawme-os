@@ -1,0 +1,63 @@
+/* ============================================================
+   Shayish · Color tokens
+   Three materials: paper (surfaces), ink (content), gold (light)
+   Docs: docs/design-system/02-color.md
+   ============================================================ */
+
+@theme {
+  /* Disable the default Tailwind palette — off-system colors must not compile. */
+  --color-*: initial;
+
+  /* ---- Paper — warm white / ivory surfaces ---- */
+  --color-paper-0: #fffefc;
+  --color-paper-50: #fbf9f5;
+  --color-paper-100: #f6f3ec;
+  --color-paper-200: #efeae0;
+  --color-paper-300: #e4ddcf;
+
+  /* ---- Ink — deep navy content ---- */
+  --color-ink-950: #081121;
+  --color-ink-900: #0a1629;
+  --color-ink-800: #12233f;
+  --color-ink-700: #1c3050;
+  --color-ink-600: #2c4265;
+  --color-ink-500: #3a4c68;
+  --color-ink-400: #5b6c87;
+  --color-ink-300: #7c8aa0;
+  --color-ink-200: #a8b2c2;
+  --color-ink-100: #d3d9e2;
+
+  /* ---- Gold — champagne light (AI & significance only) ---- */
+  --color-gold-700: #8c7239;
+  --color-gold-600: #a98b45;
+  --color-gold-500: #c9a961;
+  --color-gold-400: #d8be82;
+  --color-gold-300: #e8d9b5;
+  --color-gold-200: #f3ead3;
+  --color-gold-100: #faf5e8;
+
+  /* ---- Semantic — warm-shifted, quiet ---- */
+  --color-positive: #3d7a5c;
+  --color-positive-wash: #e9f1ec;
+  --color-caution: #a6641f;
+  --color-caution-wash: #f7edde;
+  --color-critical: #a63e3a;
+  --color-critical-wash: #f7e7e5;
+
+  /* ---- Aliases — what components actually use ---- */
+  --color-surface: var(--color-paper-50);
+  --color-surface-raised: var(--color-paper-0);
+  --color-surface-sunken: var(--color-paper-100);
+  --color-foreground: var(--color-ink-900);
+  --color-foreground-soft: var(--color-ink-500);
+  --color-foreground-faint: var(--color-ink-300);
+  --color-line: color-mix(in srgb, var(--color-ink-900) 8%, transparent);
+  --color-line-strong: color-mix(in srgb, var(--color-ink-900) 14%, transparent);
+  --color-accent: var(--color-gold-500);
+  --color-focus: var(--color-gold-600);
+
+  /* ---- Utility statics ---- */
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+}

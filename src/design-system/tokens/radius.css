@@ -1,0 +1,16 @@
+/* ============================================================
+   Shayish · Radius tokens
+   Soft but architectural. Nested radii decrease inward.
+   Docs: docs/design-system/05-shape-depth-glass.md
+   ============================================================ */
+
+@theme {
+  --radius-*: initial;
+
+  --radius-xs: 0.375rem; /* 6px  — chips, kbd */
+  --radius-sm: 0.5rem;   /* 8px  — inputs, buttons */
+  --radius-md: 0.75rem;  /* 12px — cards, popovers */
+  --radius-lg: 1rem;     /* 16px — panels, sheets, modals */
+  --radius-xl: 1.5rem;   /* 24px — glass surfaces, hero containers */
+  --radius-pill: 9999px; /* pills, avatars, dots */
+}

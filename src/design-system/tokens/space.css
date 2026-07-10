@@ -1,0 +1,20 @@
+/* ============================================================
+   Shayish · Space tokens
+   Base unit 4px + composition rhythm ("huge whitespace" as tokens)
+   Docs: docs/design-system/04-space-grid-layout.md
+   ============================================================ */
+
+@theme {
+  /* Base multiplier for numeric utilities (p-4 = 1rem etc.) */
+  --spacing: 0.25rem;
+
+  /* Rhythm — vertical composition */
+  --spacing-section: 7.5rem; /* 120px — between page chapters */
+  --spacing-block: 3rem;     /* 48px — between blocks in a chapter */
+  --spacing-element: 1.5rem; /* 24px — between related elements */
+  --spacing-tight: 0.75rem;  /* 12px — label→value, icon→text */
+
+  /* Measures — max-w-page / max-w-reading */
+  --container-page: 68rem;    /* the workspace canvas */
+  --container-reading: 42rem; /* prose measure */
+}

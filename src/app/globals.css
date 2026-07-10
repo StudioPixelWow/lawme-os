@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Self-hosted variable fonts (hebrew + latin subsets, font-display: swap).
+   npm-packaged so builds are reproducible offline — no Google request ever. */
+@import "@fontsource-variable/assistant";
+@import "@fontsource-variable/frank-ruhl-libre";
+
+/* Shayish tokens — order matters: color first (later files may reference it) */
+@import "../design-system/tokens/color.css";
+@import "../design-system/tokens/typography.css";
+@import "../design-system/tokens/space.css";
+@import "../design-system/tokens/radius.css";
+@import "../design-system/tokens/elevation.css";
+@import "../design-system/tokens/glass.css";
+@import "../design-system/tokens/motion.css";
+
+@theme {
+  --font-sans: "Assistant Variable", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Frank Ruhl Libre Variable", "Assistant Variable", Georgia,
+    serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* The gold focus ring — the moment of gold a user earns by acting. */
+@utility focus-gold {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-gold-300);
+    color: var(--color-ink-900);
+  }
+
+  ::placeholder {
+    color: var(--color-foreground-faint);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }

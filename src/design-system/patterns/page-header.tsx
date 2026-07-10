@@ -1,0 +1,27 @@
+import type { ReactNode } from "react";
+
+/**
+ * The editorial opening of every page:
+ * one serif display line + one quiet line of context.
+ */
+export function PageHeader({
+  title,
+  context,
+  children,
+}: {
+  title: string;
+  context?: ReactNode;
+  children?: ReactNode;
+}) {
+  return (
+    <header className="animate-rise">
+      <h1 className="font-display text-display text-foreground">{title}</h1>
+      {context ? (
+        <p className="mt-4 max-w-reading text-subheading text-foreground-soft">
+          {context}
+        </p>
+      ) : null}
+      {children ? <div className="mt-8">{children}</div> : null}
+    </header>
+  );
+}
