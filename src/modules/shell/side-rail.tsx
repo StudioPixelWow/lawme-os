@@ -19,6 +19,7 @@ import {
 } from "@/design-system/icons/glyphs";
 import { cx } from "@/design-system/utils/cx";
 import { NAV_ITEMS, type NavItem } from "@/config/navigation";
+import { SidebarAssistantDock } from "./sidebar-assistant-dock";
 
 const GLYPHS: Record<
   NavItem["icon"],
@@ -159,6 +160,9 @@ export function SideRail() {
           LawME OS · גרסה 0.9
         </p>
       </div>
+
+      {/* דינו — the permanent assistant dock */}
+      <SidebarAssistantDock hasNewMessage />
     </nav>
   );
 }
