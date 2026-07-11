@@ -27,23 +27,23 @@ export function SidebarAssistantDock({
         aria-label={assistantOpen ? "סגור את הצ'אט עם דינו" : "דינו — פתח את הצ'אט"}
         title="דינו"
         className={cx(
-          "group flex w-full items-center justify-center gap-3 rounded-xl p-2 text-start transition-all lg:justify-start lg:p-2.5",
+          "group relative flex w-full items-center justify-center gap-3 rounded-xl p-2 text-start transition-all lg:justify-start lg:p-2.5",
           "hover:-translate-y-0.5 hover:bg-paper-0/8 hover:shadow-lift",
           assistantOpen && "bg-paper-0/8 shadow-gold-glow",
         )}
         style={{ transitionDuration: "var(--motion-quick)" }}
         data-live={assistantOpen || undefined}
       >
-        {/* the avatar — the provided asset, untouched */}
+        {/* the avatar — larger, breaking out of the dock's frame */}
         <span
           className={cx(
-            "relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-pill shadow-seat transition-transform group-hover:scale-105 lg:h-12 lg:w-12",
+            "relative z-10 -mt-8 flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-pill shadow-float transition-transform group-hover:scale-105 lg:-mt-10 lg:h-[4.5rem] lg:w-[4.5rem]",
             hasNewMessage && "shadow-gold-breath",
           )}
           style={{ transitionDuration: "var(--motion-quick)" }}
         >
           <Image
-            src="/brand/DINO-BOT.png"
+            src="/brand/Dino-Bot.png"
             alt=""
             width={96}
             height={96}

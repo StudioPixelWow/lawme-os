@@ -1,125 +1,138 @@
-import Link from "next/link";
-import type { ReactNode } from "react";
-import {
-  BriefcaseGlyph,
-  CalendarGlyph,
-  DinoGlyph,
-  DocumentGlyph,
-  LedgerGlyph,
-  ResearchGlyph,
-  UserGlyph,
-  UsersGlyph,
-} from "@/design-system/icons/glyphs";
-import { ICON } from "@/design-system/icons/tokens";
-import { IconContainer, type IconContainerVariant } from "@/design-system/primitives/icon-container";
-import { cx } from "@/design-system/utils/cx";
-import { SectionHeading } from "./section-heading";
+"use client";
 
-type Launcher = {
-  id: string;
-  name: string;
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { SectionHeading } from "./section-heading";
+import styles from "./workspace-launchers.module.css";
+
+type NavigationItem = {
+  key: string;
+  title: string;
   description: string;
-  icon: ReactNode;
-  variant: IconContainerVariant;
+  /** real transparent liquid-gold PNG from public/brand */
+  icon: string;
   href?: string;
   soon?: boolean;
 };
 
-const LAUNCHERS: Launcher[] = [
+const navigationItems: NavigationItem[] = [
   {
-    id: "matters",
-    name: "תיקים",
-    description: "ניהול ההליכים והמשימות",
-    icon: <BriefcaseGlyph size={ICON.launcher} />,
-    variant: "matter",
+    key: "cases",
+    title: "תיקים",
+    description: "ניהול התיקים והמשימות",
+    icon: "/brand/תיקים.png",
     href: "/matters",
   },
   {
-    id: "documents",
-    name: "מסמכים",
+    key: "documents",
+    title: "מסמכים",
     description: "שולחן העבודה במסמכים",
-    icon: <DocumentGlyph size={ICON.launcher} />,
-    variant: "document",
+    icon: "/brand/מסמכים.png",
     href: "/documents",
   },
   {
-    id: "research",
-    name: "מחקר משפטי",
-    description: "חיפוש פסיקה וניתוח",
-    icon: <ResearchGlyph size={ICON.launcher} />,
-    variant: "research",
+    key: "legal-research",
+    title: "מחקר משפטי",
+    description: "חיפוש פסיקה וניתוח משפטי",
+    icon: "/brand/מחקר משפטי.png",
     soon: true,
   },
   {
-    id: "clients",
-    name: "לקוחות",
+    key: "clients",
+    title: "לקוחות",
     description: "תקשורת ועדכונים",
-    icon: <UserGlyph size={ICON.launcher} />,
-    variant: "client",
+    icon: "/brand/לקוחות.png",
     href: "/clients",
   },
   {
-    id: "calendar",
-    name: "יומן",
+    key: "calendar",
+    title: "יומן",
     description: "דיונים, מועדים ופגישות",
-    icon: <CalendarGlyph size={ICON.launcher} />,
-    variant: "calendar",
+    icon: "/brand/יומן.png",
     href: "/calendar",
   },
   {
-    id: "team",
-    name: "צוות",
+    key: "team",
+    title: "צוות",
     description: "עומסים, נוכחות וקיבולת",
-    icon: <UsersGlyph size={ICON.launcher} />,
-    variant: "team",
+    icon: "/brand/צוות.png",
     soon: true,
   },
   {
-    id: "finance",
-    name: "פיננסים",
+    key: "finance",
+    title: "פיננסים",
     description: "חיוב, גבייה ודוחות",
-    icon: <LedgerGlyph size={ICON.launcher} />,
-    variant: "finance",
+    icon: "/brand/פיננסים.png",
     soon: true,
   },
   {
-    id: "dino",
-    name: "תובנות דינו",
+    key: "dino-insights",
+    title: "תובנות דינו",
     description: "אינטליגנציה משרדית",
-    icon: <DinoGlyph size={ICON.launcher} />,
-    variant: "dino",
+    icon: "/brand/תובנות דינו.png",
     soon: true,
   },
 ];
 
-function LauncherBody({ launcher }: { launcher: Launcher }) {
-  return (
+/** One Liquid Gold navigation card — the whole card is the control. */
+function LawMeNavigationCard({
+  item,
+  active,
+}: {
+  item: NavigationItem;
+  active: boolean;
+}) {
+  const body = (
     <>
-      <IconContainer variant={launcher.variant} size="xl" interactive>
-        {launcher.icon}
-      </IconContainer>
-      <span className="mt-3 flex items-center gap-2 text-small font-semibold text-foreground">
-        {launcher.name}
-        {launcher.soon ? (
-          <span className="rounded-xs bg-surface-sunken px-1.5 py-0.5 text-micro font-medium text-foreground-faint">
-            בקרוב
-          </span>
-        ) : null}
+      <span className={styles.iconWrap}>
+        <Image
+          src={item.icon}
+          alt=""
+          aria-hidden="true"
+          width={264}
+          height={264}
+          className={styles.icon}
+        />
       </span>
-      <span className="mt-0.5 text-micro leading-snug text-foreground-faint">
-        {launcher.description}
-      </span>
+      <h3 className={styles.title}>{item.title}</h3>
+      <p className={styles.description}>{item.description}</p>
+      {item.soon ? <span className={styles.badge}>בקרוב</span> : null}
     </>
+  );
+
+  if (item.href) {
+    return (
+      <Link
+        href={item.href}
+        aria-label={`${item.title} — ${item.description}`}
+        data-active={active || undefined}
+        className={styles.card}
+      >
+        {body}
+      </Link>
+    );
+  }
+  return (
+    <button
+      type="button"
+      aria-label={`${item.title} — ${item.description} (בקרוב)`}
+      className={styles.card}
+    >
+      {body}
+    </button>
   );
 }
 
 /**
- * סביבת העבודה המשרדית — the doors into LawME's dedicated
- * applications. Each launcher is an entrance, not a tile: a premium
- * icon seat, the workspace name, one functional line. Hover lifts
- * the door into glass.
+ * סביבת העבודה המשרדית — the Liquid Gold navigation row. Deep
+ * blue-black glass cards with a thin gold frame and the 3D
+ * liquid-gold marks; the depth lives in the assets, the restraint
+ * in the CSS. Routes, badges and behavior unchanged.
  */
 export function WorkspaceLaunchers() {
+  const pathname = usePathname();
+
   return (
     <section aria-label="סביבת העבודה המשרדית">
       <SectionHeading
@@ -127,35 +140,15 @@ export function WorkspaceLaunchers() {
         caption="כניסה ליישומי המשרד הייעודיים"
       />
 
-      <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
-        {LAUNCHERS.map((launcher) => {
-          const inner = <LauncherBody launcher={launcher} />;
-          const shared = cx(
-            "living-edge group flex h-full w-full flex-col items-start rounded-xl p-4 text-start transition-all",
-            "surface-paper hover:glass hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lift",
-          );
-          return (
-            <li key={launcher.id} className="min-w-0">
-              {launcher.href ? (
-                <Link
-                  href={launcher.href}
-                  className={shared}
-                  style={{ transitionDuration: "var(--motion-smooth)" }}
-                >
-                  {inner}
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  className={shared}
-                  style={{ transitionDuration: "var(--motion-smooth)" }}
-                >
-                  {inner}
-                </button>
-              )}
-            </li>
-          );
-        })}
+      <ul className={`${styles.grid} mt-5 list-none`}>
+        {navigationItems.map((item) => (
+          <li key={item.key} className="min-w-0">
+            <LawMeNavigationCard
+              item={item}
+              active={Boolean(item.href && pathname.startsWith(item.href))}
+            />
+          </li>
+        ))}
       </ul>
     </section>
   );

@@ -1,0 +1,199 @@
+/* ============================================================
+   Liquid Gold navigation cards — סביבת העבודה המשרדית.
+   Deep blue-black glass, thin gold frame, 3D liquid-gold icons.
+   ============================================================ */
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  direction: rtl;
+}
+
+@media (min-width: 560px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+  }
+}
+
+/* the canvas is wide enough for the full row only on very wide screens */
+@media (min-width: 1800px) {
+  .grid {
+    grid-template-columns: repeat(8, minmax(150px, 1fr));
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 300px;
+  padding: 34px 20px 28px;
+  text-align: center;
+  direction: rtl;
+  border-radius: 28px;
+  border: 1px solid rgb(211 168 83 / 0.5);
+  background:
+    radial-gradient(
+      circle at 50% 5%,
+      rgb(255 204 102 / 0.07),
+      transparent 38%
+    ),
+    linear-gradient(
+      180deg,
+      rgb(11 27 45 / 0.98) 0%,
+      rgb(3 15 29 / 0.99) 100%
+    );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    inset 0 0 28px rgb(255 197 92 / 0.025),
+    0 18px 40px rgb(0 8 18 / 0.26);
+  transition:
+    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 240ms ease,
+    background 240ms ease,
+    box-shadow 240ms ease;
+}
+
+@media (max-width: 560px) {
+  .card {
+    border-radius: 22px;
+    min-height: 260px;
+  }
+}
+
+.card:hover {
+  transform: translateY(-7px);
+  border-color: rgb(235 191 102 / 0.86);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 22px 52px rgb(0 8 18 / 0.38),
+    0 0 28px rgb(213 164 67 / 0.08);
+}
+
+.card:focus-visible {
+  outline: 2px solid rgb(244 202 116 / 0.95);
+  outline-offset: 4px;
+}
+
+.card[data-active="true"] {
+  border-color: rgb(240 198 112 / 0.95);
+  background:
+    radial-gradient(
+      circle at 50% 2%,
+      rgb(227 177 79 / 0.12),
+      transparent 42%
+    ),
+    linear-gradient(180deg, rgb(13 31 51 / 0.99), rgb(3 17 32 / 1));
+  box-shadow:
+    inset 0 0 0 1px rgb(255 216 141 / 0.08),
+    0 18px 42px rgb(0 8 18 / 0.36),
+    0 0 30px rgb(211 165 74 / 0.09);
+}
+
+/* a thin gold thread crowns the active card */
+.card[data-active="true"]::after {
+  content: "";
+  display: block;
+  order: -1;
+  width: 44px;
+  height: 2px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: rgb(240 198 112 / 0.85);
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 132px;
+  height: 132px;
+  margin-inline: auto;
+}
+
+/* the quiet gold halo behind the icon */
+.iconWrap::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background: rgb(217 168 72 / 0.16);
+  filter: blur(30px);
+  opacity: 0.7;
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.35))
+    drop-shadow(0 0 14px rgb(221 173 75 / 0.16));
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 260ms ease;
+}
+
+.card:hover .icon {
+  transform: translateY(-6px) scale(1.045);
+  filter: drop-shadow(0 15px 22px rgb(0 0 0 / 0.4))
+    drop-shadow(0 0 20px rgb(227 179 83 / 0.25));
+}
+
+.card:hover .iconWrap::before {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.title {
+  margin-top: 18px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #d7aa5d;
+}
+
+.description {
+  margin-top: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: rgb(241 244 249 / 0.82);
+}
+
+.badge {
+  margin-top: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid rgb(211 168 83 / 0.35);
+  font-size: 12px;
+  color: rgb(241 244 249 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .icon,
+  .iconWrap::before {
+    transition: none;
+  }
+  .card:hover,
+  .card:hover .icon {
+    transform: none;
+  }
+}
