@@ -1,0 +1,29 @@
+{
+  "$comment": "LawME project-scoped MCP servers. NO SECRETS in this file — authentication is per-user via OAuth (browser approval on first use in Claude Code). Supabase is pinned to the LawME DEVELOPMENT project and read-only; writes go through versioned migrations with founder approval.",
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=udispadsbxqicmawqcuk&read_only=true&features=database%2Cdocs%2Cdebugging%2Cdevelopment"
+    },
+    "vercel": {
+      "type": "http",
+      "url": "https://mcp.vercel.com"
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "X-MCP-Toolsets": "repos,issues,pull_requests,actions,code_security"
+      }
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--browser", "chromium"]
+    }
+  }
+}

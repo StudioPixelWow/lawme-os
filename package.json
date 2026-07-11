@@ -7,7 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "env:check": "node scripts/validate-environment.mjs",
+    "db:types": "supabase gen types typescript --project-id udispadsbxqicmawqcuk --schema public > src/types/database.types.ts",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:status": "supabase status",
+    "db:reset:local": "supabase db reset --local",
+    "db:lint": "supabase db lint --local"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "^5.2.9",
@@ -23,6 +30,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "playwright-core": "^1.61.1",
+    "supabase": "^2.109.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

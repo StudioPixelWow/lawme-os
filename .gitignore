@@ -42,3 +42,17 @@ next-env.d.ts
 
 # local transfer staging
 /_to_delete/
+
+# supabase local
+supabase/.temp/
+supabase/.branches/
+
+# playwright state
+/playwright/.auth/
+/test-results/
+
+# claude local state
+.claude/settings.local.json
+
+# keep the example env file tracked (names only, no values)
+!.env.example

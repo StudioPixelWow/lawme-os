@@ -1,0 +1,5 @@
+-- LawME development seed.
+-- Runs on `supabase db reset` (LOCAL ONLY — never against a remote DB).
+-- Keep idempotent and free of real client data. Typed mock data lives in
+-- src/modules/today/*.ts until the schema lands; add seed rows here as
+-- tables are introduced by versioned migrations.
