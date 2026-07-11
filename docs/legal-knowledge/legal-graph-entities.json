@@ -1,0 +1,27 @@
+{
+  "$comment": "LawME Legal Knowledge Graph — entity type definitions (Epic 0, Phase 10). Design only; no storage is provisioned from this file.",
+  "entities": [
+    { "type": "judgment", "description": "A delivered court judgment (פסק דין)", "key_properties": ["document_id", "case_number", "court", "document_date", "authority_type"], "backed_by": "unified document (document_type=judgment)" },
+    { "type": "decision", "description": "An interim or procedural decision (החלטה)", "key_properties": ["document_id", "case_number", "court", "document_date"], "backed_by": "unified document (document_type=decision)" },
+    { "type": "case", "description": "A court case/proceeding as a whole — the container of its judgments and decisions", "key_properties": ["case_number", "court", "procedure_type", "status"], "backed_by": "derived from documents sharing a normalized case number" },
+    { "type": "procedure", "description": "Procedure type (ע\"א, בג\"ץ, סע\"ש…) with its hierarchy semantics", "key_properties": ["code", "court_level", "appeal_path"], "backed_by": "reference table" },
+    { "type": "court", "description": "A court or tribunal", "key_properties": ["name", "level", "district", "specialization"], "backed_by": "reference table" },
+    { "type": "judge", "description": "A judge or registrar", "key_properties": ["name", "courts", "active_years"], "backed_by": "extracted + curated reference" },
+    { "type": "party", "description": "A litigant (person/organization; may be anonymized)", "key_properties": ["name", "kind", "anonymized"], "backed_by": "document parties, entity-resolved" },
+    { "type": "lawyer", "description": "Counsel appearing on a document", "key_properties": ["name", "bar_status_unknown_ok"], "backed_by": "document lawyers, entity-resolved" },
+    { "type": "statute", "description": "A law (חוק) as a versioned whole", "key_properties": ["name", "official_ref", "current_version_date"], "backed_by": "unified document (document_type=legislation) + version chain" },
+    { "type": "section", "description": "A section (סעיף) of a statute or regulation", "key_properties": ["parent_ref", "section_number", "version_date"], "backed_by": "derived from legislation structure" },
+    { "type": "regulation", "description": "Secondary legislation (תקנות/צווים)", "key_properties": ["name", "official_ref", "parent_statute", "version_date"], "backed_by": "unified document (document_type=regulation|order)" },
+    { "type": "legal_issue", "description": "A discrete legal question (e.g. הרמת מסך, פיטורים שלא כדין)", "key_properties": ["label_he", "label_en", "domain"], "backed_by": "curated taxonomy + AI extraction (inference-labeled)" },
+    { "type": "legal_principle", "description": "A doctrine/test established by case law (e.g. מבחן ההשתלבות)", "key_properties": ["label_he", "establishing_judgments"], "backed_by": "curated + AI extraction (inference-labeled)" },
+    { "type": "remedy", "description": "A remedy type (פיצויים, צו מניעה, אכיפה)", "key_properties": ["label_he", "kind"], "backed_by": "reference taxonomy" },
+    { "type": "evidence", "description": "An evidence item inside a matter", "key_properties": ["document_id", "matter_id", "kind"], "backed_by": "unified document (document_type=evidence), firm-private" },
+    { "type": "document", "description": "Any unified-schema document not covered by a more specific entity", "key_properties": ["document_id", "document_type"], "backed_by": "unified document" },
+    { "type": "organization", "description": "A company/NPO/public body appearing as party or subject", "key_properties": ["name", "registry_number", "kind"], "backed_by": "entity-resolved against companies/amutot registries (data.gov.il)" },
+    { "type": "regulator", "description": "A regulator/authority issuing guidance", "key_properties": ["name", "domain"], "backed_by": "reference table (registry category D)" },
+    { "type": "matter", "description": "A LawME firm matter (תיק משרדי)", "key_properties": ["matter_id", "practice_area", "status"], "backed_by": "LawME core (firm-private, RLS)" },
+    { "type": "client", "description": "A firm client", "key_properties": ["client_id"], "backed_by": "LawME core (firm-private, RLS, PII-guarded)" },
+    { "type": "firm_document", "description": "Firm-private document (pleading, opinion, template, playbook)", "key_properties": ["document_id", "matter_id", "firm_doc_kind"], "backed_by": "unified document (source_type=G-firm-private)" },
+    { "type": "practice_area", "description": "Practice area (דיני עבודה, מקרקעין…)", "key_properties": ["label_he", "label_en"], "backed_by": "reference taxonomy shared with practice packs" }
+  ]
+}

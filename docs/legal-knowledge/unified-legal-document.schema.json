@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lawme.co.il/schemas/unified-legal-document.schema.json",
+  "title": "LawME Unified Legal Document",
+  "description": "Canonical envelope for every document in the LawME legal knowledge system — judicial, legislative, regulatory, academic and firm-private. Schema-only phase: no database migration derives from this file without founder approval.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "document_id", "source_id", "source_type", "authority_type",
+    "document_type", "title", "language", "ingestion_date",
+    "verification_status", "license_status", "storage_policy", "hash",
+    "version"
+  ],
+  "properties": {
+    "document_id": {
+      "type": "string",
+      "description": "LawME-internal stable ID (ULID). Never derived from mutable source fields.",
+      "pattern": "^doc_[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "judgment", "decision", "legislation", "regulation", "order",
+        "bill", "protocol", "guidance", "circular", "regulator_decision",
+        "ethics_decision", "academic_article", "internal_firm_document",
+        "pleading", "contract", "legal_opinion", "evidence", "court_filing"
+      ]
+    },
+    "canonical_source_url": { "type": ["string", "null"], "description": "Permanent public URL of the document at its authoritative publisher" },
+    "original_file_url": { "type": ["string", "null"], "description": "Direct URL of the original file (PDF/DOC) as published" },
+    "source_id": { "type": "string", "pattern": "^(LSR-\\d{3}|FIRM)$", "description": "Registry source (or FIRM for category-G documents)" },
+    "source_type": {
+      "type": "string",
+      "enum": ["A-judicial", "B-legislation", "C-legislative-process", "D-regulators", "E-open-secondary", "F-commercial", "G-firm-private"]
+    },
+    "authority_type": {
+      "type": "string",
+      "enum": ["binding", "persuasive", "secondary", "internal", "unverified", "unknown"],
+      "description": "Per the trust model; never defaulted to a trusted value"
+    },
+
+    "title": { "type": "string", "minLength": 1 },
+    "title_he": { "type": ["string", "null"] },
+    "title_en": { "type": ["string", "null"] },
+
+    "document_date": { "type": ["string", "null"], "format": "date", "description": "Date the document was signed/decided" },
+    "publication_date": { "type": ["string", "null"], "format": "date" },
+    "effective_date": { "type": ["string", "null"], "format": "date", "description": "Entry into force (legislation/regulation)" },
+    "version_date": { "type": ["string", "null"], "format": "date", "description": "Consolidation/version date for legislation" },
+    "ingestion_date": { "type": "string", "format": "date-time" },
+    "verification_date": { "type": ["string", "null"], "format": "date-time", "description": "Last time the document was verified against its canonical source" },
+
+    "case_number": { "type": ["string", "null"], "description": "Normalized case number, e.g. ע\"א 1234/23" },
+    "case_number_raw": { "type": ["string", "null"] },
+    "procedure_type": { "type": ["string", "null"], "description": "e.g. ע\"א, בג\"ץ, ת\"א, סע\"ש" },
+    "court": { "type": ["string", "null"] },
+    "chamber": { "type": ["string", "null"] },
+    "judges": { "type": "array", "items": { "type": "string" }, "description": "Panel; first entry = presiding/authoring judge where known" },
+    "panel_size": { "type": ["integer", "null"] },
+    "parties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string", "description": "e.g. תובע, נתבע, מערער, משיב" },
+          "anonymized": { "type": ["boolean", "null"] }
+        },
+        "required": ["name", "role"]
+      }
+    },
+    "lawyers": { "type": "array", "items": { "type": "string" } },
+
+    "legal_domains": { "type": "array", "items": { "type": "string" } },
+    "legal_issues": { "type": "array", "items": { "type": "string" } },
+    "statutes_cited": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "statute": { "type": "string" },
+          "section": { "type": ["string", "null"] },
+          "version_date": { "type": ["string", "null"] },
+          "target_document_id": { "type": ["string", "null"] }
+        },
+        "required": ["statute"]
+      }
+    },
+    "cases_cited": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "case_number": { "type": "string" },
+          "target_document_id": { "type": ["string", "null"] },
+          "treatment": { "type": ["string", "null"], "enum": ["follows", "applies", "interprets", "distinguishes", "limits", "overturns", "approves", "mentions", null] },
+          "location": { "type": ["string", "null"], "description": "Paragraph/page anchor of the citation" }
+        },
+        "required": ["case_number"]
+      }
+    },
+    "cases_citing": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "document_ids of later documents citing this one (maintained by the citator, never hand-set)"
+    },
+
+    "outcome": { "type": ["string", "null"] },
+    "remedies": { "type": "array", "items": { "type": "string" } },
+    "amounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": { "type": "number" },
+          "currency": { "type": "string", "default": "ILS" },
+          "kind": { "type": "string", "description": "e.g. damages, costs, fine" }
+        },
+        "required": ["amount", "kind"]
+      }
+    },
+    "majority_minority": { "type": ["string", "null"], "description": "Majority/minority composition where applicable" },
+    "ratio": { "type": ["string", "null"], "description": "Ratio decidendi summary — AI-extracted, labeled inference until reviewed" },
+    "obiter": { "type": ["string", "null"], "description": "Obiter dicta notes — AI-extracted, labeled inference until reviewed" },
+    "appeal_status": { "type": ["string", "null"], "enum": ["not_appealed", "appeal_pending", "affirmed", "reversed", "partially_reversed", "settled", "unknown", null] },
+    "later_treatment": { "type": ["string", "null"], "enum": ["positive", "negative", "limited", "distinguished", "overruled", "superseded_by_legislation", "none_observed", "unknown", null] },
+
+    "full_text": { "type": ["string", "null"], "description": "Stored only when storage_policy permits" },
+    "extracted_text": { "type": ["string", "null"] },
+    "page_count": { "type": ["integer", "null"] },
+    "language": { "type": "string", "enum": ["he", "en", "ar", "mixed", "other"] },
+    "ocr_status": { "type": ["string", "null"], "enum": ["not_required", "pending", "completed", "low_confidence", "failed", null] },
+
+    "hash": { "type": "string", "description": "SHA-256 of the original file/content as retrieved" },
+    "version": { "type": "integer", "minimum": 1, "description": "LawME record version; increments on any change, prior versions retained" },
+    "metadata_confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "verification_status": {
+      "type": "string",
+      "enum": ["verified_primary", "verified_licensed", "secondary_supported", "inference", "unverified", "unknown"]
+    },
+    "license_status": { "type": "string", "description": "License applying to THIS document copy: open / public_domain_text / licensed:<ref> / firm_private / unknown" },
+    "storage_policy": {
+      "type": "string",
+      "enum": ["store_full", "store_extract", "pointer_only"],
+      "description": "pointer_only for tier-6 mirrors and permission-unclear sources"
+    },
+    "retention_policy": { "type": ["string", "null"], "description": "e.g. permanent, until_license_end, matter_lifetime+7y" },
+
+    "citation_locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cited_ref": { "type": "string" },
+          "paragraph_anchor": { "type": ["string", "null"] },
+          "page_anchor": { "type": ["integer", "null"] },
+          "char_offset": { "type": ["integer", "null"] }
+        },
+        "required": ["cited_ref"]
+      }
+    },
+    "paragraph_anchors": { "type": "array", "items": { "type": "string" }, "description": "Stable paragraph IDs for pinpoint citation" },
+    "page_anchors": { "type": "array", "items": { "type": "integer" } },
+
+    "source_reliability": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "authority_score": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+
+    "matter_ids": { "type": "array", "items": { "type": "string" }, "description": "LawME matters this document is attached to (firm docs / research results)" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "How this record came to exist — required for every non-firm document",
+      "properties": {
+        "retrieved_from": { "type": "string" },
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "retrieval_method": { "type": "string", "description": "api / feed / structured_scrape / manual_upload / mcp:<name>" },
+        "pipeline_version": { "type": ["string", "null"] }
+      },
+      "required": ["retrieved_from", "retrieved_at", "retrieval_method"]
+    }
+  }
+}

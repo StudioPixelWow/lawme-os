@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lawme.co.il/schemas/legal-source-registry.schema.json",
+  "title": "LawME Legal Source Registry Record",
+  "description": "One row of the LawME Israeli Legal Source Registry. Values must never be inferred: when no evidence exists, the literal string 'unknown' is required. rag_permission and related permission fields must never claim more than what was actually observed in terms/licenses.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "source_id", "name_he", "name_en", "url", "publisher", "category",
+      "primary_or_secondary", "official", "access", "commercial",
+      "content_types", "full_text", "search_available", "api_available",
+      "terms_status", "license_status", "rag_permission", "update_frequency",
+      "reliability_score", "authority_score", "legal_risk",
+      "technical_difficulty", "priority_recommendation", "verified",
+      "current_integration_status", "owner", "last_reviewed"
+    ],
+    "properties": {
+      "source_id": { "type": "string", "pattern": "^LSR-\\d{3}$" },
+      "name_he": { "type": ["string", "null"] },
+      "name_en": { "type": "string", "minLength": 1 },
+      "url": { "type": "string", "minLength": 4 },
+      "publisher": { "type": ["string", "null"] },
+      "category": {
+        "type": "string",
+        "enum": [
+          "A-judicial", "B-legislation", "C-legislative-process",
+          "D-regulators", "E-open-secondary", "F-commercial", "G-firm-private"
+        ]
+      },
+      "subcategory": { "type": ["string", "null"] },
+      "legal_domains": { "type": "array", "items": { "type": "string" } },
+      "primary_or_secondary": { "type": "string" },
+      "official": { "type": ["boolean", "string"] },
+      "access": {
+        "type": "string",
+        "description": "public | restricted | requires_permission | unknown (free-form qualifiers allowed after the keyword)"
+      },
+      "commercial": { "type": ["boolean", "string"] },
+      "historical_coverage": { "type": ["string", "null"] },
+      "content_types": { "type": "array", "items": { "type": "string" } },
+      "full_text": { "type": ["string", "boolean"] },
+      "metadata_availability": { "type": ["string", "null"] },
+      "search_available": { "type": ["boolean", "string"] },
+      "api_available": { "type": ["boolean", "string"] },
+      "api_type": { "type": ["string", "null"] },
+      "feeds": { "type": ["string", "array", "null"] },
+      "formats": { "type": "array", "items": { "type": "string" } },
+      "bulk_download": { "type": ["boolean", "string"] },
+      "auth_required": { "type": ["boolean", "string"] },
+      "paywall": { "type": ["boolean", "string"] },
+      "captcha": { "type": ["boolean", "string"] },
+      "robots_policy": { "type": ["string", "null"] },
+      "terms_status": { "type": ["string", "null"] },
+      "license_status": { "type": ["string", "null"] },
+      "rag_permission": {
+        "type": "string",
+        "description": "confirmed | requires_permission | restricted | open_license | unknown — never inferred"
+      },
+      "update_frequency": { "type": ["string", "null"] },
+      "last_observed_update": { "type": ["string", "null"] },
+      "hebrew_quality": { "type": ["string", "null"] },
+      "stability": { "type": ["string", "null"] },
+      "reliability_score": { "type": ["number", "string"], "description": "0-100 analyst estimate" },
+      "authority_score": { "type": ["number", "string"], "description": "0-100 analyst estimate" },
+      "legal_risk": { "type": "string" },
+      "technical_difficulty": { "type": "string" },
+      "priority_recommendation": {
+        "type": "string",
+        "enum": ["P0", "P1", "P2", "P3", "Restricted", "License-needed", "Research-only"]
+      },
+      "recommended_ingestion": { "type": ["string", "null"] },
+      "verified": {
+        "type": "string",
+        "enum": ["url_opened", "partial", "search_result_only"],
+        "description": "How the source's existence was verified during research"
+      },
+      "example_documents": { "type": ["string", "array", "null"] },
+      "notes": { "type": ["string", "null"] },
+      "current_integration_status": { "type": "string" },
+      "owner": { "type": "string" },
+      "validation_source": { "type": ["string", "null"] },
+      "last_reviewed": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+    }
+  }
+}

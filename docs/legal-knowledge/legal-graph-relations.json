@@ -1,0 +1,37 @@
+{
+  "$comment": "LawME Legal Knowledge Graph — relation (edge) type definitions. Every edge instance MUST carry the edge_metadata fields. Design only.",
+  "edge_metadata_required": {
+    "confidence": "0.0-1.0 — extraction/inference confidence; 1.0 reserved for rule-derived or human-verified edges",
+    "provenance": "how the edge was created: citation_parser:<version> | human_review:<user> | licensed_metadata:<source_id> | inference:<model+version>",
+    "evidence_anchor": "paragraph/page anchor in the source document where the relation is asserted (null only for structural edges)",
+    "created_at": "timestamp",
+    "verified": "boolean — true only after human review or corroboration by a second independent extraction",
+    "label": "trust-model claim label: verified_primary | inference | unverified"
+  },
+  "relations": [
+    { "type": "cites", "from": ["judgment", "decision", "firm_document"], "to": ["judgment", "decision", "statute", "section", "regulation"], "description": "Document cites another authority", "primary_extraction": "citation parser (regex + normalization)", "inverse": "cited_by" },
+    { "type": "cited_by", "from": ["judgment", "decision", "statute", "section"], "to": ["judgment", "decision"], "description": "Inverse of cites — maintained automatically, never hand-written", "primary_extraction": "derived", "inverse": "cites" },
+    { "type": "interprets", "from": ["judgment"], "to": ["statute", "section"], "description": "Judgment interprets a statutory provision", "primary_extraction": "AI classification of citation context (inference-labeled)", "inverse": null },
+    { "type": "applies", "from": ["judgment"], "to": ["judgment", "legal_principle", "statute"], "description": "Applies an existing rule to new facts", "primary_extraction": "AI classification (inference-labeled)", "inverse": null },
+    { "type": "distinguishes", "from": ["judgment"], "to": ["judgment"], "description": "Distinguishes an earlier case on facts/law", "primary_extraction": "AI classification (inference-labeled)", "inverse": null },
+    { "type": "approves", "from": ["judgment"], "to": ["judgment"], "description": "Explicitly approves/adopts an earlier holding", "primary_extraction": "AI classification (inference-labeled)", "inverse": null },
+    { "type": "limits", "from": ["judgment"], "to": ["judgment", "legal_principle"], "description": "Narrows an earlier holding", "primary_extraction": "AI classification (inference-labeled)", "inverse": null },
+    { "type": "overturns", "from": ["judgment"], "to": ["judgment"], "description": "Overrules an earlier judgment — high-stakes edge, requires verification before surfacing as fact", "primary_extraction": "AI classification + mandatory human review", "inverse": null },
+    { "type": "follows", "from": ["judgment"], "to": ["judgment"], "description": "Follows binding/persuasive precedent", "primary_extraction": "AI classification (inference-labeled)", "inverse": null },
+    { "type": "conflicts_with", "from": ["judgment", "guidance"], "to": ["judgment", "guidance"], "description": "Incompatible holdings/guidance — feeds contradiction surfacing", "primary_extraction": "AI detection + human review", "inverse": "conflicts_with" },
+    { "type": "appeals", "from": ["case"], "to": ["case"], "description": "This case is an appeal of another", "primary_extraction": "case-number normalization + court records", "inverse": "appealed_by" },
+    { "type": "appealed_by", "from": ["case"], "to": ["case"], "description": "Inverse of appeals — derived", "primary_extraction": "derived", "inverse": "appeals" },
+    { "type": "amends", "from": ["statute", "regulation"], "to": ["statute", "section", "regulation"], "description": "Amending act → amended provision", "primary_extraction": "legislation DB metadata (rule-derived, high confidence)", "inverse": null },
+    { "type": "repeals", "from": ["statute", "regulation"], "to": ["statute", "section", "regulation"], "description": "Repeal relation", "primary_extraction": "legislation DB metadata (rule-derived)", "inverse": null },
+    { "type": "effective_from", "from": ["statute", "section", "regulation"], "to": ["statute", "section", "regulation"], "description": "Version chain: this version is effective from date X, superseding the target version", "primary_extraction": "legislation DB version metadata", "inverse": null },
+    { "type": "related_to", "from": ["*"], "to": ["*"], "description": "Weak association (same issue cluster, same parties…) — never used for authority", "primary_extraction": "embedding similarity (inference-labeled, confidence-capped 0.7)", "inverse": "related_to" },
+    { "type": "filed_in", "from": ["case", "firm_document"], "to": ["court"], "description": "Case/document filed in court", "primary_extraction": "metadata (rule-derived)", "inverse": null },
+    { "type": "decided_by", "from": ["judgment", "decision"], "to": ["judge"], "description": "Authored/decided by judge(s)", "primary_extraction": "metadata extraction", "inverse": null },
+    { "type": "represented_by", "from": ["party"], "to": ["lawyer"], "description": "Representation in a specific case (edge carries case ref)", "primary_extraction": "metadata extraction", "inverse": null },
+    { "type": "affects_matter", "from": ["judgment", "statute", "section", "regulation", "guidance"], "to": ["matter"], "description": "New legal development is relevant to a firm matter — drives notifications; firm-private, RLS-guarded", "primary_extraction": "matcher: matter issue profile × document issues (inference-labeled until lawyer confirms)", "inverse": null },
+    { "type": "supports_claim", "from": ["judgment", "statute", "section", "guidance"], "to": ["legal_issue", "firm_document"], "description": "Authority supports a claim/argument", "primary_extraction": "research pipeline output (inference until review)", "inverse": null },
+    { "type": "contradicts_claim", "from": ["judgment", "statute", "section", "guidance"], "to": ["legal_issue", "firm_document"], "description": "Authority against a claim — Red Team fuel", "primary_extraction": "research pipeline output (inference until review)", "inverse": null },
+    { "type": "derived_from", "from": ["document", "firm_document"], "to": ["document"], "description": "This artifact was produced from that source (summary→judgment, draft→template)", "primary_extraction": "pipeline provenance (rule-derived, confidence 1.0)", "inverse": null },
+    { "type": "verified_against", "from": ["document", "firm_document"], "to": ["judgment", "statute", "section", "regulation"], "description": "Claim/citation in the source was verified against the target primary authority (timestamped)", "primary_extraction": "verification pipeline (rule-derived)", "inverse": null }
+  ]
+}

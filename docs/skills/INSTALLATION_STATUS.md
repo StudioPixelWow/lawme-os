@@ -32,7 +32,10 @@ Content: 163 markdown files, 37 python scripts, 1 shell script
 ## What was NOT done (by design)
 - No skill connected to a real account (WhatsApp / Google / Green Invoice /
   Cardcom / bank). No credential entered anywhere.
-- No MCP server added to `.mcp.json` — proposals only (MCP_REGISTRY.md).
+- ~~No MCP server added to `.mcp.json`~~ **Update 2026-07-11 (Epic 0):**
+  Kolzchut MCP connected with founder approval (pinned 1.0.1, read-only,
+  no credentials) — see docs/legal-knowledge/KOL_ZCHUT_MCP_VALIDATION.md.
+  The other four Israeli MCPs remain proposals (MCP_REGISTRY.md).
 - No global (`~/.claude`) installation.
 - No production or database change of any kind.
 

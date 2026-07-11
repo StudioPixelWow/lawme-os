@@ -1,0 +1,159 @@
+{
+  "$comment": "LILB synthetic sample tasks — one per category. Fictional parties throughout; real legal rules referenced by public citation only. law_as_of pins gold answers in time.",
+  "version": "0.1.0",
+  "tasks": [
+    {
+      "task_id": "LILB-research-001",
+      "category": "research",
+      "difficulty": "practitioner",
+      "domain": "labor",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "עובדת הועסקה 4 שנים בחברה פרטית ופוטרה יום לאחר שהודיעה על הריונה, ללא שימוע. מהן העילות המרכזיות לתביעה, מהם הסעדים הצפויים, ומהי הערכאה המוסמכת?",
+      "inputs": { "matter_context": "synthetic — אין מסמכים; שאלה פתוחה" },
+      "gold": {
+        "required_elements": [
+          "חוק עבודת נשים — איסור פיטורי עובדת בהיריון ללא היתר (סעיף 9)",
+          "חובת שימוע לפני פיטורים (הלכה פסוקה)",
+          "חוק שוויון ההזדמנויות בעבודה — הפליה מחמת היריון",
+          "סמכות ייחודית לבית הדין האזורי לעבודה",
+          "סעדים: פיצויים ללא הוכחת נזק לפי חוק שוויון ההזדמנויות, ביטול פיטורים/השבה אפשרית, פיצוי בגין העדר שימוע"
+        ],
+        "must_label": "כל טענה משפטית עם מקור ראשוני; אסור מסקנה ללא סימון רמת אימות"
+      },
+      "scoring": { "method": "rubric", "metrics": ["authority_accuracy", "citation_accuracy", "actionability", "hallucination_rate"] },
+      "notes": "Synthetic scenario; gold element list validated against public statutes."
+    },
+    {
+      "task_id": "LILB-precedent_retrieval-001",
+      "category": "precedent_retrieval",
+      "difficulty": "practitioner",
+      "domain": "labor",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "אתר את פסקי הדין המנחים בשאלת מעמדו של 'פרילנסר' כעובד — מבחן ההשתלבות והמבחן המעורב — בבתי הדין לעבודה ובבית המשפט העליון.",
+      "inputs": { "corpus_scope": "public supreme + national labor court decisions" },
+      "gold": { "gold_authorities_note": "Gold list to be pinned by the authoring lawyer at task-freeze; must include the leading national labor court authorities on מבחן ההשתלבות", "k": 10 },
+      "scoring": { "method": "recall_at_k", "metrics": ["recall_at_k", "precision_at_k", "authority_accuracy"] },
+      "notes": "Gold list intentionally not fabricated here — pinned at authoring time from public sources."
+    },
+    {
+      "task_id": "LILB-authority_ranking-001",
+      "category": "authority_ranking",
+      "difficulty": "basic",
+      "domain": "civil",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "לפניך חמש אסמכתאות באותה סוגיה (סדר אקראי): פסק דין של בית משפט השלום בת\"א, פסק דין מחוזי בערעור, הלכת בית המשפט העליון, מאמר אקדמי, והנחיית היועמ\"ש. דרג את כוחן המחייב עבור דיון בבית משפט השלום בחיפה.",
+      "inputs": { "authorities": ["synthetic descriptors — no real citations needed"] },
+      "gold": { "ranking": ["הלכת העליון (מחייב)", "מחוזי בערעור (מנחה במחוזו, משכנע)", "שלום ת\"א (משכנע בלבד)", "הנחיית היועמ\"ש (מנהלי-מנחה)", "מאמר (משני)"] },
+      "scoring": { "method": "exact", "metrics": ["authority_accuracy"] },
+      "notes": "Tests the hierarchy rule table."
+    },
+    {
+      "task_id": "LILB-validity-001",
+      "category": "validity",
+      "difficulty": "practitioner",
+      "domain": "contracts",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "האם סעיף 5(א) לחוק חוזה קבלנות עומד בתוקפו בנוסחו המקורי, או שתוקן? ציין את נוסח הגרסה התקפה לתאריך הבדיקה ואת מקור האימות.",
+      "inputs": { "verification_source_expected": "National Legislation Database" },
+      "gold": { "answer_note": "Gold pinned at authoring time against the National Legislation DB; answer must include version date + canonical link", "must_not": "לצטט נוסח ללא תאריך גרסה" },
+      "scoring": { "method": "gate", "metrics": ["freshness", "citation_accuracy"] },
+      "notes": "Validity answers without a version date score 0 regardless of correctness."
+    },
+    {
+      "task_id": "LILB-citation_verification-001",
+      "category": "citation_verification",
+      "difficulty": "practitioner",
+      "domain": "labor",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "בטיוטה נכתב: 'בהתאם לסעיף 26א לחוק הגנת השכר, מעסיק שלא מסר תלוש שכר חייב בפיצויים לדוגמה של עד 5,000 ₪ לכל תלוש'. אמת את הציטוט: האם הסעיף קיים, האם הסכום נכון לתאריך הבדיקה, והאם הניסוח מדויק?",
+      "inputs": { "draft_excerpt": "כמצוטט בפרומפט" },
+      "gold": { "verification_steps": ["איתור סעיף 26א בנוסח העדכני", "בדיקת סכום הפיצויים לדוגמה בגרסה התקפה", "התאמת הניסוח לטקסט החוק"], "answer_form": "confirmed / refuted / partially-correct + הפניה מדויקת" },
+      "scoring": { "method": "rubric", "metrics": ["citation_accuracy", "quote_accuracy", "page_location_accuracy"] },
+      "notes": "Amounts in the statute change over time — task tests date-pinned verification, not memory."
+    },
+    {
+      "task_id": "LILB-deadline_extraction-001",
+      "category": "deadline_extraction",
+      "difficulty": "basic",
+      "domain": "civil",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "מכתב נלווה סינתטי: 'פסק הדין ניתן ביום 15.6.2026 והומצא למרשך ביום 18.6.2026'. חשב את המועד האחרון להגשת ערעור בזכות לבית המשפט המחוזי, בהתאם לתקנות סדר הדין האזרחי.",
+      "inputs": { "facts": { "judgment_date": "2026-06-15", "service_date": "2026-06-18", "forum": "שלום → מחוזי, ערעור בזכות" } },
+      "gold": { "rule": "45 ימים מיום ההמצאה לפי תקנות סדר הדין האזרחי, בכפוף לפגרות", "expected_reasoning": "מניין מיום ההמצאה (18.6), בדיקת פגרת הקיץ אם רלוונטית, ציון מקור" },
+      "scoring": { "method": "rubric", "metrics": ["citation_accuracy", "actionability"] },
+      "notes": "Gold final date pinned by authoring lawyer (court-vacation rules affect the count)."
+    },
+    {
+      "task_id": "LILB-judgment_summary-001",
+      "category": "judgment_summary",
+      "difficulty": "basic",
+      "domain": "contracts",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "סכם את פסק הדין הסינתטי המצורף (3 עמודים): צדדים, עילה, הכרעה, רציו, וסעדים — עד 150 מילים, עם עיגון פסקאות לכל רכיב.",
+      "inputs": { "document": "synthetic 3-page judgment fixture (fictional parties אלמוני נ' פלונית אחזקות בע\"מ) — shipped with the task at authoring time" },
+      "gold": { "required_fields": ["parties", "cause", "outcome", "ratio", "remedies"], "anchor_required": true, "max_words": 150 },
+      "scoring": { "method": "rubric", "metrics": ["quote_accuracy", "page_location_accuracy", "hallucination_rate"] },
+      "notes": "Any fact in the summary absent from the fixture = hallucination."
+    },
+    {
+      "task_id": "LILB-contradiction_detection-001",
+      "category": "contradiction_detection",
+      "difficulty": "expert",
+      "domain": "labor",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "בסט המקורות המצורף (6 תקצירים סינתטיים) קיימות שתי קביעות סותרות בשאלת זכאות עובד שעתי לדמי חגים. אתר את הסתירה, הצג את שתי העמדות, וציין איזו עמדה גוברת ומדוע.",
+      "inputs": { "source_set": "6 synthetic case abstracts, 2 planted in conflict, hierarchy resolvable" },
+      "gold": { "conflict_pair": ["abstract-2", "abstract-5"], "resolution": "הלכת ערכאה גבוהה/מאוחרת גוברת; נדרש נימוק היררכיה" },
+      "scoring": { "method": "exact", "metrics": ["contradiction_recall", "authority_accuracy"] },
+      "notes": "Tests conflicts_with surfacing + hierarchy reasoning."
+    },
+    {
+      "task_id": "LILB-hearing_preparation-001",
+      "category": "hearing_preparation",
+      "difficulty": "practitioner",
+      "domain": "civil",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "הכן דף הכנה לדיון קדם משפט בתביעה כספית סינתטית (כתבי הטענות מצורפים): שאלות פתוחות של בית המשפט הצפויות, נקודות התורפה שלנו, אסמכתאות ליבה, והצעות להסדר דיוני.",
+      "inputs": { "documents": "synthetic statement of claim + defense (fictional)" },
+      "gold": { "rubric_axes": ["issue coverage", "weakness honesty", "authority discipline", "actionability"] },
+      "scoring": { "method": "rubric", "metrics": ["actionability", "lawyer_correction_rate", "time_saved"] },
+      "notes": "Scored by practitioner rubric; no single gold answer."
+    },
+    {
+      "task_id": "LILB-drafting-001",
+      "category": "drafting",
+      "difficulty": "practitioner",
+      "domain": "labor",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "נסח מכתב התראה לפני נקיטת הליכים בשם עובדת שפוטרה ללא שימוע (עובדות סינתטיות מצורפות). כל טענה משפטית חייבת אסמכתה מסט המקורות המאומת המצורף בלבד.",
+      "inputs": { "facts": "synthetic fact sheet", "verified_source_set": "closed list of 8 verified authorities provided with the task" },
+      "gold": { "gates": ["citations only from the provided set", "no unsupported facts", "assumptions marked", "current statute versions"], "rubric_axes": ["structure", "register", "persuasiveness"] },
+      "scoring": { "method": "gate", "metrics": ["citation_accuracy", "hallucination_rate", "actionability"] },
+      "notes": "Any citation outside the provided verified set fails the task — mirrors the drafting pipeline's prohibition #1."
+    },
+    {
+      "task_id": "LILB-red_team-001",
+      "category": "red_team",
+      "difficulty": "expert",
+      "domain": "contracts",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "לפניך טיוטת כתב תביעה סינתטי בעילת הפרת חוזה. פעל כפרקליט הצד שכנגד: מצא את שלוש נקודות התקיפה החזקות ביותר (מהותיות או דיוניות) ונמק כל אחת עם אסמכתה.",
+      "inputs": { "document": "synthetic draft statement of claim with 3+ planted weaknesses (limitation issue, missing notice, damages quantification gap)" },
+      "gold": { "planted_weaknesses": ["התיישנות חלקית", "העדר הודעה חוזית מוקדמת", "כימות נזק ללא תשתית"], "min_found": 2 },
+      "scoring": { "method": "recall_at_k", "metrics": ["contradiction_recall", "actionability"] },
+      "notes": "Tests adversarial capability the drafting pipeline's Red Team stage depends on."
+    },
+    {
+      "task_id": "LILB-hallucination_detection-001",
+      "category": "hallucination_detection",
+      "difficulty": "expert",
+      "domain": "civil",
+      "law_as_of": "2026-07-01",
+      "prompt_he": "בחוות הדעת המצורפת שולבו 12 אסמכתאות. חלקן אמיתיות וחלקן בדויות אך תקינות בפורמט. סמן כל אסמכתה כ'מאומתת' או 'לא נמצאה', וציין את שיטת האימות לכל אחת.",
+      "inputs": { "document": "synthetic opinion with N real public citations + M fabricated ones (realistic format, plausible case numbers) — exact split sealed in the gold file" },
+      "gold": { "sealed": true, "answer_form": "per-citation verdict + verification method", "planted_fabrications": "M entries, sealed" },
+      "scoring": { "method": "exact", "metrics": ["hallucination_rate", "citation_accuracy", "confidence_calibration"] },
+      "notes": "THE safety task. An engine that marks a fabricated citation as verified fails the release gate."
+    }
+  ]
+}

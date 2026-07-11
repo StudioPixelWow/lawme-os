@@ -24,6 +24,12 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest", "--browser", "chromium"]
+    },
+    "kolzchut": {
+      "$comment": "Founder-approved 2026-07-11 (Epic 0). Read-only public rights knowledge base (kolzchut.org.il). No credentials. Version pinned — update only via the procedure in docs/skills/UPDATE_AND_ROLLBACK.md.",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@skills-il/kolzchut-mcp@1.0.1"]
     }
   }
 }

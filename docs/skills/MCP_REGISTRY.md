@@ -1,14 +1,16 @@
 # LawME — MCP Registry (Israeli data servers)
 
-**State: NONE of the servers below is enabled.** `.mcp.json` still contains
-only the infrastructure servers (Supabase read-only, Vercel, GitHub,
-Context7, Playwright — see docs/setup/MCP_CONNECTIONS.md). Everything here
-is a **proposal awaiting founder approval**, because stdio MCPs run via
-`npx` = arbitrary code execution inside the dev environment.
+**State (2026-07-11): Kolzchut is CONNECTED** (founder-approved, Epic 0).
+`.mcp.json` contains the infrastructure servers (Supabase read-only,
+Vercel, GitHub, Context7, Playwright — see docs/setup/MCP_CONNECTIONS.md)
+plus `kolzchut` (pinned `@skills-il/kolzchut-mcp@1.0.1`, read-only, no
+credentials). The remaining four servers below are **proposals awaiting
+founder approval**, because stdio MCPs run via `npx` = arbitrary code
+execution inside the dev environment.
 
 Source directory: https://agentskills.co.il/he/mcp (42 servers, 2026-07-11).
 
-## 1. Kolzchut (כל-זכות) — RECOMMENDED FIRST
+## 1. Kolzchut (כל-זכות) — ✅ CONNECTED 2026-07-11
 - Package: `@skills-il/kolzchut-mcp` **1.0.1** · MIT · maintained by the
   Skills-IL org itself · stdio · **no credentials**.
 - Purpose: search/read Israel's rights-and-entitlements knowledge base —
@@ -18,7 +20,12 @@ Source directory: https://agentskills.co.il/he/mcp (42 servers, 2026-07-11).
   read-only + non-destructive. Protocol verified live in the sandbox
   (initialize + tools/list OK); the data call hit the sandbox egress
   allowlist (HTTP 403) — expected to work on the founder's machine.
-- Trust: **reviewed + protocol-verified · pending live-data test**.
+- Trust: **reviewed + protocol-verified + live-data validated**
+  (full test log: docs/legal-knowledge/KOL_ZCHUT_MCP_VALIDATION.md;
+  note: api.php blocks datacenter IPs — validated via the founder's
+  browser against the identical endpoint; confirm first local MCP use).
+- Classification: public secondary explanatory source — never sole
+  authority for a legal conclusion (trust tier 5).
 
 ## 2. data.gov.il (המאגר הממשלתי)
 - Candidates: `datagov-israel` (creator: aviveldan) · alternative
@@ -47,18 +54,12 @@ Source directory: https://agentskills.co.il/he/mcp (42 servers, 2026-07-11).
 (Also noted: `boi-exchange` by Skills-IL org — BOI exchange rates; overlaps
 with the `boi-economic-data` skill already installed; not proposed.)
 
-## Proposed configuration (DO NOT paste into .mcp.json without approval)
-```jsonc
-// Proposal only — founder approval required per server.
-{
-  "kolzchut": {
-    "command": "npx",
-    "args": ["-y", "@skills-il/kolzchut-mcp@1.0.1"]   // version pinned
-  }
-  // datagov / knesset / budget / cbs intentionally omitted until each
-  // package passes the same npm-pack review Kolzchut received.
-}
-```
+## Active configuration
+`kolzchut` is live in `.mcp.json` (stdio, `npx -y
+@skills-il/kolzchut-mcp@1.0.1`). datagov / knesset / budget / cbs remain
+omitted until each package passes the same npm-pack review Kolzchut
+received — see docs/legal-knowledge/ISRAELI_MCP_ROADMAP.md for the
+approved order and Go/No-Go criteria.
 
 ## Enable procedure (per server)
 1. `npm pack` the pinned version → read every file + dependency tree.

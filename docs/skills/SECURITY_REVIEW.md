@@ -36,7 +36,7 @@ NOT enabled).
   secret scanner; no network, no writes. **PASS** (and useful: complements
   `npm run env:check`).
 
-## 3. `@skills-il/kolzchut-mcp` 1.0.1 (reviewed, not enabled)
+## 3. `@skills-il/kolzchut-mcp` 1.0.1 (CONNECTED 2026-07-11, founder-approved)
 - Package inspected via `npm pack` + full dependency read: MIT, stdio
   transport, **no credentials**, single network destination
   `https://www.kolzchut.org.il`.
@@ -46,10 +46,14 @@ NOT enabled).
   (`kolzchut_search_rights`, `kolzchut_get_article`,
   `kolzchut_get_article_sections`, `kolzchut_get_article_section`,
   `kolzchut_list_category_members`, `kolzchut_list_categories`).
-- The actual API call returned `HTTP 403 Forbidden` **from the cloud-sandbox
-  egress allowlist** (kolzchut.org.il is not on it) — an environment limit,
-  not a server fault. Status: **reviewed + protocol-verified; live-data test
-  pending on the founder's machine.**
+- The actual API call returns `HTTP 403 Forbidden` from datacenter IPs
+  (kolzchut.org.il bot-protects `api.php`; the article site itself serves
+  them). Live-data validation was completed through the founder's real
+  browser against the identical endpoint + parameters — searches, article
+  structure, Hebrew encoding and source URLs all pass. Status:
+  **reviewed + protocol-verified + live-data validated; CONNECTED in
+  .mcp.json (pinned 1.0.1). Confirm first local use on the Mac.** Full log:
+  docs/legal-knowledge/KOL_ZCHUT_MCP_VALIDATION.md.
 
 ## 4. Skills rejected
 None. Zero skills failed review. Risk concentrates in credentialed
