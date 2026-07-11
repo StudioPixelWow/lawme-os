@@ -96,6 +96,13 @@ export function OfficeAttentionStrip() {
                   <span className="mt-0.5 block text-micro text-foreground-faint">
                     {risksOpen ? "סגור פירוט" : `אחראית: ${item.owner} · פתח פירוט`}
                   </span>
+                ) : item.trend ? (
+                  <span
+                    dir="rtl"
+                    className="mt-0.5 block text-micro text-foreground-faint"
+                  >
+                    {item.trend}
+                  </span>
                 ) : null}
               </span>
             </>

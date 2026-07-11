@@ -3,9 +3,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AIMark } from "@/design-system/primitives/indicators";
 import { DEFAULT_FOCUS, eventById, focusedMatter, type FocusRef } from "../focus";
+import { WHATSAPP_MESSAGES } from "../office";
 import { DinoOffice } from "./dino-office";
 import { MatterBoard } from "./matter-board";
 import { OfficeAttentionStrip } from "./office-attention";
+import { WhatsAppAIInbox } from "./whatsapp-inbox";
 import { TodayFocus } from "./today-focus";
 import { WorkspaceLaunchers } from "./workspace-launchers";
 
@@ -48,11 +50,16 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
       />
 
       {/* 2 · the office attention strip */}
-      <div className="animate-rise mt-8" style={{ animationDelay: "120ms" }}>
+      <div className="animate-rise mt-6" style={{ animationDelay: "120ms" }}>
         <OfficeAttentionStrip />
       </div>
 
-      {/* 3 · the work */}
+      {/* 3 · WhatsApp — the smart inbox, directly under the KPIs */}
+      <div className="animate-rise mt-6" style={{ animationDelay: "160ms" }}>
+        <WhatsAppAIInbox messages={WHATSAPP_MESSAGES} />
+      </div>
+
+      {/* 4 · the work */}
       <div className="animate-rise mt-12" style={{ animationDelay: "200ms" }}>
         <MatterBoard
           selectedId={selectedMatter.id}
@@ -60,12 +67,12 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
         />
       </div>
 
-      {/* 4 · the doors to the dedicated workspaces */}
+      {/* 5 · the doors to the dedicated workspaces */}
       <div className="animate-rise mt-12" style={{ animationDelay: "280ms" }}>
         <WorkspaceLaunchers />
       </div>
 
-      {/* 5 · דינו — the compact intelligence footer */}
+      {/* 6 · דינו — the compact intelligence footer */}
       <div className="animate-rise mt-12" style={{ animationDelay: "360ms" }}>
         <DinoOffice />
         <p className="mt-4 flex items-center justify-center gap-2 text-micro text-foreground-faint">

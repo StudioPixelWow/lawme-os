@@ -22,6 +22,8 @@ export type OfficeAttentionItem = {
   owner?: string;
   /** id of the workspace section the item focuses */
   target: string;
+  /** small week-over-week trend, when relevant */
+  trend?: string;
 };
 
 export const OFFICE_ATTENTION: OfficeAttentionItem[] = [
@@ -43,6 +45,7 @@ export const OFFICE_ATTENTION: OfficeAttentionItem[] = [
     status: "today",
     icon: "matter",
     target: "matters",
+    trend: "↑ 10% מהשבוע שעבר",
   },
   {
     id: "oa-clients",
@@ -70,6 +73,7 @@ export const OFFICE_ATTENTION: OfficeAttentionItem[] = [
     status: "scheduled",
     icon: "billing",
     target: "finance",
+    trend: "↑ 8% מהשבוע שעבר",
   },
   {
     id: "oa-messages",
@@ -79,6 +83,7 @@ export const OFFICE_ATTENTION: OfficeAttentionItem[] = [
     status: "new",
     icon: "message",
     target: "clients",
+    trend: "↓ 12% מהשבוע שעבר",
   },
 ];
 
@@ -559,3 +564,79 @@ export const OFFICE_SCENARIO = {
   highValueLeadUnanswered: true,
   financeException: true,
 };
+
+/* ── 10. WhatsApp — the smart inbox (V12) ─────────────────── */
+
+export type WhatsAppStatus = "new" | "urgent" | "waiting";
+
+export type SuggestionStatus =
+  | "idle"
+  | "generating"
+  | "ready"
+  | "edited"
+  | "error";
+
+export type WhatsAppMessage = {
+  id: string;
+  contactName: string;
+  avatarUrl?: string;
+  initials: string;
+  timestamp: string;
+  messagePreview: string;
+  status: WhatsAppStatus;
+  clientId?: string;
+  clientName?: string;
+  caseId?: string;
+  caseName?: string;
+  /** "client" | "lead" — drives the inbox filters */
+  kind: "client" | "lead";
+  dinoSuggestion?: string;
+  suggestionStatus: SuggestionStatus;
+};
+
+export const WHATSAPP_MESSAGES: WhatsAppMessage[] = [
+  {
+    id: "wa-1",
+    contactName: "רות אלמוג",
+    initials: "ר",
+    timestamp: "10:42",
+    messagePreview: "מה קורה עם ההסכם? המשקיעים שואלים ואני צריכה תשובה היום…",
+    status: "urgent",
+    clientId: "c-almog",
+    clientName: "רות אלמוג",
+    caseId: "m-3",
+    caseName: "TechLine — הסכם מייסדים",
+    kind: "client",
+    dinoSuggestion:
+      "שלום רות, גרסה 5 של ההסכם מוכנה וכוללת את סעיפי השליטה שביקשת. נשמח לאישורך לסעיף 7 — ואז נעביר לחתימות עוד השבוע.",
+    suggestionStatus: "ready",
+  },
+  {
+    id: "wa-2",
+    contactName: "יעקב כהן",
+    initials: "י",
+    timestamp: "09:17",
+    messagePreview: "בוקר טוב, רציתי לוודא שהכול מוכן לדיון היום ב־11:30…",
+    status: "new",
+    clientId: "c-cohen",
+    clientName: "יעקב כהן",
+    caseId: "m-1",
+    caseName: "כהן נ׳ לוי",
+    kind: "client",
+    dinoSuggestion:
+      "בוקר טוב יעקב, הכול ערוך לדיון היום: התדריך מוכן, התצהירים הוגשו והצוות ייפגש איתך באולם 304 ב־11:15. נתראה שם.",
+    suggestionStatus: "ready",
+  },
+  {
+    id: "wa-3",
+    contactName: "אורי שגב",
+    initials: "א",
+    timestamp: "אתמול",
+    messagePreview: "תודה על השיחה! מחכים להצעת שכר הטרחה שדיברנו עליה…",
+    status: "waiting",
+    kind: "lead",
+    caseName: "ליד — מקרקעין, ליקויי בנייה",
+    dinoSuggestion: undefined,
+    suggestionStatus: "idle",
+  },
+];

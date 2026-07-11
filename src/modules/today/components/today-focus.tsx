@@ -55,7 +55,7 @@ function CompactTimeline({
       <p className="text-micro font-semibold tracking-wide text-ink-300">
         השלב הבא בלוח הזמנים
       </p>
-      <ol className="relative mt-2.5 flex flex-col gap-1">
+      <ol className="relative mt-3 flex flex-col gap-1.5">
         {/* the vertical meridian */}
         <span
           aria-hidden
@@ -72,8 +72,10 @@ function CompactTimeline({
                 aria-pressed={active}
                 data-live={active || undefined}
                 className={cx(
-                  "living-edge relative flex w-full items-center gap-2.5 rounded-md py-1.5 ps-0 pe-2 text-start transition-colors",
-                  active ? "glass-navy" : "hover:bg-paper-0/5",
+                  "relative flex h-11 w-full items-center gap-2.5 rounded-md ps-1 pe-2.5 text-start transition-colors",
+                  active
+                    ? "glass-navy border border-gold-400/50"
+                    : "border border-transparent hover:bg-paper-0/5",
                   done && !active && "opacity-50",
                 )}
                 style={{ transitionDuration: "var(--motion-quick)" }}
@@ -83,7 +85,7 @@ function CompactTimeline({
                   className={cx(
                     "z-1 ms-0.5 flex h-2.5 w-2.5 shrink-0 rounded-pill",
                     active
-                      ? "bg-gold-400 shadow-gold-breath"
+                      ? "bg-gold-400"
                       : done
                         ? "bg-ink-500"
                         : "border border-paper-0/30 bg-ink-900",
@@ -171,7 +173,15 @@ export function TodayFocus({
             className="absolute inset-y-8 start-0 z-1 w-0.5 rounded-pill bg-gold-500/80"
           />
 
-          <div className="grid grid-cols-1 gap-x-10 gap-y-7 p-6 md:p-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]">
+          {/* a quiet legal presence — architectural, never stock */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -bottom-10 -start-6 text-paper-0/[0.05]"
+          >
+            <CourtGlyph size={230} strokeWidth={1} />
+          </span>
+
+          <div className="grid grid-cols-1 gap-x-10 gap-y-7 p-6 md:p-8 lg:grid-cols-[minmax(0,29fr)_minmax(0,21fr)]">
             {/* ── the mission ── */}
             <div className="min-w-0">
               <p className="text-micro font-semibold tracking-wide text-gold-300">
