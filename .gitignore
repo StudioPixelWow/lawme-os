@@ -56,3 +56,6 @@ supabase/.branches/
 
 # keep the example env file tracked (names only, no values)
 !.env.example
+
+# POC local run telemetry
+.poc-runs/

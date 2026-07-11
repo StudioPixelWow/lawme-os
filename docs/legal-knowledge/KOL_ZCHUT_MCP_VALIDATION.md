@@ -51,6 +51,18 @@ to work; **first local use should confirm one search returns results.**
 If kolzchut's WAF ever blocks the `kolzchut-mcp-server/1.0` user-agent
 generally, the fallback is browser-based access; report to Skills-IL.
 
+### Local verification attempt (Epic 1, Phase 1 — 2026-07-11)
+Attempted from the desktop-bridge VM on the founder's machine: the VM
+itself has **no network access** (npm registry 403 via allowlist), so the
+MCP server process cannot be exercised from this session at all — a
+session-environment limitation, not a Kolzchut problem. **No
+circumvention attempted.** Status unchanged: MCP stays configured in
+`.mcp.json`; endpoint + parameters validated via the founder's real
+browser (searches for פיצויי פיטורים and דמי לידה both pass — see test
+table above); the POC does not depend on this MCP. **Definitive local
+test = the founder opens Claude Code in the repo and runs one
+kolzchut_search_rights query (30 seconds).**
+
 ## Classification (binding)
 - **Public secondary legal-information source** (explanatory).
 - Excellent for rights discovery, client-friendly explanations, intake.

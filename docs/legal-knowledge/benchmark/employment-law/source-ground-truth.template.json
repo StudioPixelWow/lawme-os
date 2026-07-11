@@ -1,0 +1,15 @@
+{
+  "$comment": "Template for pinning a gold source (used inside gold.correct_legal_sources / mandatory_authorities). Public references only; version-dated; never commercial editorial content.",
+  "template": {
+    "kind": "statute_section | regulation | extension_order | judgment | guidance",
+    "name_he": "שם המקור בעברית, למשל: חוק פיצויי פיטורים, סעיף 11(א)",
+    "official_ref": "מזהה רשמי: מספר סעיף / מספר הליך מנורמל (searchKey) / מספר ילקוט פרסומים",
+    "case_number_display": "לפסיקה בלבד: התצוגה הקנונית, למשל ע\"ע 44776-05-21 (null אחרת)",
+    "public_url": "קישור למקור הרשמי (מאגר החקיקה הלאומי / supremedecisions / gov.il)",
+    "version_date": "YYYY-MM-DD — גרסת הנוסח שההצמדה מתייחסת אליה",
+    "authority_level": "binding | persuasive | secondary",
+    "why_mandatory": "מדוע אסמכתה זו הכרחית לתשובה (או null אם חלופית)",
+    "pinned_by": "שם עורך הדין המאמת",
+    "pinned_at": "YYYY-MM-DD"
+  }
+}

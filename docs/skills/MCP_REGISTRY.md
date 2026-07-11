@@ -23,7 +23,10 @@ Source directory: https://agentskills.co.il/he/mcp (42 servers, 2026-07-11).
 - Trust: **reviewed + protocol-verified + live-data validated**
   (full test log: docs/legal-knowledge/KOL_ZCHUT_MCP_VALIDATION.md;
   note: api.php blocks datacenter IPs — validated via the founder's
-  browser against the identical endpoint; confirm first local MCP use).
+  browser against the identical endpoint; Epic-1 local verification via
+  the desktop-bridge VM was impossible — the VM has no network; the
+  definitive test is one kolzchut_search_rights query in Claude Code on
+  the Mac).
 - Classification: public secondary explanatory source — never sole
   authority for a legal conclusion (trust tier 5).
 

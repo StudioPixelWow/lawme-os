@@ -1,0 +1,25 @@
+{
+  "$comment": "Template for one employment-law gold question. Copy, fill, keep status=draft until an employment lawyer completes expert review (see expert-review-guide.md).",
+  "template": {
+    "id": "EMP-<category>-<serial>",
+    "category": "severance | notice_period | pension | section14 | overtime | vacation | sick_leave | maternity | equal_opportunity | harassment | termination_procedure | employee_vs_contractor | collective | extension_orders",
+    "difficulty": "basic | practitioner | expert",
+    "status": "draft | expert_validated | retired",
+    "expert_validated": false,
+    "synthetic_or_public": "synthetic | public_reference",
+    "law_as_of": "YYYY-MM-DD — the date the gold answer is pinned to",
+    "question_he": "השאלה בעברית, כפי שתוצג למנוע",
+    "matter_context": "optional synthetic matter context or null",
+    "expected_topics": ["fixture/corpus topic tags used for POC machinery scoring"],
+    "gold": {
+      "correct_legal_sources": ["pinned by the reviewing lawyer — statute sections, judgments (public citations only)"],
+      "mandatory_authorities": ["authorities WITHOUT which the answer fails"],
+      "acceptable_alternative_authorities": ["substitutes that also support the answer"],
+      "expected_answer_elements": ["the propositions a complete answer must contain"],
+      "common_traps": ["known wrong answers / outdated rules / confusions"],
+      "difficulty_rationale": "why this difficulty",
+      "review_notes": "lawyer's notes"
+    },
+    "scoring": { "method": "rubric | recall_at_k | gate", "metrics": ["recall_at_k", "citation_accuracy", "hallucination_rate"] }
+  }
+}

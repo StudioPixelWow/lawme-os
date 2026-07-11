@@ -14,7 +14,12 @@
     "db:stop": "supabase stop",
     "db:status": "supabase status",
     "db:reset:local": "supabase db reset --local",
-    "db:lint": "supabase db lint --local"
+    "db:lint": "supabase db lint --local",
+    "legal:case-number:test": "node --test \"src/lib/legal/case-number/__tests__/*.test.ts\"",
+    "legal:poc:test": "node --test \"src/lib/legal/case-number/__tests__/*.test.ts\" \"src/modules/legal-knowledge/tests/*.test.ts\"",
+    "legal:fixtures:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts fixtures",
+    "legal:sources:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts sources",
+    "legal:benchmark:run": "node src/modules/legal-knowledge/benchmark/run-benchmark.ts"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "^5.2.9",
@@ -30,6 +35,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "jszip": "^3.10.1",
+    "pdf-parse": "^1.1.1",
     "playwright-core": "^1.61.1",
     "supabase": "^2.109.1",
     "tailwindcss": "^4",
