@@ -53,7 +53,7 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
       </div>
 
       {/* 3 · the work */}
-      <div className="animate-rise mt-10 md:mt-12" style={{ animationDelay: "200ms" }}>
+      <div className="animate-rise mt-12" style={{ animationDelay: "200ms" }}>
         <MatterBoard
           selectedId={selectedMatter.id}
           onSelect={(id) => setFocus({ kind: "matter", id })}
@@ -61,12 +61,12 @@ export function TodayWorkspace({ dateLine }: { dateLine: ReactNode }) {
       </div>
 
       {/* 4 · the doors to the dedicated workspaces */}
-      <div className="animate-rise mt-10 md:mt-12" style={{ animationDelay: "280ms" }}>
+      <div className="animate-rise mt-12" style={{ animationDelay: "280ms" }}>
         <WorkspaceLaunchers />
       </div>
 
       {/* 5 · דינו — the compact intelligence footer */}
-      <div className="animate-rise mt-10 md:mt-12" style={{ animationDelay: "360ms" }}>
+      <div className="animate-rise mt-12" style={{ animationDelay: "360ms" }}>
         <DinoOffice />
         <p className="mt-4 flex items-center justify-center gap-2 text-micro text-foreground-faint">
           <AIMark />

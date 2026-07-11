@@ -184,11 +184,16 @@ export function MicroProgress({
       >
         <span
           className={cx(
-            "block h-full rounded-pill",
+            "relative block h-full overflow-hidden rounded-pill",
             surface === "navy" ? ON_NAVY_DOT[status] : STATUS_DOT[status],
           )}
           style={{ width: `${pct}%` }}
-        />
+        >
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-linear-to-b from-white/35 to-transparent"
+          />
+        </span>
       </span>
       {showValue ? (
         <span

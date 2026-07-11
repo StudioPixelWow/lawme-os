@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   BellGlyph,
+  DinoGlyph,
   SearchGlyph,
-  SparkleGlyph,
 } from "@/design-system/icons/glyphs";
 import { Kbd } from "@/design-system/primitives/kbd";
 import { cx } from "@/design-system/utils/cx";
@@ -20,8 +20,8 @@ export function TopBar() {
   const { setCommandOpen, assistantOpen, setAssistantOpen } = useShell();
 
   return (
-    <header className="glass fixed top-0 end-0 start-0 z-30 md:start-20 lg:start-64 xl:end-72">
-      <div className="flex h-16 w-full items-center gap-3 px-4 md:gap-6 md:px-8">
+    <header className="glass fixed top-3 end-3 start-3 z-30 rounded-xl shadow-float md:start-[5.75rem] lg:start-[16.75rem] xl:end-[18.75rem]">
+      <div className="flex h-14 w-full items-center gap-3 px-4 md:gap-5 md:px-5">
         {/* mobile-only logo (the sidebar owns it from md up) */}
         <Link
           href="/today"
@@ -65,7 +65,7 @@ export function TopBar() {
           <button
             type="button"
             onClick={() => setAssistantOpen(!assistantOpen)}
-            aria-label="דינו — הדינו המשפטי"
+            aria-label="דינו — האינטליגנציה המשפטית"
             aria-pressed={assistantOpen}
             className={cx(
               "flex h-10 w-10 shrink-0 items-center justify-center rounded-pill transition-all",
@@ -75,7 +75,7 @@ export function TopBar() {
             )}
             style={{ transitionDuration: "var(--motion-quick)" }}
           >
-            <SparkleGlyph size={19} />
+            <DinoGlyph size={19} />
           </button>
 
           <button

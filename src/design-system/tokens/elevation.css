@@ -35,9 +35,9 @@
      1–3px translate). Between raised and float, warm and soft. */
   --shadow-lift:
     inset 0 1px 0 0 rgb(255 255 255 / 0.75),
-    0 0 0 1px rgb(10 22 41 / 0.06),
+    0 0 0 1px rgb(201 169 97 / 0.22),
     0 2px 6px rgb(10 22 41 / 0.05),
-    0 10px 28px rgb(10 22 41 / 0.09);
+    0 12px 40px rgb(10 22 41 / 0.1);
 
   /* Icon seats — the small material behind meaningful glyphs. */
   --shadow-seat:

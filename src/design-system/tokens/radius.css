@@ -11,6 +11,6 @@
   --radius-sm: 0.5rem;   /* 8px  — inputs, buttons */
   --radius-md: 0.75rem;  /* 12px — cards, popovers */
   --radius-lg: 1rem;     /* 16px — panels, sheets, modals */
-  --radius-xl: 1.5rem;   /* 24px — glass surfaces, hero containers */
+  --radius-xl: 1.375rem; /* 22px — operational surfaces, hero containers */
   --radius-pill: 9999px; /* pills, avatars, dots */
 }

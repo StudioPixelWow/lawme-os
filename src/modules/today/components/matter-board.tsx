@@ -186,7 +186,7 @@ function SupportingMatter({
     <article
       data-live={selected || undefined}
       className={cx(
-        "living-edge surface-paper group relative min-w-0 flex-1 rounded-xl p-4",
+        "living-edge surface-paper group relative min-w-0 flex-1 rounded-xl p-5 transition-all hover:-translate-y-0.5 hover:shadow-lift",
         selected && "context-halo surface-paper-raised",
       )}
     >

@@ -7,13 +7,13 @@ const RING = { size: 52, stroke: 3.5, r: 22 };
 const CIRC = 2 * Math.PI * RING.r;
 
 const RING_STROKE: Record<string, string> = {
-  completed: "stroke-status-completed",
-  progress: "stroke-status-progress",
-  today: "stroke-status-today",
-  urgent: "stroke-status-urgent",
-  waiting: "stroke-status-waiting",
-  risk: "stroke-status-risk",
-  scheduled: "stroke-status-scheduled",
+  completed: "stroke-status-completed text-status-completed",
+  progress: "stroke-status-progress text-status-progress",
+  today: "stroke-status-today text-status-today",
+  urgent: "stroke-status-urgent text-status-urgent",
+  waiting: "stroke-status-waiting text-status-waiting",
+  risk: "stroke-status-risk text-status-risk",
+  scheduled: "stroke-status-scheduled text-status-scheduled",
 };
 
 /**
@@ -62,6 +62,10 @@ export function HealthRing({
           strokeDasharray={`${dash} ${CIRC.toFixed(1)}`}
           transform={`rotate(-90 ${RING.size / 2} ${RING.size / 2})`}
           className={cx(RING_STROKE[status] ?? "stroke-status-progress")}
+          style={{
+            filter:
+              "drop-shadow(0 0 5px color-mix(in srgb, currentColor 40%, transparent))",
+          }}
         />
       </svg>
       <span className={cx("absolute text-micro font-semibold tabular-nums", surface === "navy" ? "text-paper-0" : "text-foreground")}>

@@ -61,6 +61,7 @@
   --motion-instant: 80ms;  /* hover, press, toggles */
   --motion-quick: 160ms;   /* chips, checkboxes, tooltips */
   --motion-settle: 280ms;  /* cards, list items, accordion */
+  --motion-smooth: 250ms;  /* premium card hover (V11 polish) */
   --motion-scene: 450ms;   /* panels, sheets, command bar, pages */
   --motion-reveal: 700ms;  /* scroll-chapter reveals */
   --motion-breath: 2400ms; /* gold AI breath only */
@@ -72,6 +73,7 @@
     --motion-instant: 1ms;
     --motion-quick: 1ms;
     --motion-settle: 1ms;
+    --motion-smooth: 1ms;
     --motion-scene: 1ms;
     --motion-reveal: 1ms;
     --motion-breath: 1ms;

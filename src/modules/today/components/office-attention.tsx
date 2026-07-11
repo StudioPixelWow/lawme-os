@@ -75,7 +75,7 @@ export function OfficeAttentionStrip() {
                 <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
                   <span
                     className={cx(
-                      "text-subheading font-bold tracking-tight tabular-nums",
+                      "text-heading font-bold tracking-tight tabular-nums",
                       critical ? "text-status-urgent" : "text-foreground",
                     )}
                   >
@@ -118,15 +118,26 @@ export function OfficeAttentionStrip() {
                 }
                 aria-expanded={critical ? risksOpen : undefined}
                 className={cx(
-                  "living-edge flex min-w-0 flex-1 items-center gap-2.5 rounded-lg px-3 py-2.5 transition-colors",
+                  "living-edge group relative flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3.5 py-3 transition-all hover:-translate-y-px",
                   critical
                     ? "bg-gold-100/50 shadow-gold-glow"
                     : "hover:bg-surface-sunken/50",
                 )}
                 data-live={critical || undefined}
-                style={{ transitionDuration: "var(--motion-quick)" }}
+                style={{ transitionDuration: "var(--motion-smooth)" }}
               >
                 {inner}
+                {/* the accent line */}
+                <span
+                  aria-hidden
+                  className={cx(
+                    "absolute inset-x-3.5 bottom-0 h-0.5 rounded-t-pill transition-colors",
+                    critical
+                      ? "bg-gold-500/70"
+                      : "bg-transparent group-hover:bg-line-strong",
+                  )}
+                  style={{ transitionDuration: "var(--motion-quick)" }}
+                />
               </button>
             </div>
           );

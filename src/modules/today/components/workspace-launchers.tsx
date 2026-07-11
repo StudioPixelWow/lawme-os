@@ -132,7 +132,7 @@ export function WorkspaceLaunchers() {
           const inner = <LauncherBody launcher={launcher} />;
           const shared = cx(
             "living-edge group flex h-full w-full flex-col items-start rounded-xl p-4 text-start transition-all",
-            "surface-paper hover:glass hover:-translate-y-0.5 hover:shadow-lift",
+            "surface-paper hover:glass hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-lift",
           );
           return (
             <li key={launcher.id} className="min-w-0">
@@ -140,7 +140,7 @@ export function WorkspaceLaunchers() {
                 <Link
                   href={launcher.href}
                   className={shared}
-                  style={{ transitionDuration: "var(--motion-quick)" }}
+                  style={{ transitionDuration: "var(--motion-smooth)" }}
                 >
                   {inner}
                 </Link>
@@ -148,7 +148,7 @@ export function WorkspaceLaunchers() {
                 <button
                   type="button"
                   className={shared}
-                  style={{ transitionDuration: "var(--motion-quick)" }}
+                  style={{ transitionDuration: "var(--motion-smooth)" }}
                 >
                   {inner}
                 </button>

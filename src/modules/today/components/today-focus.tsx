@@ -227,7 +227,7 @@ export function TodayFocus({
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
                 <Link
                   href="/matters"
-                  className="inline-flex h-11 items-center rounded-md border border-gold-400/70 px-7 text-small font-semibold text-gold-200 shadow-gold-glow transition-all hover:-translate-y-px hover:border-gold-300 hover:bg-gold-500/10"
+                  className="inline-flex h-12 items-center rounded-md border border-gold-400/70 px-8 text-body font-semibold text-gold-200 shadow-gold-glow transition-all hover:-translate-y-px hover:border-gold-300 hover:bg-gold-500/10"
                   style={{ transitionDuration: "var(--motion-quick)" }}
                 >
                   {hearing ? mode.cta : "פתח הכנה"}

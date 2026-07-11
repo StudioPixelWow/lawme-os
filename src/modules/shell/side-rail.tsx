@@ -54,20 +54,20 @@ export function SideRail() {
       aria-label="ניווט ראשי"
       className="surface-sidebar fixed inset-y-0 start-0 z-40 hidden w-20 flex-col border-e border-paper-0/10 md:flex lg:w-64"
     >
-      {/* logo plate */}
-      <div className="flex justify-center px-4 pt-6 lg:justify-start lg:px-5">
+      {/* the logo — the brand plate itself */}
+      <div className="flex justify-center px-4 pt-5 lg:px-5">
         <Link
           href="/today"
           aria-label="LawME — היום"
-          className="flex items-center justify-center rounded-md bg-paper-0 p-2 shadow-raised lg:px-4"
+          className="block w-full overflow-hidden rounded-lg shadow-raised"
         >
           <Image
-            src="/brand/lawme-logo.png"
+            src="/brand/lawme-logo2.png"
             alt="LawME"
-            width={72}
-            height={48}
+            width={432}
+            height={288}
             priority
-            className="h-9 w-auto lg:h-11"
+            className="mx-auto h-14 w-auto rounded-md object-cover lg:h-auto lg:w-full lg:rounded-lg"
           />
         </Link>
       </div>
@@ -88,7 +88,7 @@ export function SideRail() {
       </div>
 
       {/* main navigation */}
-      <div className="mt-4 flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 lg:px-4">
+      <div className="mt-4 flex flex-1 flex-col gap-2 overflow-y-auto px-3 lg:px-4">
         {NAV_ITEMS.map((item) => {
           const active = pathname.startsWith(item.href);
           const Glyph = GLYPHS[item.icon];
@@ -99,9 +99,9 @@ export function SideRail() {
               aria-current={active ? "page" : undefined}
               title={item.label}
               className={cx(
-                "relative flex h-12 items-center justify-center gap-3.5 rounded-md px-3 text-body transition-all lg:justify-start lg:px-4",
+                "relative flex h-12 items-center justify-center gap-3.5 rounded-lg px-3 text-body transition-all lg:justify-start lg:px-4",
                 active
-                  ? "bg-gold-500/15 font-semibold text-gold-200"
+                  ? "bg-linear-to-b from-gold-500/22 to-gold-500/10 font-semibold text-gold-200 shadow-seat"
                   : "font-medium text-ink-100 hover:-translate-x-px hover:bg-paper-0/8 hover:text-paper-0",
               )}
               style={{ transitionDuration: "var(--motion-quick)" }}
