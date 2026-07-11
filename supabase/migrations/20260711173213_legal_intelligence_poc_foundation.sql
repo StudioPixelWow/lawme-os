@@ -1,9 +1,9 @@
 -- ============================================================================
 -- LawME — Legal Intelligence POC Foundation (Epic 1)
--- Migration: 20260711155956_legal_intelligence_poc_foundation
+-- Migration: 20260711173213_legal_intelligence_poc_foundation (applied to dev 2026-07-11)
 --
--- STATUS: prepared, NOT applied remotely. Founder approval is required
--- before `supabase db push` (see docs/setup/DATABASE_WORKFLOW.md).
+-- STATUS: APPLIED to the development project (udispadsbxqicmawqcuk) on
+-- 2026-07-11 with founder approval (Epic 2), via the Supabase MCP migration path.
 --
 -- Design sources: docs/legal-knowledge/UNIFIED_LEGAL_DOCUMENT_SCHEMA.md,
 -- LAWME_SOURCE_TRUST_MODEL.md, LEGAL_KNOWLEDGE_GRAPH_ARCHITECTURE.md,

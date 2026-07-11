@@ -41,10 +41,12 @@ const ADAPTER_VERSION = "poc-0.1.0-fixture";
 const SOURCE_ID = "LSR-038"; // Supreme Court decisions DB in the source registry
 
 function loadFixtures(): FixtureItem[] {
-  const p = path.join(
-    import.meta.dirname,
-    "..", "..", "fixtures", "employment-poc.fixtures.json",
-  );
+  // import.meta.dirname exists under plain Node; bundlers (Next/turbopack)
+  // leave it undefined — fall back to a cwd-relative repo path.
+  const baseDir =
+    (import.meta as { dirname?: string }).dirname ??
+    path.join(process.cwd(), "src", "modules", "legal-knowledge", "ingestion", "adapters", "supreme-decisions");
+  const p = path.join(baseDir, "..", "..", "fixtures", "employment-poc.fixtures.json");
   const parsed = JSON.parse(readFileSync(p, "utf8")) as { items: FixtureItem[] };
   return parsed.items;
 }

@@ -21,6 +21,9 @@ export interface PocRunRecord {
   warnings: string[];
   failures: string[];
   benchmarkResult: Record<string, unknown> | null;
+  /** correlation id propagated across research/persistence/audit */
+  correlationId?: string;
+  durationMs?: number;
 }
 
 const RUN_DIR = ".poc-runs";

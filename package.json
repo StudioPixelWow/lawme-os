@@ -19,14 +19,17 @@
     "legal:poc:test": "node --test \"src/lib/legal/case-number/__tests__/*.test.ts\" \"src/modules/legal-knowledge/tests/*.test.ts\"",
     "legal:fixtures:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts fixtures",
     "legal:sources:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts sources",
-    "legal:benchmark:run": "node src/modules/legal-knowledge/benchmark/run-benchmark.ts"
+    "legal:benchmark:run": "node src/modules/legal-knowledge/benchmark/run-benchmark.ts",
+    "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "^5.2.9",
     "@fontsource-variable/frank-ruhl-libre": "^5.2.8",
+    "@supabase/supabase-js": "^2.110.2",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

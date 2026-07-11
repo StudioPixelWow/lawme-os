@@ -25,6 +25,22 @@ go-live.
 | 16 | **Service-role isolation** | service key leaking to client | Key lives only in server env (Vercel server scope/vault); never in repo (env:check + appsec scanner sweep); RLS means anon/authenticated keys can't write global corpus even if leaked | ✅ policy + scanners |
 | 17 | **Secret leakage via telemetry** | run logs capturing tokens | run-log recorder REJECTS payloads matching secret patterns (tested); logs hold counts/scores, never full private documents | ✅ implemented + tested |
 
+## Epic 2 update (2026-07-11) — database-integration checks
+| Check | Status |
+|---|---|
+| Dev route cannot expose service-role credentials | ✅ server component + `server-only` runner; key read from server env, never rendered, never in client bundle |
+| Browser uses only browser-safe credentials | ✅ only NEXT_PUBLIC_* names may reach the client (env:check enforces the naming law); the dev page ships no keys at all |
+| Ingestion writes server-side only | ✅ seed CLI gates (env assertion + dev-ref check + secret required) + storage bucket has zero client write policies |
+| Repository methods enforce org context | ✅ tested (cross-tenant tests) + RLS as the real enforcement on Supabase |
+| No cross-tenant leakage | ✅ remote RLS suite 11/11 on the live dev DB, incl. membership-revocation |
+| Storage paths not guessable-for-access | ✅ org UUID is parsed from the path and membership-checked by policy — knowing a path grants nothing |
+| Signed URLs expire | ✅ policy: server-generated signed URLs only (60s–1h); no public objects exist (bucket private) |
+| HTML remains sanitized | ✅ unchanged extractor path (tested) |
+| File limits enforced | ✅ DB CHECK 100MB + bucket file_size_limit 100MB + extractor caps |
+| Audit logs store no document bodies | ✅ 8KB payload cap + secret-pattern rejection (tested) |
+| Errors don't reveal schema | ✅ mapError → generic Hebrew messages; driver detail server-side only |
+| No production project ref used | ✅ APPROVED_DEV_PROJECT_REF guard throws on any other target (tested) |
+
 ## Residual risks accepted for the POC
 - No sandboxed parser process (pure-JS parsers on fixtures only).
 - No live fetch code exists — SSRF/redirect controls are design-stage by

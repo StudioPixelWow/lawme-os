@@ -1,0 +1,285 @@
+/**
+ * DB-backed research vertical slice (Epic 2, Phases 10-11).
+ * Same contract and honesty rules as the in-memory engine: controlled
+ * Hebrew expansion, hybrid weighting with full score decomposition, exact
+ * anchors, warnings, missing-source notice, extractive-only downstream.
+ * Embedding note: MockEmbeddingProvider (deterministic trigram-hash) —
+ * NOT production semantic quality, and labeled as such in every output.
+ */
+import { randomUUID } from "node:crypto";
+import { normalizeText } from "../extraction/normalize-text.ts";
+import { expandQuery } from "./expansion.ts";
+import { ENGINE_VERSION } from "./engine.ts";
+import { MockEmbeddingProvider, cosineSimilarity } from "../embeddings/mock-provider.ts";
+import { formatCitation } from "../citations/anchors.ts";
+import type { CitationAnchor } from "../citations/anchors.ts";
+import { normalizeCaseNumber } from "../../../lib/legal/case-number/index.ts";
+import { recordRun } from "../observability/run-log.ts";
+import type {
+  LegalDocumentRow, OrgContext, Repositories, SectionSearchFilters, SectionSearchHit,
+} from "../repositories/types.ts";
+
+export const DB_ENGINE_VERSION = `${ENGINE_VERSION}+db`;
+
+const WEIGHTS = { lexical: 0.40, vector: 0.25, authority: 0.18, trust: 0.10, freshness: 0.07 };
+
+function authorityWeight(doc: LegalDocumentRow): number {
+  const court = doc.court ?? "";
+  if (["legislation", "regulation", "order"].includes(doc.documentType)) return 1.0;
+  if (court.includes("העליון")) return 1.0;
+  if (court.includes("הארצי")) return 0.85;
+  if (court.includes("האזורי") || court.includes("מחוזי")) return 0.6;
+  if (["guidance", "circular", "regulator_decision"].includes(doc.documentType)) return 0.55;
+  if (doc.documentType === "academic_article") return 0.3;
+  return 0.4;
+}
+function trustWeight(doc: LegalDocumentRow): number {
+  switch (doc.documentType) {
+    case "legislation": case "regulation": case "order": return 1.0;
+    case "judgment": case "decision": return 0.9;
+    case "guidance": case "circular": case "regulator_decision": return 0.8;
+    case "academic_article": return 0.5;
+    default: return 0.6;
+  }
+}
+function freshnessWeight(doc: LegalDocumentRow): number {
+  const d = doc.documentDate ?? doc.versionDate ?? doc.effectiveDate;
+  if (!d) return 0.5;
+  const ageYears = (Date.now() - new Date(d).getTime()) / (365.25 * 24 * 3600 * 1000);
+  if (ageYears <= 2) return 1.0;
+  if (ageYears <= 5) return 0.85;
+  if (ageYears <= 10) return 0.7;
+  if (ageYears <= 20) return 0.55;
+  return 0.4;
+}
+function authorityClass(doc: LegalDocumentRow): string {
+  if (["legislation", "regulation", "order"].includes(doc.documentType)) return "legislation";
+  const c = doc.court ?? "";
+  if (c.includes("העליון")) return "supreme";
+  if (c.includes("הארצי")) return "national_labor";
+  if (c.includes("האזורי")) return "regional";
+  if (["guidance", "circular", "regulator_decision"].includes(doc.documentType)) return "guidance";
+  if (doc.documentType === "academic_article") return "secondary";
+  return "unknown";
+}
+
+export interface DbResearchRequest {
+  question: string;
+  organizationId?: string | null;   // optional org context (persists session when set)
+  actorProfileId?: string | null;
+  legalDomain?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  authorityPreference?: "binding_first" | "recent_first" | "balanced";
+  limit?: number;
+}
+
+export interface DbEvidenceItem {
+  documentId: string;
+  versionId: string;
+  title: string;
+  documentType: string;
+  court: string | null;
+  caseNumberDisplay: string | null;
+  authorityClass: string;
+  verificationStatus: string;
+  passage: string;
+  anchor: CitationAnchor;
+  citation: string;
+  sourceUrl: string | null;
+  scoreBreakdown: { lexical: number; vector: number; authority: number; trust: number; freshness: number; final: number; weights?: Record<string, number> };
+  warnings: string[];
+}
+
+export interface DbResearchResult {
+  engineVersion: string;
+  correlationId: string;
+  repositoryKind: "in-memory" | "supabase";
+  normalizedQuery: string;
+  expansions: string[];
+  evidence: DbEvidenceItem[];
+  retrievalExplanation: string;
+  warnings: string[];
+  missingSourceNotice: string | null;
+  durationMs: number;
+  persisted: { sessionId: string; queryId: string } | null;
+}
+
+export async function runDbResearch(repos: Repositories, request: DbResearchRequest): Promise<DbResearchResult> {
+  const started = Date.now();
+  const correlationId = randomUUID();
+  const ctx: OrgContext = {
+    organizationId: request.organizationId ?? null,
+    actorProfileId: request.actorProfileId ?? null,
+    correlationId,
+  };
+  const warnings: string[] = [
+    "הקורפוס סינתטי (POC) — אין להסתמך על התוצאות משפטית",
+    "דירוג וקטורי: MockEmbeddingProvider — אינו איכות פרודקשן",
+  ];
+
+  const normalizedQuery = normalizeText(request.question);
+  const expanded = expandQuery(normalizedQuery);
+  const queryTerms = [normalizedQuery, ...expanded.expansions];
+
+  const filters: SectionSearchFilters = {
+    legalDomain: request.legalDomain,
+    dateFrom: request.dateFrom,
+    dateTo: request.dateTo,
+  };
+  const limit = request.limit ?? 8;
+
+  const search = await repos.documents.searchSections(queryTerms, filters, limit * 4, ctx);
+  if (!search.ok) {
+    return {
+      engineVersion: DB_ENGINE_VERSION, correlationId, repositoryKind: repos.kind,
+      normalizedQuery, expansions: expanded.expansions, evidence: [],
+      retrievalExplanation: "האחזור נכשל", warnings: [...warnings, search.error.message],
+      missingSourceNotice: "שגיאת אחזור — לא ניתן לאשר או לשלול קיום מקורות",
+      durationMs: Date.now() - started, persisted: null,
+    };
+  }
+
+  // hybrid scoring on the candidate set (mock vector over section content)
+  const provider = new MockEmbeddingProvider();
+  const [qVec] = await provider.embed([queryTerms.join(" ")]);
+  const maxLex = search.data[0]?.lexicalScore || 1;
+
+  const scored = await Promise.all(search.data.map(async (hit: SectionSearchHit) => {
+    const [sVec] = await provider.embed([hit.section.content]);
+    const vector = Math.max(0, cosineSimilarity(qVec, sVec));
+    const breakdown = {
+      lexical: hit.lexicalScore / maxLex,
+      vector,
+      authority: authorityWeight(hit.document),
+      trust: trustWeight(hit.document),
+      freshness: freshnessWeight(hit.document),
+      final: 0,
+    };
+    breakdown.final =
+      WEIGHTS.lexical * breakdown.lexical + WEIGHTS.vector * breakdown.vector +
+      WEIGHTS.authority * breakdown.authority + WEIGHTS.trust * breakdown.trust +
+      WEIGHTS.freshness * breakdown.freshness;
+    return { hit, breakdown };
+  }));
+
+  scored.sort((a, b) => b.breakdown.final - a.breakdown.final || a.hit.section.id.localeCompare(b.hit.section.id));
+
+  // diversification: max 2 passages per document
+  const perDoc = new Map<string, number>();
+  const top: typeof scored = [];
+  for (const s of scored) {
+    const n = perDoc.get(s.hit.document.id) ?? 0;
+    if (n >= 2) continue;
+    perDoc.set(s.hit.document.id, n + 1);
+    top.push(s);
+    if (top.length >= limit) break;
+  }
+
+  const evidence: DbEvidenceItem[] = top.map(({ hit, breakdown }) => {
+    const caseNo = hit.document.caseNumberRaw ? normalizeCaseNumber(hit.document.caseNumberRaw) : null;
+    const anchor: CitationAnchor = {
+      documentId: hit.document.id,
+      versionHash: "db", // full hash available via version row; kept light in the slice
+      anchorKey: hit.section.anchorKey,
+      pageNumber: hit.section.pageNumber,
+      charStart: hit.section.charStart,
+      charEnd: hit.section.charEnd,
+      sourceUrl: hit.document.canonicalSourceUrl,
+      retrievedAt: new Date().toISOString(),
+      verificationStatus: "unverified",
+    };
+    const itemWarnings = ["fixture content — not legal authority"];
+    if (hit.document.verificationStatus === "unverified") itemWarnings.push("source unverified");
+    return {
+      documentId: hit.document.id,
+      versionId: hit.section.versionId,
+      title: hit.document.title,
+      documentType: hit.document.documentType,
+      court: hit.document.court,
+      caseNumberDisplay: caseNo?.display ?? null,
+      authorityClass: authorityClass(hit.document),
+      verificationStatus: hit.document.verificationStatus,
+      passage: hit.section.content,
+      anchor,
+      citation: formatCitation({ displayName: caseNo?.display ?? hit.document.title, anchor }),
+      sourceUrl: hit.document.canonicalSourceUrl,
+      scoreBreakdown: { ...breakdown, weights: WEIGHTS },
+      warnings: itemWarnings,
+    };
+  });
+
+  if (request.authorityPreference === "binding_first") {
+    const rank: Record<string, number> = { legislation: 0, supreme: 1, national_labor: 2, guidance: 3, regional: 4, secondary: 5, unknown: 6 };
+    evidence.sort((a, b) => (rank[a.authorityClass] ?? 9) - (rank[b.authorityClass] ?? 9) || b.scoreBreakdown.final - a.scoreBreakdown.final);
+  }
+
+  // conflicting-source surfacing
+  const hasConflictMarker = evidence.some((e) => e.passage.includes("בניגוד לגישה") || e.title.includes("מנוגדת"));
+  if (hasConflictMarker) warnings.push("אותר מקור עם עמדה מנוגדת בסט התוצאות — ראה סעיף הסתירות");
+
+  // optional persistence (org-scoped, only with a real org context)
+  let persisted: DbResearchResult["persisted"] = null;
+  if (ctx.organizationId && ctx.actorProfileId) {
+    const session = await repos.research.createResearchSession({
+      organizationId: ctx.organizationId, createdBy: ctx.actorProfileId,
+      matterRef: null, title: normalizedQuery.slice(0, 120),
+    }, ctx);
+    if (session.ok) {
+      const query = await repos.research.addResearchQuery({
+        sessionId: session.data.id, queryText: request.question,
+        normalizedQuery, expansion: expanded.expansions,
+        filters: filters as Record<string, unknown>, engineVersion: DB_ENGINE_VERSION,
+      }, ctx);
+      if (query.ok) {
+        await repos.research.saveResearchResults(evidence.map((e, i) => ({
+          queryId: query.data.id, documentId: e.documentId, versionId: e.versionId,
+          rank: i + 1, score: e.scoreBreakdown.final,
+          scoreBreakdown: e.scoreBreakdown, passageAnchor: e.anchor.anchorKey,
+          passageText: e.passage, authorityType: "unknown", warnings: e.warnings,
+        })), ctx);
+        persisted = { sessionId: session.data.id, queryId: query.data.id };
+      }
+    }
+  }
+
+  const missingSourceNotice = evidence.length === 0
+    ? "לא אותר מקור תומך בקורפוס. היעדר מקור הוא תשובה לגיטימית — אין להשלים טענה ללא אסמכתה."
+    : null;
+
+  const result: DbResearchResult = {
+    engineVersion: DB_ENGINE_VERSION,
+    correlationId,
+    repositoryKind: repos.kind,
+    normalizedQuery,
+    expansions: expanded.expansions,
+    evidence,
+    retrievalExplanation:
+      `מאגר: ${repos.kind === "supabase" ? "Supabase (פיתוח)" : "זיכרון מקומי"} · ` +
+      `${evidence.length} קטעים מ-${new Set(evidence.map((e) => e.documentId)).size} מסמכים · ` +
+      `שקלול: לקסיקלי 40% · וקטורי-mock ‏25% · סמכות 18% · אמינות 10% · עדכניות 7% · גיוון עד 2 למסמך`,
+    warnings,
+    missingSourceNotice,
+    durationMs: Date.now() - started,
+    persisted,
+  };
+
+  try {
+    recordRun({
+      kind: "research", timestamp: new Date().toISOString(),
+      engineVersion: DB_ENGINE_VERSION, modelProvider: "mock/trigram-hash@1.0.0",
+      parserVersion: "poc-seed-0.2.0",
+      query: request.question, sourceAdapters: [repos.kind],
+      documentsRetrieved: evidence.length,
+      rankScores: evidence.map((e) => Number(e.scoreBreakdown.final.toFixed(4))),
+      citationsReturned: evidence.length,
+      verificationStatus: [...new Set(evidence.map((e) => e.verificationStatus))],
+      warnings: result.warnings, failures: [],
+      benchmarkResult: null,
+      correlationId,
+      durationMs: result.durationMs,
+    });
+  } catch { /* observability must never break research */ }
+
+  return result;
+}
