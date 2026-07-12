@@ -84,6 +84,13 @@ export default async function LegalIntelligenceDevPage({
             >
               הרץ מחקר
             </button>
+            {/* out-of-domain gate fixture — expected: no sufficiently relevant source */}
+            <a
+              href="?q=ירושת דירה&domain=labor&authority=balanced"
+              className="rounded-pill border border-ink-200 px-4 py-2 text-caption text-ink-500 transition-colors hover:border-gold-400"
+            >
+              בדיקת שער: &quot;ירושת דירה&quot; (מצופה: אין מקור רלוונטי)
+            </a>
           </div>
         </form>
 
@@ -100,11 +107,66 @@ export default async function LegalIntelligenceDevPage({
               ))}
             </div>
 
-            {result.missingSourceNotice && (
+            {/* ---- relevance-gate panel (fail-closed transparency) ---- */}
+            <div className="rounded-xl border border-ink-100 bg-paper-0 p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-body font-bold">שער רלוונטיות</span>
+                <span className={`rounded-pill px-3 py-0.5 text-caption font-semibold ${
+                  result.gate.status === "pass" ? "bg-ink-900 text-paper-0" : "bg-status-pending-wash text-status-pending"
+                }`}>
+                  {result.gate.status === "pass" ? "PASS — עבר" : "FAIL — נכשל (fail-closed)"}
+                </span>
+                <span className="text-caption text-ink-500">ביטחון {result.gate.confidence.toFixed(2)}</span>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-caption text-ink-500 sm:grid-cols-3">
+                <p>לקסיקלי גולמי (אבסולוטי): <b className="text-ink-700">{result.gate.signals.rawLexicalTop.toFixed(3)}</b></p>
+                <p>לקסיקלי מנורמל (דירוג בלבד): {result.gate.signals.normalizedLexicalTop.toFixed(3)}</p>
+                <p>סמנטי גולמי (mock): {result.gate.signals.rawSemanticTop.toFixed(3)}</p>
+                <p>תחום שזוהה: <b className="text-ink-700">{result.gate.domain.detectedDomainLabelHe}</b></p>
+                <p>תחום פעיל: {result.gate.activeDomainLabelHe}</p>
+                <p>התאמת תחום: {result.gate.domain.domainMatch ? "כן" : "לא"}</p>
+                <p>קטעים רלוונטיים: {result.gate.signals.relevantPassages}</p>
+                <p>מקורות עצמאיים רלוונטיים: {result.gate.signals.independentRelevantSources}</p>
+                <p>מקורות ראשיים רלוונטיים: {result.gate.signals.primaryRelevantSources}</p>
+                <p>הפרדת ניקוד: {result.gate.signals.scoreSeparation.toFixed(3)}</p>
+                <p>ביטחון שאלה: {result.gate.signals.queryConfidence.toFixed(2)}</p>
+                <p>עוגנים תקינים: {result.gate.signals.anchorsValid ? "כן" : "לא"}</p>
+              </div>
+              {result.gate.failureReasons.length > 0 && (
+                <ul className="mt-3 space-y-1 text-caption font-semibold text-status-pending">
+                  {result.gate.failureReasons.map((r) => (
+                    <li key={r.code}>✗ [{r.code}] {r.messageHe}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* ---- structured no-answer state ---- */}
+            {result.answerState === "no_answer" ? (
+              <div className="rounded-xl border-2 border-status-pending/60 bg-status-pending-wash p-5">
+                <p className="text-body font-bold">{result.missingSourceNotice}</p>
+                <div className="mt-3 grid grid-cols-1 gap-1 text-caption text-ink-700 sm:grid-cols-2">
+                  <p>תחום שזוהה: {result.gate.domain.detectedDomainLabelHe}</p>
+                  <p>תחום הקורפוס הפעיל: {result.gate.activeDomainLabelHe}</p>
+                  <p>ניקוד רלוונטיות גולמי מרבי: {result.gate.signals.rawLexicalTop.toFixed(3)}</p>
+                  <p>מדוע נכשל: {result.gate.failureReasons.map((r) => r.code).join(", ")}</p>
+                </div>
+                {result.gate.missingSourceTypes.length > 0 && (
+                  <p className="mt-2 text-caption text-ink-700">
+                    מקורות חסרים: {result.gate.missingSourceTypes.join(" · ")}
+                  </p>
+                )}
+                {result.gate.suggestedActionsHe.length > 0 && (
+                  <p className="mt-2 text-caption font-semibold text-ink-700">
+                    פעולות מוצעות: {result.gate.suggestedActionsHe.join(" · ")}
+                  </p>
+                )}
+              </div>
+            ) : result.missingSourceNotice ? (
               <div className="rounded-xl border border-status-pending/40 bg-status-pending-wash p-4 text-body">
                 {result.missingSourceNotice}
               </div>
-            )}
+            ) : null}
 
             <ol className="space-y-4">
               {result.evidence.map((e, i) => (
@@ -140,6 +202,45 @@ export default async function LegalIntelligenceDevPage({
                 </li>
               ))}
             </ol>
+
+            {/* ---- weak results: collapsed, explicitly non-authoritative ---- */}
+            {result.weakEvidence.length > 0 && (
+              <details className="rounded-xl border border-dashed border-ink-200 bg-paper-0 p-4">
+                <summary className="cursor-pointer text-caption font-semibold text-ink-500">
+                  תוצאות חלשות שאינן מספיקות לתשובה ({result.weakEvidence.length}) — אינן עונות על השאלה
+                </summary>
+                <ol className="mt-3 space-y-3">
+                  {result.weakEvidence.map((e) => (
+                    <li key={`${e.documentId}:${e.anchor.anchorKey}`} className="rounded-lg border border-ink-100 p-3 opacity-70">
+                      <p className="text-caption font-semibold">{e.title}</p>
+                      <p className="mt-1 text-caption text-ink-500">{e.passage.slice(0, 160)}…</p>
+                      <p className="mt-1 text-caption text-ink-500">
+                        כיסוי אבסולוטי {e.scoreBreakdown.raw.lexicalCoverage.toFixed(3)} · עוגן {e.anchor.anchorKey}
+                      </p>
+                      <p className="mt-1 text-caption text-status-pending">⚠ {e.warnings.join(" · ")}</p>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            )}
+
+            {/* ---- corpus coverage ---- */}
+            <div className="rounded-xl border border-ink-100 bg-paper-0 p-4 text-caption text-ink-500">
+              <p className="text-body font-bold text-ink-900">כיסוי הקורפוס הפעיל</p>
+              <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
+                <p>תחום פעיל: {result.corpusCoverage.activeDomainHe}</p>
+                <p>מסמכים באינדקס: {result.corpusCoverage.indexedDocuments}</p>
+                <p>
+                  סוגי מקורות:{" "}
+                  {Object.entries(result.corpusCoverage.documentsByType).map(([k, v]) => `${k} (${v})`).join(" · ") || "—"}
+                </p>
+                <p>עדכון מאומת אחרון: {result.corpusCoverage.latestVerifiedUpdate ?? "אין — הקורפוס סינתטי, דבר לא אומת"}</p>
+                <p>תאריך מסמך אחרון: {result.corpusCoverage.latestDocumentDate ?? "—"}</p>
+                <p>פסיקה זמינה: {result.corpusCoverage.caseLawAvailable ? "כן (סינתטית)" : "לא"}</p>
+              </div>
+              <p className="mt-2">חסר: {result.corpusCoverage.missingCategoriesHe.join(" · ")}</p>
+              <p className="mt-2 font-semibold text-ink-700">{result.corpusCoverage.noticeHe}</p>
+            </div>
 
             <footer className="rounded-xl border border-ink-100 bg-paper-0 p-4 text-caption text-ink-500">
               טיוטת מחקר — נדרשת בדיקת עורך דין. מאגר: {result.repositoryKind === "supabase" ? "Supabase פיתוח" : "זיכרון מקומי (fallback)"}.

@@ -20,6 +20,7 @@
     "legal:fixtures:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts fixtures",
     "legal:sources:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts sources",
     "legal:benchmark:run": "node src/modules/legal-knowledge/benchmark/run-benchmark.ts",
+    "legal:benchmark:negative": "node src/modules/legal-knowledge/benchmark/negative-benchmark.ts",
     "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"
   },
   "dependencies": {
