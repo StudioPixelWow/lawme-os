@@ -53,3 +53,32 @@ go-live.
 3. Parser versions pinned + review procedure recorded.
 4. Failure-queue + anomaly dashboards from the update-pipeline design.
 5. Re-run this threat model against the live adapter.
+
+---
+
+## Epic 3A update — Dino Orchestration Layer (2026-07-12)
+
+The Dino orchestration engine adds a reasoning/planning layer above the
+retrieval + Relevance Gate covered by this document. Its dedicated threat
+analysis lives in `DINO_ORCHESTRATION_THREAT_MODEL.md` (15 threats D1–D15
++ invariants). Key reinforcements relevant to this POC threat model:
+
+- **Extractive-only drafting preserved**: Dino's Controlled Drafting
+  Engine emits only structured research artifacts, every substantive
+  paragraph traceable to atomic claims with verified citations; the
+  mandatory label "טיוטת מחקר משפטי — נדרשת בדיקת עורך דין" is enforced by
+  Legal QA (blocking).
+- **Citation verification is now a hard stop**: any broken anchor or
+  quote mismatch blocks the affected claim (T-anchors threat closed
+  end-to-end, verified by the Dino benchmark: 100% broken-citation block).
+- **No chain-of-thought** is stored or displayed anywhere (policy
+  `dino.safety.no-chain-of-thought`); only structured audit artifacts.
+- **Provider isolation**: no paid/live provider is connected;
+  `ProviderRouter` refuses any network provider; provider output is
+  untrusted until schema-validated.
+- **AI-policy stop**: a matter marked `aiPolicy=prohibited` halts before
+  any retrieval of private content, with an audit event.
+- **Fail-closed unchanged**: the Relevance Gate remains mandatory and is
+  now combined with a coverage/source-plan gate (a relevant passage
+  without required authority, or authority without relevance, does not
+  yield an answer).

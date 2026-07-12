@@ -7,7 +7,10 @@
 import { notFound } from "next/navigation";
 import { isDevInterfaceEnabled } from "./gate";
 import { runDevResearch } from "./run-research";
+import { runDevDino } from "./run-dino";
+import { DinoPipelineView } from "./dino-view";
 import type { DbResearchResult } from "../../../modules/legal-knowledge/research/engine-db";
+import type { DinoRunResult } from "../../../modules/dino/core/pipeline-result";
 
 export const dynamic = "force-dynamic";
 
@@ -24,13 +27,19 @@ const AUTHORITY_LABELS: Record<string, string> = {
 export default async function LegalIntelligenceDevPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; domain?: string; authority?: string }>;
+  searchParams: Promise<{ q?: string; domain?: string; authority?: string; mode?: string }>;
 }) {
   if (!isDevInterfaceEnabled(process.env)) notFound();
 
   const params = await searchParams;
   const question = (params.q ?? "").trim();
-  const result: DbResearchResult | null = question
+  const mode = params.mode === "dino" ? "dino" : "research";
+
+  const dinoResult: DinoRunResult | null = question && mode === "dino"
+    ? await runDevDino({ question, legalDomain: params.domain || "labor" })
+    : null;
+
+  const result: DbResearchResult | null = question && mode === "research"
     ? await runDevResearch({
         question,
         legalDomain: params.domain || "labor",
@@ -78,21 +87,36 @@ export default async function LegalIntelligenceDevPage({
                 <option value="binding_first">מחייב תחילה</option>
               </select>
             </label>
+            <label className="text-caption text-ink-500">
+              מצב:{" "}
+              <select name="mode" defaultValue={mode} className="rounded border border-ink-200 bg-paper-0 p-1">
+                <option value="research">אחזור (שער רלוונטיות)</option>
+                <option value="dino">Dino — צינור אורקסטרציה מלא</option>
+              </select>
+            </label>
             <button
               type="submit"
               className="rounded-pill bg-ink-900 px-5 py-2 text-body font-semibold text-paper-0 transition-colors hover:bg-ink-700"
             >
-              הרץ מחקר
+              הרץ
             </button>
-            {/* out-of-domain gate fixture — expected: no sufficiently relevant source */}
+            {/* out-of-domain gate fixtures — expected: no sufficiently relevant source / domain stop */}
             <a
-              href="?q=ירושת דירה&domain=labor&authority=balanced"
+              href="?q=ירושת דירה&domain=labor&authority=balanced&mode=research"
               className="rounded-pill border border-ink-200 px-4 py-2 text-caption text-ink-500 transition-colors hover:border-gold-400"
             >
               בדיקת שער: &quot;ירושת דירה&quot; (מצופה: אין מקור רלוונטי)
             </a>
+            <a
+              href="?q=ירושת דירה&domain=labor&mode=dino"
+              className="rounded-pill border border-ink-200 px-4 py-2 text-caption text-ink-500 transition-colors hover:border-gold-400"
+            >
+              בדיקת Dino: &quot;ירושת דירה&quot; (מצופה: עצירת תחום)
+            </a>
           </div>
         </form>
+
+        {dinoResult && <DinoPipelineView result={dinoResult} />}
 
         {result && (
           <section className="space-y-4">
