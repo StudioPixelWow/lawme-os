@@ -34,3 +34,27 @@ export type {
   MatterState, MatterQuestions, WhenItem,
   MatterDegradation, EngineFailure, EngineFailureCategory, AssessMatterOptions,
 } from "./intelligence.ts";
+
+// Epic 4.2 — Matter Score, Narrative, and the composed Profile (all additive).
+export {
+  computeMatterScore, MATTER_SCORE_VERSION, DIMENSION_SPECS, dimensionSpec,
+  resolveDimensions, derivePosture, computeTrend, MATTER_TREND_VERSION,
+} from "./score/index.ts";
+export type {
+  MatterScore, MatterScoreSummary, ScoreDimension, ScoreDimensionId,
+  DimensionState, MatterPosture, Freshness, ScoreTrend, TrendDirection,
+  DimensionChange, ScoreResolveOptions,
+} from "./score/index.ts";
+
+export {
+  buildNarrative, prioritizeActions, oneLineHe, morningBriefingHe, fullBriefingHe,
+  MATTER_NARRATIVE_VERSION,
+} from "./narrative/index.ts";
+export type {
+  MatterNarrative, NarrativeVariant, SentenceEvidence, PrioritizedAction, NarrativeOptions,
+} from "./narrative/index.ts";
+
+export {
+  buildMatterProfile, profileFromState, MATTER_PROFILE_VERSION,
+} from "./profile.ts";
+export type { MatterProfile, MatterProfileOptions } from "./profile.ts";
