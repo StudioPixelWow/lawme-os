@@ -93,6 +93,8 @@ export interface MatterClient {
 export interface Matter {
   id: string;
   titleHe: string;
+  /** the office file/case number — presentation input, optional */
+  fileNoHe?: string | null;
   /** the forum/court this matter is (or will be) heard in — presentation input, optional */
   forumHe?: string | null;
   legalDomain: "labor";

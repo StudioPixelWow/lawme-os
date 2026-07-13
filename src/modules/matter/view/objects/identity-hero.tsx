@@ -1,14 +1,13 @@
 import { cx } from "@/design-system/utils/cx";
-import { DinoMark } from "@/design-system/primitives/indicators";
+import { AlertGlyph } from "@/design-system/icons/glyphs";
 import { DOT_NAVY } from "./tone";
 import type { IdentityVM, PostureVM, ReviewVM } from "../types";
 
 /**
- * Level 1 — Matter presence.
- * The one navy focal surface of the room: entering it should feel like entering
- * the matter itself, not opening a widget about it. Practice + forum eyebrow,
- * the matter name as the hero, client/owner/stage beneath, and — held to the
- * end edge — the posture and the human-review seal.
+ * Level 1 — the matter hero (approved concept).
+ * A deep-navy band: breadcrumb and the posture chip on the top edge, the matter
+ * name centered as the hero, and the file-number meta line with the specialist
+ * seal along the bottom edge.
  */
 export function IdentityHero({
   identity,
@@ -19,58 +18,58 @@ export function IdentityHero({
   posture: PostureVM;
   review: ReviewVM | null;
 }) {
-  const eyebrow = [identity.practiceAreaHe, identity.forumHe].filter(Boolean) as string[];
+  const meta = [
+    identity.fileNoHe ? `תיק: ${identity.fileNoHe}` : null,
+    `לקוח: ${identity.clientHe}`,
+    identity.ownerHe ? `אחראי: ${identity.ownerHe}` : null,
+    identity.stageTitleHe ? `שלב: ${identity.stageTitleHe}` : null,
+  ].filter((p): p is string => Boolean(p));
+
   return (
     <section
       aria-labelledby="matter-name"
-      className="surface-navy rounded-xl px-6 py-4 shadow-raised md:px-8 md:py-4"
+      className="surface-navy rounded-xl px-6 py-4 shadow-raised md:px-8 md:py-5"
     >
-      <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between md:gap-8">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h1
-              id="matter-name"
-              className="text-balance text-heading font-semibold leading-tight tracking-tight text-paper-0"
-            >
-              {identity.titleHe}
-            </h1>
-            <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-caption text-ink-300">
-              {eyebrow.map((part, i) => (
-                <span key={part} className="flex items-center gap-2">
-                  {i > 0 ? <span aria-hidden className="text-ink-500">·</span> : null}
-                  {part}
-                </span>
-              ))}
-            </span>
-          </div>
-
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-small">
-            <span className="font-medium text-ink-100">{identity.clientHe}</span>
-            {identity.ownerHe ? (
-              <span className="text-ink-300">
-                אחראי/ת: <span className="text-ink-100">{identity.ownerHe}</span>
-              </span>
-            ) : null}
-            {identity.stageTitleHe ? (
-              <span className="text-ink-300">
-                שלב: <span className="text-ink-100">{identity.stageTitleHe}</span>
-              </span>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-3 md:gap-4">
-          {review ? (
-            <span className="inline-flex items-center gap-1.5 text-caption font-medium text-gold-200/90">
-              <DinoMark surface="navy" />
-              {review.targetHe}
-            </span>
+      <div className="flex items-center justify-between gap-4">
+        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-caption text-ink-300">
+          <span>{identity.practiceAreaHe}</span>
+          {identity.forumHe ? (
+            <>
+              <span aria-hidden className="text-ink-500">›</span>
+              <span className="truncate">{identity.forumHe}</span>
+            </>
           ) : null}
-          <span className="inline-flex items-center gap-2 rounded-pill bg-paper-0/10 px-3 py-1 text-caption font-semibold text-paper-0">
-            <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT_NAVY[posture.tone])} />
-            {posture.labelHe}
+        </p>
+
+        <span className="inline-flex shrink-0 items-center gap-2 rounded-pill border border-gold-400/50 px-3 py-1 text-caption font-semibold text-gold-200">
+          <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT_NAVY[posture.tone])} />
+          {posture.labelHe}
+        </span>
+      </div>
+
+      <h1
+        id="matter-name"
+        className="mt-2.5 text-balance text-center text-title font-semibold leading-tight tracking-tight text-paper-0"
+      >
+        {identity.titleHe}
+      </h1>
+
+      <div className="mt-3 flex items-center justify-between gap-4">
+        <p className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 text-small text-ink-200">
+          {meta.map((part, i) => (
+            <span key={part} className="flex items-center gap-3">
+              {i > 0 ? <span aria-hidden className="text-ink-500">|</span> : null}
+              <span className="truncate">{part}</span>
+            </span>
+          ))}
+        </p>
+
+        {review ? (
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-caption text-ink-300">
+            <AlertGlyph size={14} className="text-gold-400/80" />
+            {review.targetHe}
           </span>
-        </div>
+        ) : null}
       </div>
     </section>
   );

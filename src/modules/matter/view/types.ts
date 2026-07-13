@@ -16,6 +16,7 @@ export type Tone =
 export interface IdentityVM {
   matterId: string;
   titleHe: string;
+  fileNoHe: string | null;
   clientHe: string;
   practiceAreaHe: string;
   forumHe: string | null;
@@ -34,6 +35,8 @@ export interface DeadlineVM {
   labelHe: string;
   /** humanized relative time — "בעוד 4 ימים" / "היום" / "עבר לפני N ימים" */
   whenHe: string;
+  /** full formatted date — "יום חמישי, 16.7.2026" */
+  dateHe: string;
   daysRemaining: number | null;
   strict: boolean;
   tone: Tone;

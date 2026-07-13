@@ -10,6 +10,7 @@ import type { Matter } from "../types.ts";
 const DEMO_MATTER: Matter = {
   id: "demo",
   titleHe: "פיטורי עובדת בהיריון — כהן נ׳ טק־לייף",
+  fileNoHe: "23-07-57631",
   forumHe: "בית הדין האזורי לעבודה תל אביב",
   legalDomain: "labor",
   procedureType: "pregnancy_dismissal",
@@ -56,7 +57,7 @@ const DEMO_MATTER: Matter = {
   team: [
     { id: "tm-partner", role: "partner", nameHe: "עו״ד מאיה", openTasks: 2, capacityLoad: 0.55 },
     { id: "tm-senior", role: "senior_lawyer", nameHe: "עו״ד לאה שרון", openTasks: 4, capacityLoad: 0.68 },
-    { id: "tm-lawyer", role: "lawyer", nameHe: "עו״ד עדן כהן", openTasks: 6, capacityLoad: 0.72 },
+    { id: "tm-lawyer", role: "lawyer", nameHe: "עו״ד ברוך", openTasks: 6, capacityLoad: 0.72 },
   ],
   availableLegislationRefIds: ["E3B-LEG-007", "E3B-LEG-008"],
   asOf: "2026-07-12",

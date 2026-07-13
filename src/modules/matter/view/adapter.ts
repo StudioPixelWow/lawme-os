@@ -79,8 +79,8 @@ const FIELD_HE: Record<string, string> = {
   hearing_held: "קיום שימוע",
 };
 
-/** the compact score rail — only the dimensions that change a decision. */
-const RAIL_DIMENSIONS: ScoreDimensionId[] = ["legal", "evidence", "deadlines", "documents"];
+/** the score rail dimensions, in the approved order. */
+const RAIL_DIMENSIONS: ScoreDimensionId[] = ["legal", "evidence", "deadlines", "documents", "team"];
 
 function humanizeFields(s: string): string {
   let out = s;
@@ -132,6 +132,17 @@ function formatUpdatedHe(iso: string): string {
   if (!m) return iso;
   const [, y, mm, dd] = m;
   return `${Number(dd)}.${Number(mm)}.${y}`;
+}
+
+const WEEKDAYS_HE = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+
+/** full date — "יום חמישי, 16.7.2026" (deterministic weekday from the ISO date). */
+function formatFullDateHe(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!m) return iso;
+  const [, y, mm, dd] = m;
+  const weekday = WEEKDAYS_HE[new Date(Date.UTC(Number(y), Number(mm) - 1, Number(dd))).getUTCDay()];
+  return `יום ${weekday}, ${Number(dd)}.${Number(mm)}.${y}`;
 }
 
 /** relative-time humanization for a deadline (never invents a date). */
@@ -188,6 +199,7 @@ function resolveDeadline(when: WhenItem[]): DeadlineVM | null {
   return {
     labelHe: near.labelHe,
     whenHe: whenHe(near.daysRemaining),
+    dateHe: near.dueDate ? formatFullDateHe(near.dueDate) : "",
     daysRemaining: near.daysRemaining,
     strict: near.strict,
     tone: deadlineTone(near.state),
@@ -260,7 +272,17 @@ function resolveBlocker(matter: Matter, profile: MatterProfile): BlockerVM | nul
   };
 }
 
-function resolveAction(profile: MatterProfile): ActionVM | null {
+/** resolve the action's owner to the assigned person, falling back to the role. */
+function resolveActionOwnerHe(profile: MatterProfile, matter: Matter, topActionId: string, ownerRoleHe: string): string | null {
+  const raw = profile.state.questions.whatNext.find((a) => a.id === topActionId);
+  if (raw && raw.ownerRole !== "client") {
+    const member = matter.team.find((m) => m.role === raw.ownerRole);
+    if (member) return member.nameHe;
+  }
+  return ownerRoleHe === "לא ידוע" ? null : ownerRoleHe;
+}
+
+function resolveAction(profile: MatterProfile, matter: Matter): ActionVM | null {
   const top = profile.prioritizedActions[0];
   if (!top) return null;
   const reviewTarget = profile.state.requiresHumanReview
@@ -269,7 +291,7 @@ function resolveAction(profile: MatterProfile): ActionVM | null {
   return {
     labelHe: stripScaffolds(top.labelHe),
     reasonHe: top.reasonHe,
-    ownerHe: top.ownerRoleHe === "לא ידוע" ? null : top.ownerRoleHe,
+    ownerHe: resolveActionOwnerHe(profile, matter, top.actionId, top.ownerRoleHe),
     dueHe: top.dueHe === "לא ידוע" ? null : top.dueHe,
     requiresApproval: top.requiresHumanApproval,
     reviewTargetHe: reviewTarget ? REVIEW_TARGET_HE[reviewTarget] ?? null : null,
@@ -304,19 +326,18 @@ function resolveScoreRail(profile: MatterProfile): ScoreRailVM {
 /** one quiet, fully-sourced Dino seal — only when there is a real finding to source. */
 function resolveDino(profile: MatterProfile, matter: Matter): DinoSealVM | null {
   if (!profile.state.requiresHumanReview) return null;
-  const legal = profile.score.dimensions.find((d) => d.id === "legal");
   const target = profile.narrative.reviewRoute?.primaryTarget ?? null;
   const targetHe = target ? REVIEW_TARGET_HE[target] ?? "בדיקה אנושית" : "בדיקה אנושית";
-  const insightHe = `דינו זיהה פער בכיסוי המשפטי — ההערכה טעונה ${targetHe}.`;
+  const areaHe = DOMAIN_HE[matter.legalDomain] ?? matter.legalDomain;
+  const insightHe = `דינו זיהה צוואר בקבוק בכיסוי המשפטי — טעון ${targetHe}.`;
   const policyNoteHe = matter.client.aiPolicy === "allowed_with_review"
     ? "תובנת AI — מותנית בבדיקה אנושית"
     : matter.client.aiPolicy === "prohibited"
       ? "עיבוד AI חסום במדיניות הלקוח"
       : null;
   const provenanceHe = [
-    `מקור הערכה: ${(legal?.sourceAssessmentIds ?? ["matter-legal"]).join(", ")}`,
-    `ניתוב אנושי: ${targetHe}`,
-    ensurePeriod(humanizeFields(stripStateCode(profile.score.summary.dominantConcernHe ?? "כיסוי משפטי לא מספיק"))),
+    "הערכת כיסוי משפטי",
+    `מסלול בדיקה: ${targetHe} · ${areaHe}`,
   ];
   return { insightHe, policyNoteHe, provenanceHe };
 }
@@ -333,6 +354,7 @@ export function toRoomViewModel(profile: MatterProfile, matter: Matter): RoomVie
     identity: {
       matterId: state.matterId,
       titleHe: state.titleHe,
+      fileNoHe: matter.fileNoHe ?? null,
       clientHe: matter.client.nameHe,
       practiceAreaHe: DOMAIN_HE[matter.legalDomain] ?? matter.legalDomain,
       forumHe: matter.forumHe ?? null,
@@ -345,7 +367,7 @@ export function toRoomViewModel(profile: MatterProfile, matter: Matter): RoomVie
     review,
     spine: resolveSpine(matter, profile),
     blocker,
-    action: resolveAction(profile),
+    action: resolveAction(profile, matter),
     scoreRail: resolveScoreRail(profile),
     dino: resolveDino(profile, matter),
     updatedHe: formatUpdatedHe(state.asOf),

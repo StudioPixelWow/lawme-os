@@ -1,48 +1,64 @@
+import type { ComponentType, SVGProps } from "react";
 import { cx } from "@/design-system/utils/cx";
+import {
+  CourtGlyph,
+  EvidenceGlyph,
+  CalendarGlyph,
+  DocumentGlyph,
+  UsersGlyph,
+  ClockGlyph,
+} from "@/design-system/icons/glyphs";
 import { DOT, TEXT } from "./tone";
 import type { ScoreRailVM } from "../types";
 
+const ICON: Record<string, ComponentType<SVGProps<SVGSVGElement> & { size?: number }>> = {
+  משפטי: CourtGlyph,
+  ראיות: EvidenceGlyph,
+  מועדים: CalendarGlyph,
+  מסמכים: DocumentGlyph,
+  צוות: UsersGlyph,
+};
+
 /**
- * The diagnostic strip — a living band, not a table.
- * The Matter Score read at a glance across one horizontal strip: each dimension a
- * categorical state (never a percentage), the weakest quietly marked. Strong /
- * weak / at-risk in a single sweep of the eye — no KPI grid.
+ * The diagnostic card (approved concept) — "overall matter state".
+ * A short read of the Matter Score: each dimension with its icon and a
+ * categorical state (never a percentage), and a route to the full diagnostic.
  */
 export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
   return (
-    <section aria-label="אבחון התיק" className="mt-12">
-      <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-caption font-semibold uppercase tracking-[0.14em] text-foreground-faint">
-          אבחון התיק
-        </h2>
+    <section className="flex flex-col rounded-xl border border-line-strong bg-surface p-5 shadow-lift" aria-label="אבחון התיק">
+      <div className="flex items-baseline justify-between">
         <button
           type="button"
           className="text-caption text-foreground-faint transition-colors hover:text-foreground-soft"
         >
-          אבחון מלא <span aria-hidden>←</span>
+          אבחון מלא <span aria-hidden>‹</span>
         </button>
+        <h2 className="text-caption font-semibold text-foreground-soft">מצב תיק כללי</h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4 rounded-lg bg-surface-sunken/50 px-5 py-4 sm:grid-cols-4 sm:gap-x-4">
-        {rail.rows.map((row) => (
-          <div key={row.labelHe} className="flex min-w-0 items-center gap-2.5">
-            <span aria-hidden className={cx("h-2 w-2 shrink-0 rounded-pill", DOT[row.tone])} />
-            <span className="min-w-0">
-              <span className="block truncate text-small font-medium text-foreground">
-                {row.labelHe}
-                {row.emphasis === "weak" ? (
-                  <span className="ms-1.5 text-micro font-normal text-foreground-faint">החלש</span>
-                ) : null}
-              </span>
-              <span className={cx("block truncate text-caption", TEXT[row.tone])}>{row.stateHe}</span>
-            </span>
-          </div>
-        ))}
-      </div>
+      <dl className="mt-3 divide-y divide-line-strong">
+        {rail.rows.map((row) => {
+          const Icon = ICON[row.labelHe] ?? DocumentGlyph;
+          return (
+            <div key={row.labelHe} className="flex items-center justify-between gap-3 py-2.5">
+              <dd className={cx("flex shrink-0 items-center gap-1.5 text-small font-medium", TEXT[row.tone])}>
+                <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT[row.tone])} />
+                {row.stateHe}
+              </dd>
+              <dt className="flex items-center gap-2 text-small text-foreground">
+                <span className="text-foreground-faint">{row.labelHe}</span>
+                <Icon size={16} className="text-foreground-faint" />
+              </dt>
+            </div>
+          );
+        })}
+      </dl>
 
-      {rail.noteHe ? (
-        <p className="mt-2 text-caption text-foreground-faint">{rail.noteHe}</p>
-      ) : null}
+      <p className="mt-auto flex items-center justify-end gap-1.5 pt-4 text-micro text-foreground-faint">
+        {rail.noteHe ?? "נתונים מתעדכנים לפי מידע בתיק"}
+        <ClockGlyph size={12} />
+      </p>
     </section>
   );
 }

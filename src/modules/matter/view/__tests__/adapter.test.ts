@@ -116,7 +116,8 @@ test("Dino seal is a single, sourced, policy-aware insight", () => {
   assert.ok(vm.dino);
   assert.match(vm.dino.insightHe, /דינו/u);
   assert.ok(vm.dino.provenanceHe.length >= 2, "traceable to real sources");
-  assert.ok(vm.dino.provenanceHe.some((p) => /matter-legal/u.test(p)));
+  assert.ok(vm.dino.provenanceHe.some((p) => /כיסוי משפטי/u.test(p)));
+  assert.ok(vm.dino.provenanceHe.some((p) => /בדיקת מומחה/u.test(p)));
   assert.ok(vm.dino.policyNoteHe && /בדיקה אנושית/u.test(vm.dino.policyNoteHe));
 });
 
