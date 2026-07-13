@@ -31,7 +31,7 @@ export default async function MatterRoomPage({
   const vm = toRoomViewModel(profile, matter);
 
   return (
-    <Workspace width="page">
+    <Workspace width="wide">
       <MatterRoom vm={vm} />
     </Workspace>
   );

@@ -93,6 +93,8 @@ export interface MatterClient {
 export interface Matter {
   id: string;
   titleHe: string;
+  /** the forum/court this matter is (or will be) heard in — presentation input, optional */
+  forumHe?: string | null;
   legalDomain: "labor";
   /** the procedure type this matter follows (maps to the procedure graph) */
   procedureType: EmploymentProcedureType;

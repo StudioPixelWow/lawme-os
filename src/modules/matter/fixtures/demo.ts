@@ -9,7 +9,8 @@ import type { Matter } from "../types.ts";
 
 const DEMO_MATTER: Matter = {
   id: "demo",
-  titleHe: "פיטורי עובדת בהריון — כהן נ׳ טק-ליין",
+  titleHe: "פיטורי עובדת בהיריון — כהן נ׳ טק־לייף",
+  forumHe: "בית הדין האזורי לעבודה תל אביב",
   legalDomain: "labor",
   procedureType: "pregnancy_dismissal",
   topic: "pregnancy_dismissal",
@@ -37,6 +38,7 @@ const DEMO_MATTER: Matter = {
     { id: "preg-e2", labelHe: "ראיה לידיעת המעסיק על ההיריון", evidenceType: "communication", collected: false, mandatory: true },
   ],
   deadlines: [
+    { id: "dl-hearing", labelHe: "דיון מקדמי", dueDate: "2026-07-16", strict: true, basisHe: "זימון לדיון מקדמי בבית הדין" },
     { id: "dl-limitation", labelHe: "התיישנות תביעה אזרחית", dueDate: "2033-06-15", strict: true, basisHe: "התיישנות כללית" },
   ],
   communications: [

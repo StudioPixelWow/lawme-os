@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ShellProvider } from "./shell-provider";
 import { TopBar } from "./top-bar";
 import { SideRail } from "./side-rail";
-import { UtilityRail } from "./utility-rail";
+import { ShellCanvas } from "./shell-canvas";
 import { MobileNav } from "./mobile-nav";
 import { CommandBar } from "./command-bar";
 import { AssistantPanel } from "./assistant-panel";
@@ -24,12 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </a>
       <SideRail />
       <TopBar />
-      <UtilityRail />
-      <div className="pt-20 md:ps-20 lg:ps-64 xl:pe-72">
-        <main id="main" className="pb-28 md:pb-8">
-          {children}
-        </main>
-      </div>
+      <ShellCanvas>{children}</ShellCanvas>
       <MobileNav />
       <CommandBar />
       <AssistantPanel />
