@@ -15,9 +15,9 @@ export function BlockerCard({ blocker }: { blocker: BlockerVM }) {
 
   return (
     <section className="flex flex-col rounded-xl border border-line-strong bg-surface p-5 shadow-lift" aria-label="חסם עיקרי">
-      <div className={cx("flex items-center gap-2 text-caption font-semibold", TEXT[blocker.tone])}>
-        <AlertGlyph size={15} />
+      <div className={cx("flex items-center justify-between gap-2 text-caption font-semibold", TEXT[blocker.tone])}>
         חסם עיקרי
+        <AlertGlyph size={15} />
       </div>
 
       <h3 className="mt-3 text-subheading font-semibold leading-snug text-foreground">

@@ -1,5 +1,4 @@
 import { cx } from "@/design-system/utils/cx";
-import { CheckGlyph } from "@/design-system/icons/glyphs";
 import type { SpineVM } from "../types";
 
 type NodeKind = "past" | "current" | "next";
@@ -30,14 +29,13 @@ function SpineNode({
             <span aria-hidden className="absolute h-7 w-7 rounded-pill bg-gold-400/20" />
             <span aria-hidden className="relative h-3.5 w-3.5 rounded-pill bg-gold-500 ring-4 ring-gold-300/40" />
           </>
-        ) : kind === "past" ? (
-          <span aria-hidden className="grid h-5 w-5 place-items-center rounded-pill bg-status-completed text-paper-0">
-            <CheckGlyph size={12} />
-          </span>
         ) : (
           <span
             aria-hidden
-            className={cx("h-3.5 w-3.5 rounded-pill", blocked ? "bg-status-urgent" : "bg-ink-300")}
+            className={cx(
+              "h-3.5 w-3.5 rounded-pill",
+              kind === "past" ? "bg-status-completed" : blocked ? "bg-status-urgent" : "bg-ink-300",
+            )}
           />
         )}
       </span>
@@ -45,7 +43,7 @@ function SpineNode({
         <span
           className={cx(
             "block text-balance leading-tight",
-            isCurrent ? "text-subheading font-semibold text-foreground" : "text-small text-foreground-soft",
+            isCurrent ? "text-body font-semibold text-foreground" : "text-small text-foreground-soft",
           )}
         >
           {label ?? "—"}

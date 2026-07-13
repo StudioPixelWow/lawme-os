@@ -15,9 +15,9 @@ export function ActionCard({ action }: { action: ActionVM }) {
 
   return (
     <section className="flex flex-col rounded-xl border border-line-strong bg-surface p-5 shadow-lift" aria-label="הצעד הבא">
-      <div className="flex items-center gap-2 text-caption font-semibold text-foreground-soft">
-        <CourtGlyph size={15} className="text-gold-600" />
+      <div className="flex items-center justify-between gap-2 text-caption font-semibold text-foreground-soft">
         מה עושים עכשיו
+        <CourtGlyph size={15} className="text-status-completed" />
       </div>
 
       <h3 className="mt-3 text-subheading font-semibold leading-snug text-foreground">

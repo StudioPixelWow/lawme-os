@@ -50,7 +50,8 @@ const DIMENSION_STATE: Record<DimensionState, { labelHe: string; tone: Tone }> =
   attention: { labelHe: "תשומת לב", tone: "today" },
   at_risk: { labelHe: "בסיכון", tone: "risk" },
   blocked: { labelHe: "חסום", tone: "urgent" },
-  requires_review: { labelHe: "דורש בדיקה", tone: "reviewed" },
+  // the weakest dimension reads as attention-red in the diagnostic (approved concept)
+  requires_review: { labelHe: "דורש בדיקה", tone: "risk" },
   unavailable: { labelHe: "לא זמין", tone: "waiting" },
   stale: { labelHe: "לא עדכני", tone: "waiting" },
   unknown: { labelHe: "לא ידוע", tone: "waiting" },

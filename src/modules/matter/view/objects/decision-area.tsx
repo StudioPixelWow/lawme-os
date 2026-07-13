@@ -48,8 +48,8 @@ export function DecisionArea({
           <h2 className="text-caption font-semibold uppercase tracking-[0.12em] text-foreground-faint">
             מצב התיק
           </h2>
-          <p className="mt-2.5 max-w-[42ch] text-small leading-relaxed text-foreground-soft">
-            {briefingHe.join(" ")}
+          <p className="mt-2.5 max-w-[38ch] text-small leading-relaxed text-foreground-soft">
+            {briefingHe[0]}
           </p>
         </div>
 
@@ -73,9 +73,6 @@ export function DecisionArea({
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-2.5">
-                <Button intent="primary" className="gap-1.5">
-                  התחל בצעד <span aria-hidden>‹</span>
-                </Button>
                 {action.ownerHe ? (
                   <span className="inline-flex items-center gap-1.5 rounded-md border border-line-strong px-2.5 py-1.5 text-caption text-foreground-soft">
                     <UserGlyph size={13} className="text-foreground-faint" />
@@ -88,6 +85,9 @@ export function DecisionArea({
                     אישור: נדרש
                   </span>
                 ) : null}
+                <Button intent="primary" className="gap-1.5">
+                  התחל בצעד <span aria-hidden>‹</span>
+                </Button>
               </div>
             </div>
           </div>

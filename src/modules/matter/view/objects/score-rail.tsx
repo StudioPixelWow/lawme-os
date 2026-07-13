@@ -28,13 +28,13 @@ export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
   return (
     <section className="flex flex-col rounded-xl border border-line-strong bg-surface p-5 shadow-lift" aria-label="אבחון התיק">
       <div className="flex items-baseline justify-between">
+        <h2 className="text-caption font-semibold text-foreground-soft">מצב תיק כללי</h2>
         <button
           type="button"
           className="text-caption text-foreground-faint transition-colors hover:text-foreground-soft"
         >
           אבחון מלא <span aria-hidden>‹</span>
         </button>
-        <h2 className="text-caption font-semibold text-foreground-soft">מצב תיק כללי</h2>
       </div>
 
       <dl className="mt-3 divide-y divide-line-strong">
@@ -46,7 +46,7 @@ export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
                 <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT[row.tone])} />
                 {row.stateHe}
               </dd>
-              <dt className="flex items-center gap-2 text-small text-foreground">
+              <dt className="flex flex-row-reverse items-center gap-2 text-small text-foreground">
                 <span className="text-foreground-faint">{row.labelHe}</span>
                 <Icon size={16} className="text-foreground-faint" />
               </dt>
