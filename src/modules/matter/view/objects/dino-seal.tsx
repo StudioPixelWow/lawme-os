@@ -6,15 +6,15 @@ import { DinoMark } from "@/design-system/primitives/indicators";
 import type { DinoSealVM } from "../types";
 
 /**
- * The Dino seal — almost invisible, always felt.
- * Not a chatbot, not a widget, not a boxed panel: a single quiet line carrying
- * one sourced observation, with the meridian mark as the only sign that an
- * expert is continuously watching the matter. Clicking reveals its provenance.
+ * The Dino note — presence, not a panel.
+ * A single quiet margin line beneath the briefing: the meridian mark plus one
+ * sourced observation, as if a senior expert is quietly supervising the matter.
+ * Never a chatbot, never a widget. Clicking reveals the provenance.
  */
 export function DinoSeal({ dino }: { dino: DinoSealVM }) {
   const [open, setOpen] = useState(false);
   return (
-    <div>
+    <div className="mt-3.5">
       <button
         type="button"
         aria-expanded={open}
@@ -23,20 +23,25 @@ export function DinoSeal({ dino }: { dino: DinoSealVM }) {
       >
         <DinoMark />
         <span className="min-w-0 flex-1 truncate">
-          {dino.insightHe}
-          {dino.policyNoteHe ? <span className="text-foreground-faint"> · {dino.policyNoteHe}</span> : null}
+          <span className="text-foreground-soft">דינו</span> · {dino.insightHe}
         </span>
-        <span className={cx("shrink-0 transition-transform", open && "rotate-180")}>מקורות ⌄</span>
+        <span className={cx("shrink-0 text-micro transition-transform", open && "rotate-180")}>מקורות ⌄</span>
       </button>
 
       {open ? (
-        <ul className="mt-2.5 space-y-1 border-t border-ink-900/8 pt-2.5 text-caption text-foreground-soft">
+        <ul className="mt-2 space-y-1 ps-6 text-caption text-foreground-soft">
           {dino.provenanceHe.map((p, i) => (
             <li key={i} className="flex gap-2">
               <span aria-hidden className="text-foreground-faint">•</span>
               <span className="min-w-0">{p}</span>
             </li>
           ))}
+          {dino.policyNoteHe ? (
+            <li className="flex gap-2 text-foreground-faint">
+              <span aria-hidden>•</span>
+              <span>{dino.policyNoteHe}</span>
+            </li>
+          ) : null}
         </ul>
       ) : null}
     </div>

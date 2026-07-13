@@ -43,7 +43,7 @@ function SpineNode({
           className={cx(
             "block text-balance leading-tight",
             isCurrent
-              ? "text-body font-semibold text-foreground"
+              ? "text-subheading font-semibold text-foreground"
               : "text-small text-foreground-faint",
           )}
         >
@@ -77,8 +77,8 @@ function SpineNode({
  */
 export function MilestoneSpine({ spine }: { spine: SpineVM }) {
   return (
-    <section className="mt-10" aria-label="מסלול ההליך">
-      <div className="mb-5 flex items-baseline justify-between">
+    <section className="mt-12" aria-label="מסלול ההליך">
+      <div className="mb-7 flex items-baseline justify-between">
         <h2 className="text-caption font-semibold uppercase tracking-[0.14em] text-foreground-faint">
           מסלול ההליך
         </h2>
@@ -95,7 +95,7 @@ export function MilestoneSpine({ spine }: { spine: SpineVM }) {
       </div>
 
       {spine.blocked && spine.blockedReasonHe ? (
-        <p className="mt-5 flex items-center justify-center gap-2 text-caption text-status-urgent">
+        <p className="mt-6 flex items-center justify-center gap-2 text-caption text-status-urgent">
           <span aria-hidden className="h-1.5 w-1.5 rounded-pill bg-status-urgent" />
           {spine.blockedReasonHe}
         </p>

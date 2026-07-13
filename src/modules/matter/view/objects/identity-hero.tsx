@@ -23,52 +23,53 @@ export function IdentityHero({
   return (
     <section
       aria-labelledby="matter-name"
-      className="surface-navy rounded-xl px-6 py-5 shadow-raised md:px-8 md:py-6"
+      className="surface-navy rounded-xl px-6 py-4 shadow-raised md:px-8 md:py-4"
     >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8">
+      <div className="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between md:gap-8">
         <div className="min-w-0">
-          <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-caption text-ink-200">
-            {eyebrow.map((part, i) => (
-              <span key={part} className="flex items-center gap-2.5">
-                {i > 0 ? <span aria-hidden className="text-ink-400">·</span> : null}
-                {part}
-              </span>
-            ))}
-          </p>
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <h1
+              id="matter-name"
+              className="text-balance text-heading font-semibold leading-tight tracking-tight text-paper-0"
+            >
+              {identity.titleHe}
+            </h1>
+            <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-caption text-ink-300">
+              {eyebrow.map((part, i) => (
+                <span key={part} className="flex items-center gap-2">
+                  {i > 0 ? <span aria-hidden className="text-ink-500">·</span> : null}
+                  {part}
+                </span>
+              ))}
+            </span>
+          </div>
 
-          <h1
-            id="matter-name"
-            className="mt-1.5 text-balance text-heading font-semibold leading-tight tracking-tight text-paper-0 md:text-title"
-          >
-            {identity.titleHe}
-          </h1>
-
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-small">
-            <span className="font-medium text-paper-0">{identity.clientHe}</span>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-small">
+            <span className="font-medium text-ink-100">{identity.clientHe}</span>
             {identity.ownerHe ? (
-              <span className="text-ink-200">
+              <span className="text-ink-300">
                 אחראי/ת: <span className="text-ink-100">{identity.ownerHe}</span>
               </span>
             ) : null}
             {identity.stageTitleHe ? (
-              <span className="text-ink-200">
+              <span className="text-ink-300">
                 שלב: <span className="text-ink-100">{identity.stageTitleHe}</span>
               </span>
             ) : null}
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-2.5 md:flex-col md:items-end">
-          <span className="inline-flex items-center gap-2 rounded-pill bg-paper-0/10 px-3 py-1 text-caption font-semibold text-paper-0">
-            <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT_NAVY[posture.tone])} />
-            {posture.labelHe}
-          </span>
+        <div className="flex shrink-0 items-center gap-3 md:gap-4">
           {review ? (
             <span className="inline-flex items-center gap-1.5 text-caption font-medium text-gold-200/90">
               <DinoMark surface="navy" />
               {review.targetHe}
             </span>
           ) : null}
+          <span className="inline-flex items-center gap-2 rounded-pill bg-paper-0/10 px-3 py-1 text-caption font-semibold text-paper-0">
+            <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT_NAVY[posture.tone])} />
+            {posture.labelHe}
+          </span>
         </div>
       </div>
     </section>

@@ -3,18 +3,17 @@ import { RoomShell } from "./room-shell";
 import { IdentityHero } from "./objects/identity-hero";
 import { Briefing } from "./objects/briefing";
 import { MilestoneSpine } from "./objects/milestone-spine";
-import { Blocker } from "./objects/operational-focus";
+import { OperationalWorkspace } from "./objects/operational-focus";
 import { ScoreRail } from "./objects/score-rail";
-import { DinoSeal } from "./objects/dino-seal";
 import type { RoomViewModel } from "./types";
 
 /**
- * The Matter Room — the complete first viewport.
- * A server component that seeds the client store and composes the room as one
- * connected working surface, in a single reading order: identity (a compact navy
- * band) → situation + next move (on the gold meridian) → the milestone backbone
- * → the operational blocker beside a calm diagnostic → a near-invisible Dino
- * line. Everything is derived by the adapter from the engines.
+ * The Matter Room — one continuous workspace, not a stack of sections.
+ * A slim identity band, then the partner's briefing on the gold meridian (with
+ * Dino quietly supervising in the margin), the legal journey at the center, the
+ * operational conversation (why it's blocked → what we do), and a living
+ * diagnostic strip. No dividers, no cards fighting each other — one surface, held
+ * together by rhythm and the meridian. Everything is derived from the engines.
  */
 export function MatterRoom({ vm }: { vm: RoomViewModel }) {
   return (
@@ -22,29 +21,15 @@ export function MatterRoom({ vm }: { vm: RoomViewModel }) {
       <RoomShell ariaLabel={`תיק: ${vm.identity.titleHe}`}>
         <IdentityHero identity={vm.identity} posture={vm.posture} review={vm.review} />
 
-        <Briefing
-          briefingHe={vm.briefingHe}
-          action={vm.action}
-          deadline={vm.deadline}
-          review={vm.review}
-        />
+        <Briefing briefingHe={vm.briefingHe} deadline={vm.deadline} dino={vm.dino} />
 
         <MilestoneSpine spine={vm.spine} />
 
-        <section className="mt-10 border-t border-ink-900/10 pt-8" aria-label="מוקד תפעולי ואבחון">
-          <div className="grid gap-10 md:grid-cols-[1.5fr_1fr] md:gap-14">
-            {vm.blocker ? <Blocker blocker={vm.blocker} /> : <div />}
-            <ScoreRail rail={vm.scoreRail} />
-          </div>
-        </section>
+        <OperationalWorkspace blocker={vm.blocker} action={vm.action} />
 
-        {vm.dino ? (
-          <div className="mt-8 border-t border-ink-900/10 pt-5">
-            <DinoSeal dino={vm.dino} />
-          </div>
-        ) : null}
+        <ScoreRail rail={vm.scoreRail} />
 
-        <p className="mt-6 text-micro text-foreground-faint">
+        <p className="mt-10 text-micro text-foreground-faint">
           {vm.stale ? "נתונים לא עדכניים · " : ""}
           עודכן {vm.updatedHe}
         </p>
