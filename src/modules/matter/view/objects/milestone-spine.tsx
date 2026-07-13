@@ -14,24 +14,25 @@ function SpineNode({
 }) {
   const caption =
     kind === "current" ? "עכשיו" : kind === "past" ? "הושלם" : blocked ? "חסום" : "הבא";
+  const isCurrent = kind === "current";
   return (
-    <li className="flex min-w-0 flex-col items-center gap-3 px-1 text-center">
-      <span className="relative flex h-6 items-center justify-center">
-        {kind === "current" ? (
+    <li className={cx("flex min-w-0 flex-col items-center gap-3 px-1 text-center", !isCurrent && "pt-0.5")}>
+      <span className="relative flex h-7 items-center justify-center">
+        {isCurrent ? (
           <>
-            <span aria-hidden className="absolute h-6 w-6 rounded-pill bg-gold-400/20" />
+            <span aria-hidden className="absolute h-7 w-7 rounded-pill bg-gold-400/20" />
             <span
               aria-hidden
-              className="relative h-3 w-3 rounded-pill bg-gold-500 ring-2 ring-gold-300/50"
+              className="relative h-3.5 w-3.5 rounded-pill bg-gold-500 ring-4 ring-gold-300/40"
             />
           </>
         ) : kind === "past" ? (
-          <span aria-hidden className="h-2.5 w-2.5 rounded-pill bg-ink-400" />
+          <span aria-hidden className="h-2 w-2 rounded-pill bg-ink-300" />
         ) : (
           <span
             aria-hidden
             className={cx(
-              "h-2.5 w-2.5 rounded-pill border-2 bg-surface",
+              "h-2 w-2 rounded-pill border-2 bg-surface",
               blocked ? "border-status-urgent" : "border-ink-300",
             )}
           />
@@ -40,19 +41,25 @@ function SpineNode({
       <span className="min-w-0">
         <span
           className={cx(
-            "block text-small leading-tight text-balance",
-            kind === "current" ? "font-semibold text-foreground" : "text-foreground-soft",
+            "block text-balance leading-tight",
+            isCurrent
+              ? "text-body font-semibold text-foreground"
+              : "text-small text-foreground-faint",
           )}
         >
           {label ?? "—"}
         </span>
-        {kind === "current" ? (
-          <span aria-hidden className="mx-auto mt-2 block h-0.5 w-8 rounded-pill bg-gold-500" />
+        {isCurrent ? (
+          <span aria-hidden className="mx-auto mt-2 block h-0.5 w-10 rounded-pill bg-gold-500" />
         ) : null}
         <span
           className={cx(
             "mt-1.5 block text-caption",
-            kind === "next" && blocked ? "text-status-urgent" : "text-foreground-faint",
+            isCurrent
+              ? "font-medium text-gold-600"
+              : kind === "next" && blocked
+                ? "text-status-urgent"
+                : "text-foreground-faint",
           )}
         >
           {caption}

@@ -23,9 +23,9 @@ export function IdentityHero({
   return (
     <section
       aria-labelledby="matter-name"
-      className="surface-navy rounded-xl px-7 py-8 shadow-raised md:px-10 md:py-9"
+      className="surface-navy rounded-xl px-6 py-5 shadow-raised md:px-8 md:py-6"
     >
-      <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between md:gap-10">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8">
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-caption text-ink-200">
             {eyebrow.map((part, i) => (
@@ -38,33 +38,33 @@ export function IdentityHero({
 
           <h1
             id="matter-name"
-            className="mt-3 text-balance text-title font-semibold leading-tight tracking-tight text-paper-0 md:text-display"
+            className="mt-1.5 text-balance text-heading font-semibold leading-tight tracking-tight text-paper-0 md:text-title"
           >
             {identity.titleHe}
           </h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-small">
+          <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-small">
             <span className="font-medium text-paper-0">{identity.clientHe}</span>
             {identity.ownerHe ? (
               <span className="text-ink-200">
-                אחראי/ת: <span className="text-paper-0">{identity.ownerHe}</span>
+                אחראי/ת: <span className="text-ink-100">{identity.ownerHe}</span>
               </span>
             ) : null}
             {identity.stageTitleHe ? (
               <span className="text-ink-200">
-                שלב: <span className="text-paper-0">{identity.stageTitleHe}</span>
+                שלב: <span className="text-ink-100">{identity.stageTitleHe}</span>
               </span>
             ) : null}
           </div>
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2.5 md:flex-col md:items-end">
-          <span className="inline-flex items-center gap-2 rounded-pill bg-paper-0/10 px-3.5 py-1.5 text-small font-semibold text-paper-0">
-            <span aria-hidden className={cx("h-2 w-2 rounded-pill", DOT_NAVY[posture.tone])} />
+          <span className="inline-flex items-center gap-2 rounded-pill bg-paper-0/10 px-3 py-1 text-caption font-semibold text-paper-0">
+            <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT_NAVY[posture.tone])} />
             {posture.labelHe}
           </span>
           {review ? (
-            <span className="inline-flex items-center gap-1.5 rounded-pill border border-gold-400/40 px-3 py-1 text-caption font-medium text-gold-200">
+            <span className="inline-flex items-center gap-1.5 text-caption font-medium text-gold-200/90">
               <DinoMark surface="navy" />
               {review.targetHe}
             </span>

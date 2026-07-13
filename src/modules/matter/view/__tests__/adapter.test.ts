@@ -34,13 +34,19 @@ test("posture is a human word carried by a status tone", () => {
   assert.equal(vm.posture.tone, "reviewed");
 });
 
-test("narrative is one clean Hebrew sentence — no machine tokens", () => {
+test("briefing is one-or-two clean, sourced sentences — no machine tokens", () => {
   const { matter, vm } = vmOf("c1");
-  assert.ok(vm.narrativeHe.length > 0);
-  assert.doesNotMatch(vm.narrativeHe, /\(מצב:/u);
-  assert.doesNotMatch(vm.narrativeHe, /[a-z_]{3,}/u);
-  assert.match(vm.narrativeHe, /[.!?]$/u);
-  assert.notEqual(vm.narrativeHe, `${matter.titleHe}.`);
+  assert.ok(vm.briefingHe.length >= 1 && vm.briefingHe.length <= 2);
+  for (const s of vm.briefingHe) {
+    assert.ok(s.length > 0);
+    assert.doesNotMatch(s, /\(מצב:/u, "state code stripped");
+    assert.doesNotMatch(s, /[a-z_]{3,}/u, "no leaking english field keys");
+    assert.match(s, /[.!?]$/u, "reads as a finished sentence");
+  }
+  assert.notEqual(vm.briefingHe[0], `${matter.titleHe}.`);
+  // sentence 1 weaves in the decisive missing fact; sentence 2 carries the tempo
+  assert.match(vm.briefingHe[0], /ידיעת המעסיק על ההיריון/u);
+  assert.match(vm.briefingHe[1], /דיון מקדמי/u);
 });
 
 test("the critical deadline is the real, near one — never invented", () => {

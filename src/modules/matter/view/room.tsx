@@ -1,20 +1,20 @@
 import { MatterRoomProvider } from "./room-store";
 import { RoomShell } from "./room-shell";
 import { IdentityHero } from "./objects/identity-hero";
-import { MatterBrief } from "./objects/matter-brief";
+import { Briefing } from "./objects/briefing";
 import { MilestoneSpine } from "./objects/milestone-spine";
-import { OperationalFocus } from "./objects/operational-focus";
+import { Blocker } from "./objects/operational-focus";
 import { ScoreRail } from "./objects/score-rail";
 import { DinoSeal } from "./objects/dino-seal";
 import type { RoomViewModel } from "./types";
 
 /**
  * The Matter Room — the complete first viewport.
- * A server component that seeds the client store with the open matter and
- * composes the room as one spatial experience (not a card grid): a navy
- * identity hero, the state brief, the milestone spine on the gold meridian, the
- * operational focus (blocker + next move), and the intelligence summary (score
- * rail + Dino seal). Everything is derived by the adapter from the engines.
+ * A server component that seeds the client store and composes the room as one
+ * connected working surface, in a single reading order: identity (a compact navy
+ * band) → situation + next move (on the gold meridian) → the milestone backbone
+ * → the operational blocker beside a calm diagnostic → a near-invisible Dino
+ * line. Everything is derived by the adapter from the engines.
  */
 export function MatterRoom({ vm }: { vm: RoomViewModel }) {
   return (
@@ -22,20 +22,29 @@ export function MatterRoom({ vm }: { vm: RoomViewModel }) {
       <RoomShell ariaLabel={`תיק: ${vm.identity.titleHe}`}>
         <IdentityHero identity={vm.identity} posture={vm.posture} review={vm.review} />
 
-        <MatterBrief narrativeHe={vm.narrativeHe} deadline={vm.deadline} review={vm.review} />
+        <Briefing
+          briefingHe={vm.briefingHe}
+          action={vm.action}
+          deadline={vm.deadline}
+          review={vm.review}
+        />
 
         <MilestoneSpine spine={vm.spine} />
 
-        <OperationalFocus blocker={vm.blocker} action={vm.action} />
-
-        <section className="mt-10 border-t border-ink-900/10 pt-8" aria-label="סיכום מודיעין">
-          <div className="grid gap-8 md:grid-cols-[1.3fr_1fr] md:gap-10">
+        <section className="mt-10 border-t border-ink-900/10 pt-8" aria-label="מוקד תפעולי ואבחון">
+          <div className="grid gap-10 md:grid-cols-[1.5fr_1fr] md:gap-14">
+            {vm.blocker ? <Blocker blocker={vm.blocker} /> : <div />}
             <ScoreRail rail={vm.scoreRail} />
-            {vm.dino ? <DinoSeal dino={vm.dino} /> : null}
           </div>
         </section>
 
-        <p className="mt-8 text-micro text-foreground-faint">
+        {vm.dino ? (
+          <div className="mt-8 border-t border-ink-900/10 pt-5">
+            <DinoSeal dino={vm.dino} />
+          </div>
+        ) : null}
+
+        <p className="mt-6 text-micro text-foreground-faint">
           {vm.stale ? "נתונים לא עדכניים · " : ""}
           עודכן {vm.updatedHe}
         </p>

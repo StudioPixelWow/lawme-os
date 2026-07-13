@@ -79,8 +79,8 @@ const FIELD_HE: Record<string, string> = {
   hearing_held: "קיום שימוע",
 };
 
-/** the compact score rail — a curated, decision-relevant subset (never 12 cards). */
-const RAIL_DIMENSIONS: ScoreDimensionId[] = ["legal", "evidence", "deadlines", "documents", "team"];
+/** the compact score rail — only the dimensions that change a decision. */
+const RAIL_DIMENSIONS: ScoreDimensionId[] = ["legal", "evidence", "deadlines", "documents"];
 
 function humanizeFields(s: string): string {
   let out = s;
@@ -148,11 +148,37 @@ function deadlineTone(state: string): Tone {
   return "scheduled";
 }
 
-/** the one briefing sentence — the concern, humanized and clean. */
-function resolveNarrativeHe(profile: MatterProfile, titleHe: string): string {
+function concernCore(profile: MatterProfile, titleHe: string): string {
   const raw = profile.score.summary.dominantConcernHe
     ?? stripTitlePrefix(profile.narrative.headlineHe, titleHe);
-  return ensurePeriod(humanizeFields(stripStateCode(raw)));
+  return humanizeFields(stripStateCode(raw)).replace(/[.]\s*$/u, "").trim();
+}
+
+/**
+ * The situation briefing — one or two short, fully-sourced sentences, in the
+ * register a senior partner uses before entering court. Sentence 1: the concern
+ * with the decisive missing fact. Sentence 2: the tempo (deadline + review).
+ * Every atom is engine-sourced; nothing is invented.
+ */
+function resolveBriefing(
+  profile: MatterProfile,
+  titleHe: string,
+  primaryMissingHe: string | null,
+  deadline: DeadlineVM | null,
+  review: ReviewVM | null,
+): string[] {
+  const out: string[] = [];
+  const core = concernCore(profile, titleHe);
+  out.push(ensurePeriod(primaryMissingHe ? `${core} ללא אימות ${primaryMissingHe}` : core));
+
+  if (deadline && review) {
+    out.push(`${deadline.labelHe} ${deadline.whenHe}; ההערכה טעונה ${review.targetHe}.`);
+  } else if (deadline) {
+    out.push(`${deadline.labelHe} ${deadline.whenHe}${deadline.strict ? " (מועד קשיח)" : ""}.`);
+  } else if (review) {
+    out.push(`ההערכה טעונה ${review.targetHe}.`);
+  }
+  return out;
 }
 
 /** the single critical deadline, only when a real, near one exists. */
@@ -298,6 +324,10 @@ function resolveDino(profile: MatterProfile, matter: Matter): DinoSealVM | null 
 export function toRoomViewModel(profile: MatterProfile, matter: Matter): RoomViewModel {
   const { state, score } = profile;
   const posture = POSTURE[score.summary.posture];
+  const deadline = resolveDeadline(state.questions.when);
+  const review = resolveReview(profile);
+  const blocker = resolveBlocker(matter, profile);
+  const briefingHe = resolveBriefing(profile, state.titleHe, blocker?.missingHe[0] ?? null, deadline, review);
 
   return {
     identity: {
@@ -310,11 +340,11 @@ export function toRoomViewModel(profile: MatterProfile, matter: Matter): RoomVie
       stageTitleHe: stripEnglishGloss(state.stage.currentStageTitleHe ?? "") || null,
     },
     posture,
-    narrativeHe: resolveNarrativeHe(profile, state.titleHe),
-    deadline: resolveDeadline(state.questions.when),
-    review: resolveReview(profile),
+    briefingHe,
+    deadline,
+    review,
     spine: resolveSpine(matter, profile),
-    blocker: resolveBlocker(matter, profile),
+    blocker,
     action: resolveAction(profile),
     scoreRail: resolveScoreRail(profile),
     dino: resolveDino(profile, matter),

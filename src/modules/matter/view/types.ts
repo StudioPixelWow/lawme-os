@@ -108,8 +108,8 @@ export interface DinoSealVM {
 export interface RoomViewModel {
   identity: IdentityVM;
   posture: PostureVM;
-  /** the one strong narrative sentence — "what is happening" */
-  narrativeHe: string;
+  /** the situation briefing — one or two short, fully-sourced sentences */
+  briefingHe: string[];
   deadline: DeadlineVM | null;
   review: ReviewVM | null;
   spine: SpineVM;

@@ -3,38 +3,38 @@ import { DOT, TEXT } from "./tone";
 import type { ScoreRailVM } from "../types";
 
 /**
- * Level 5 — the compact diagnostic rail.
- * Not twelve cards: a curated, decision-relevant read of the Matter Score —
- * each dimension a categorical state (never an overall percentage), with the
- * weakest and strongest gently marked. Access to the full diagnostic sits quiet.
+ * The diagnostic rail — calm, not loud.
+ * A short read of the Matter Score: each dimension a categorical state (never a
+ * percentage), with only the weakest and strongest quietly marked. Enough to
+ * know where to look; never a wall of cards.
  */
 export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
   return (
     <section aria-label="אבחון התיק" className="min-w-0">
-      <div className="mb-3 flex items-baseline justify-between">
+      <div className="mb-1 flex items-baseline justify-between">
         <h2 className="text-caption font-semibold uppercase tracking-[0.14em] text-foreground-faint">
-          אבחון התיק
+          אבחון
         </h2>
         <button
           type="button"
-          className="text-caption font-medium text-foreground-soft transition-colors hover:text-foreground"
+          className="text-caption text-foreground-faint transition-colors hover:text-foreground-soft"
         >
-          אבחון מלא <span aria-hidden>←</span>
+          מלא <span aria-hidden>←</span>
         </button>
       </div>
 
-      <dl className="divide-y divide-ink-900/8">
+      <dl>
         {rail.rows.map((row) => (
-          <div key={row.labelHe} className="flex items-center justify-between gap-4 py-2.5">
-            <dt className="flex items-center gap-2 text-small text-foreground">
+          <div key={row.labelHe} className="flex items-center justify-between gap-4 py-2">
+            <dt className="flex items-baseline gap-2 text-small text-foreground">
               {row.labelHe}
               {row.emphasis === "weak" ? (
-                <span className="text-caption font-medium text-status-risk">· החוליה החלשה</span>
+                <span className="text-micro text-foreground-faint">החלש ביותר</span>
               ) : row.emphasis === "strong" ? (
-                <span className="text-caption text-foreground-faint">· החזק ביותר</span>
+                <span className="text-micro text-foreground-faint">החזק ביותר</span>
               ) : null}
             </dt>
-            <dd className={cx("flex shrink-0 items-center gap-1.5 text-small font-medium", TEXT[row.tone])}>
+            <dd className={cx("flex shrink-0 items-center gap-1.5 text-small", TEXT[row.tone])}>
               <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT[row.tone])} />
               {row.stateHe}
             </dd>
@@ -43,7 +43,7 @@ export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
       </dl>
 
       {rail.noteHe ? (
-        <p className="mt-2.5 text-caption text-foreground-faint">{rail.noteHe}</p>
+        <p className="mt-2 text-caption text-foreground-faint">{rail.noteHe}</p>
       ) : null}
     </section>
   );
