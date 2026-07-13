@@ -27,6 +27,7 @@
     "dino:test": "node --test \"src/modules/dino/tests/*.test.ts\"",
     "dino:benchmark": "node src/modules/dino/benchmark/orchestration-benchmark.ts",
     "matter:test": "node --test \"src/modules/matter/__tests__/*.test.ts\"",
+    "matter:view:test": "node --test \"src/modules/matter/view/__tests__/*.test.ts\"",
     "matter:benchmark": "node src/modules/matter/benchmark/score-narrative-benchmark.ts",
     "intelligence:test": "node --test \"src/modules/intelligence/core/__tests__/*.test.ts\" \"src/modules/intelligence/__tests__/*.test.ts\"",
     "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"

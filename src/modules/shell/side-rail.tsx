@@ -32,6 +32,15 @@ const GLYPHS: Record<
   document: DocumentGlyph,
 };
 
+/**
+ * Temporary DEV-only entry point to the Matter App (Sprint 1 review).
+ * Visible in development and in an explicitly-flagged preview build; NEVER in
+ * deployed production. Remove once matters are reachable from the real list.
+ */
+const DEV_NAV_ENABLED =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_LAWME_DEV_NAV === "1";
+
 /** Visual placeholders — no routes exist for these yet (visual sprint). */
 const SECONDARY = [
   { label: "מחקר משפטי", Glyph: ResearchGlyph },
@@ -119,6 +128,25 @@ export function SideRail() {
             </Link>
           );
         })}
+
+        {/* TEMP dev-only entry to the Matter App (Sprint 1 review) */}
+        {DEV_NAV_ENABLED ? (
+          <Link
+            href="/matters/demo"
+            aria-current={pathname.startsWith("/matters/demo") ? "page" : undefined}
+            title="Matter App · תיק לדוגמה (Dev)"
+            className={cx(
+              "relative mt-4 flex h-11 items-center justify-center gap-3.5 rounded-md border border-dashed border-gold-400/30 px-3 text-small transition-all lg:justify-start lg:px-4",
+              pathname.startsWith("/matters/demo")
+                ? "bg-gold-500/12 font-semibold text-gold-200"
+                : "font-medium text-ink-100 hover:bg-paper-0/8 hover:text-paper-0",
+            )}
+            style={{ transitionDuration: "var(--motion-quick)" }}
+          >
+            <BriefcaseGlyph size={20} className="shrink-0 text-gold-300" />
+            <span className="hidden lg:inline">תיק לדוגמה · Dev</span>
+          </Link>
+        ) : null}
 
         {/* secondary navigation */}
         <p className="mt-6 hidden px-4 text-micro font-medium tracking-wider text-ink-300 lg:block">
