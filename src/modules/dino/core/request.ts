@@ -4,6 +4,8 @@
  * invents them; missing critical fields trigger the Clarification Gate.
  */
 
+import type { AiPolicy, Confidentiality } from "../../intelligence/core/index.ts";
+
 export type DinoOutputType =
   | "research_summary"
   | "issue_outline"
@@ -12,13 +14,11 @@ export type DinoOutputType =
   | "retrieval_list"
   | "clarification_only";
 
-export type DinoConfidentiality = "internal" | "client_confidential" | "privileged";
+/** @deprecated alias — canonical type is `Confidentiality` in intelligence/core. */
+export type DinoConfidentiality = Confidentiality;
 
-export type DinoAiPolicy =
-  | "allowed"
-  | "allowed_with_review"
-  | "restricted_no_private_context"
-  | "prohibited";
+/** @deprecated alias — canonical type is `AiPolicy` in intelligence/core. */
+export type DinoAiPolicy = AiPolicy;
 
 export interface DinoRequest {
   question: string;

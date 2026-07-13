@@ -6,13 +6,22 @@
  * Every engine emits STRUCTURED output — never free text alone.
  */
 import type { EmploymentProcedureType } from "../legal-knowledge/procedure/types.ts";
+import type { AiPolicy, Confidentiality, Severity, EngineStatus } from "../intelligence/core/index.ts";
+
+// Re-export shared primitives so existing `../types.ts` consumers keep working.
+export type { Severity, EngineStatus } from "../intelligence/core/index.ts";
 
 export type MatterStageKind =
   | "intake" | "assessment" | "pre_litigation" | "filing" | "interim"
   | "pleadings" | "disclosure" | "hearing" | "summations" | "judgment"
   | "remedy" | "enforcement" | "appeal" | "closed";
 
-/** epistemic status of a fact — allegations are never facts */
+/**
+ * epistemic status of a fact — allegations are never facts.
+ * Legacy Matter values; maps to the canonical `EpistemicStatus` in
+ * intelligence/core via `fromMatterFactStatus` (tested; no allegation ever
+ * becomes a confirmed fact).
+ */
 export type FactStatus = "confirmed" | "client_alleged" | "opposing_alleged" | "document_derived" | "disputed" | "unknown";
 
 export interface MatterFact {
@@ -75,8 +84,8 @@ export interface MatterClient {
   id: string;
   nameHe: string;
   responsiveness: "responsive" | "slow" | "unreachable" | "unknown";
-  aiPolicy: "allowed" | "allowed_with_review" | "restricted_no_private_context" | "prohibited";
-  confidentiality: "internal" | "client_confidential" | "privileged";
+  aiPolicy: AiPolicy;
+  confidentiality: Confidentiality;
   lastContactAt: string | null;
 }
 
@@ -108,9 +117,6 @@ export interface Matter {
 /* ------------------------------------------------------------------ */
 /* Shared engine framework — every engine emits a typed assessment     */
 /* ------------------------------------------------------------------ */
-
-export type Severity = "info" | "low" | "medium" | "high" | "critical";
-export type EngineStatus = "healthy" | "attention" | "at_risk" | "blocked" | "unknown";
 
 export interface Finding {
   code: string;

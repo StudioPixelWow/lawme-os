@@ -30,4 +30,7 @@ export {
 export {
   MATTER_INTELLIGENCE_VERSION, assessMatter,
 } from "./intelligence.ts";
-export type { MatterState, MatterQuestions, WhenItem } from "./intelligence.ts";
+export type {
+  MatterState, MatterQuestions, WhenItem,
+  MatterDegradation, EngineFailure, EngineFailureCategory, AssessMatterOptions,
+} from "./intelligence.ts";

@@ -7,6 +7,7 @@
 import { createHash } from "node:crypto";
 import type { DinoRequest, SuppliedContextItem } from "../core/request.ts";
 import type { ContextItem, ContextItemStatus, MatterContextPackage } from "./types.ts";
+import type { AiPolicy } from "../../intelligence/core/index.ts";
 
 export const CONTEXT_ASSEMBLER_VERSION = "matter-context-1.0.0";
 
@@ -40,7 +41,7 @@ export interface SyntheticMatterFixture {
   matterId: string;
   clientId: string;
   matterTitleHe: string;
-  aiPolicy?: "allowed" | "allowed_with_review" | "restricted_no_private_context" | "prohibited";
+  aiPolicy?: AiPolicy;
   items: { field: string; statementHe: string; status: ContextItemStatus }[];
 }
 
