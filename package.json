@@ -21,8 +21,12 @@
     "legal:sources:validate": "node src/modules/legal-knowledge/benchmark/validate-fixtures.ts sources",
     "legal:benchmark:run": "node src/modules/legal-knowledge/benchmark/run-benchmark.ts",
     "legal:benchmark:negative": "node src/modules/legal-knowledge/benchmark/negative-benchmark.ts",
+    "legal:corpus:test": "node --test \"src/modules/legal-knowledge/legislation/__tests__/*.test.ts\" \"src/modules/legal-knowledge/extension-orders/__tests__/*.test.ts\" \"src/modules/legal-knowledge/ingestion/import/__tests__/*.test.ts\"",
+    "legal:triad:test": "node --test \"src/modules/legal-knowledge/procedure/__tests__/*.test.ts\" \"src/modules/legal-knowledge/case-law/__tests__/*.test.ts\" \"src/modules/legal-knowledge/triad/__tests__/*.test.ts\"",
+    "legal:corpus:ingest:dev": "node src/modules/legal-knowledge/ingestion/import/ingest-command.ts",
     "dino:test": "node --test \"src/modules/dino/tests/*.test.ts\"",
     "dino:benchmark": "node src/modules/dino/benchmark/orchestration-benchmark.ts",
+    "matter:test": "node --test \"src/modules/matter/__tests__/*.test.ts\"",
     "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"
   },
   "dependencies": {

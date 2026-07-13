@@ -1,0 +1,28 @@
+{
+  "sourceId": "E3B-LEG-001",
+  "titleHe": "חוק פיצויי פיטורים, התשכ\"ג-1963",
+  "canonicalSourceUrl": "https://main.knesset.gov.il/apps/legislation/main/laws/2001162",
+  "publisherHe": "מאגר החקיקה הלאומי — הכנסת",
+  "official": true,
+  "knessetOfEnactment": "כנסת 5",
+  "publicationInReshumot": "1963-08-16",
+  "lastAmendment": "2025-01-30",
+  "lastAmendmentTitle": "עקיף — חוק משפחות חיילים שנספו במערכה (תיקון מס' 46), התשפ\"ה-2025",
+  "directLastDirectAmendment": "חוק פיצויי פיטורים (תיקון מס' 34 – הוראת שעה – חרבות ברזל), התשפ\"ד-2024 (08.08.2024)",
+  "inForceStatus": "תקף",
+  "subject": "תעסוקה",
+  "responsibleMinistry": "העבודה",
+  "committee": "עבודה ורווחה",
+  "amendmentCount_observed": 35,
+  "subsidiaryRegulations_sample": [
+    "תקנות פיצויי פיטורים (חישוב הפיצויים והתפטרות שרואים אותה כפיטורים)",
+    "תקנות פיצויי פיטורים (שיעורי פיצויי פיטורים לעובד בשכר), התשמ\"ג-1983",
+    "תקנות פיצויי פיטורים (חובת מסירת הודעות למעביד), התשמ\"ט-1988"
+  ],
+  "versionState": "current",
+  "verificationStatus": "verified_primary_metadata",
+  "fullTextStatus": "pending — consolidated section text not on the official page; layered separately",
+  "retrievedAt": "2026-07-12",
+  "retrievalMethod": "human_present_browser",
+  "extractionNote": "Official Knesset National Legislation Database record. Metadata is version-certain (in force, last amended 2025-01-30). Consolidated full text is reached via 'ספר החוקים הפתוח / לחוק המלא' (volunteer consolidation) — must be labeled consolidated_community until officially verified."
+}

@@ -1,0 +1,11 @@
+source_group,official,full_text_copyright,access_terms,waf_block,full_text_decision,embedding,redistribution,attribution,permission_confidence
+primary_statutes_text,yes,public_domain_§6,portal_restricted_no_api,n/a,allow_full_text_dev_poc(verified seed only),mock_only,dev_internal_only,canonical_url,high(copyright)/low(autonomous_access)
+regulations_text,yes,public_domain_§6,portal_restricted,n/a,allow_full_text_dev_poc(verified seed),mock_only,dev_internal_only,canonical_url,high/low
+extension_orders_text,yes,official_publication,gov_il_waf_block,yes,allow_full_text_dev_poc(verified seed),mock_only,dev_internal_only,canonical_url,high/low
+national_legislation_db_autonomous,yes,n/a,restricted_ToS_no_api,partial,rejected(autonomous),none,none,canonical_url,high
+reshumot_autonomous,yes,n/a,restricted,yes,rejected(autonomous),none,none,canonical_url,high
+gov_il_guidance,yes,mixed(may_include_editorial),waf_block,yes,allow_metadata_only,none,none,canonical_url,medium
+nii_btl,yes,mixed,unclear,no,allow_metadata_only,none,none,canonical_url,medium
+knesset_odata,yes,facts_not_expressive,api_terms_unclear,no,allow_metadata_only,none,none,canonical_url,medium
+kol_zchut,no,editorial_copyright,discovery_use,no,pointer_only,none,none,link_only,high(copyright)
+commercial_db,varies,licensed,commercial,n/a,rejected,none,none,n/a,high

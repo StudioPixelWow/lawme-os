@@ -1,0 +1,42 @@
+{
+  "manifestVersion": "import-manifest-1.0.0",
+  "createdBy": "fixture",
+  "notes": "Tiny synthetic fixture to exercise the import pipeline in tests ONLY. Not real legal text.",
+  "entries": [
+    {
+      "sourceId": "E3B-TEST-001",
+      "documentType": "legislation",
+      "titleHe": "חוק בדיקה לדוגמה, התש\"ף-2020",
+      "file": "sample-statute.txt",
+      "contentType": "text/plain",
+      "publisherHe": "מאגר החקיקה הלאומי",
+      "canonicalSourceUrl": "https://main.knesset.gov.il/Activity/Legislation/Laws/sample",
+      "fullTextDecision": "allow_full_text_dev_poc",
+      "legalTopic": "severance",
+      "publicationDate": "2020-01-01",
+      "effectiveDate": "2020-02-01",
+      "versionState": "current",
+      "amendmentNoteHe": null
+    },
+    {
+      "sourceId": "E3B-TEST-GUI-001",
+      "documentType": "guidance",
+      "titleHe": "הנחיית בדיקה — זכויות בסיום עבודה",
+      "publisherHe": "משרד העבודה",
+      "canonicalSourceUrl": "https://www.gov.il/he/departments/labor/sample",
+      "fullTextDecision": "allow_metadata_only",
+      "legalTopic": "termination",
+      "versionState": "unknown"
+    },
+    {
+      "sourceId": "E3B-TEST-SEC-001",
+      "documentType": "secondary",
+      "titleHe": "כל זכות — ערך בדיקה",
+      "publisherHe": "כל זכות",
+      "canonicalSourceUrl": "https://www.kolzchut.org.il/he/sample",
+      "fullTextDecision": "pointer_only",
+      "legalTopic": "severance",
+      "versionState": "unknown"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "sourceId": "E3B-LEG-007",
+  "titleHe": "חוק עבודת נשים, התשי\"ד-1954",
+  "canonicalSourceUrl": "https://main.knesset.gov.il/apps/legislation/main/laws/2001135",
+  "publisherHe": "מאגר החקיקה הלאומי — הכנסת",
+  "official": true,
+  "knessetOfEnactment": "כנסת 2",
+  "publicationInReshumot": "1954-08-12",
+  "effectiveStart": "1954-08-12",
+  "lastAmendment": "2026-03-31",
+  "lastDirectAmendment": "חוק עבודת נשים (תיקון מס' 67), התשפ\"ו-2026 (07.01.2026)",
+  "inForceStatus": "תקף",
+  "subject": "תעסוקה",
+  "responsibleMinistry": "העבודה",
+  "committee": "עבודה ורווחה",
+  "replaces": "פקודת העבדתן של נשים, 1945 (בטל, עד 12.08.1954)",
+  "amendmentCount_observed": 68,
+  "subsidiaryRegulations_sample": [
+    "תקנות עבודת נשים (עבודות אסורות, עבודות מוגבלות ועבודות מסוכנות), התשס\"א-2001",
+    "תקנות עבודת נשים (תנאים לעבודת לילה)",
+    "תקנות עבודת נשים (מועדים וכללים לתשלומים לקופת גמל), התשס\"ח-2008"
+  ],
+  "keySectionNote": "סעיף 9 — איסור פיטורי עובדת בהיריון ללא היתר (התקופה המוגנת); סעיף 22א — חובת דיווח",
+  "versionState": "current",
+  "verificationStatus": "verified_primary_metadata",
+  "fullTextStatus": "pending",
+  "retrievedAt": "2026-07-12",
+  "retrievalMethod": "human_present_browser"
+}
