@@ -115,6 +115,8 @@ export interface WorkflowDefinition {
   titleHe: string;
   subtitleHe: string;
   kindHe: string;
+  /** how the drawer renders the draft/review body ("form" default, "document" for uploads). */
+  uiKind?: "form" | "document";
   /** does this workflow currently apply to the matter? */
   detect(matter: Matter): boolean;
   /** a fresh, prefilled task (nothing invented is asserted as fact). */
@@ -189,7 +191,9 @@ const ALLOWED: Record<WorkflowStatus, WorkflowEvent["type"][]> = {
   in_progress: ["update-fields", "pause", "wait", "submit", "complete"],
   paused: ["resume"],
   waiting: ["resume"],
-  in_review: ["approve", "reject"],
+  // update-fields in review lets the reviewer record their evidentiary decision
+  // before approving/rejecting; it changes no transition or state.
+  in_review: ["update-fields", "approve", "reject"],
   rejected: ["resume", "reopen"],
   completed: ["reopen"],
 };

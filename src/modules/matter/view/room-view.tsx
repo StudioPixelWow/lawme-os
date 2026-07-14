@@ -9,7 +9,8 @@
  * the workflow drawer, and a quiet post-resolution summary strip.
  */
 import { cx } from "@/design-system/utils/cx";
-import { CheckGlyph, HistoryGlyph } from "@/design-system/icons/glyphs";
+import { CheckGlyph, HistoryGlyph, ChatGlyph } from "@/design-system/icons/glyphs";
+import type { ActivityEntry } from "../activity/activity";
 import { RoomShell } from "./room-shell";
 import { useRoom } from "./room-store";
 import { IdentityHero } from "./objects/identity-hero";
@@ -22,17 +23,21 @@ import { DinoSeal } from "./objects/dino-seal";
 import { WorkflowDrawer } from "./objects/workflow-drawer";
 import { applicableWorkflows } from "../workflow/registry";
 import { describeHealthDelta, greenCount } from "./health-delta";
+import { deriveActivity } from "../activity/activity";
 
 export function RoomView() {
-  const { state, dispatch, vm } = useRoom();
-  const resolved = state.instance?.status === "completed";
+  const { state, dispatch, vm, baselineVm } = useRoom();
+  const changes = describeHealthDelta(baselineVm, vm);
+  const improved = state.instance?.status === "completed" && changes.length > 0;
+  const activity = state.instance ? deriveActivity(state.instance, changes) : [];
   const workflowId = applicableWorkflows(state.baseline)[0]?.id ?? state.instance?.definitionId ?? null;
 
   return (
     <RoomShell ariaLabel={`תיק: ${vm.identity.titleHe}`}>
       <IdentityHero identity={vm.identity} posture={vm.posture} review={vm.review} />
 
-      {resolved && <HealthStrip onOpenLog={() => dispatch({ type: "open-drawer" })} />}
+      {improved && <HealthStrip onOpenLog={() => dispatch({ type: "open-drawer" })} />}
+      {activity.length > 0 && <ActivitySurface activity={activity} onOpen={() => dispatch({ type: "open-drawer" })} />}
 
       <DecisionArea briefingHe={vm.briefingHe} deadline={vm.deadline} action={vm.action} />
 
@@ -57,6 +62,36 @@ export function RoomView() {
 
       <WorkflowDrawer />
     </RoomShell>
+  );
+}
+
+const ACTIVITY_DOT: Record<ActivityEntry["tone"], string> = {
+  info: "bg-status-scheduled",
+  progress: "bg-status-progress",
+  success: "bg-status-completed",
+  warn: "bg-status-risk",
+};
+
+function ActivitySurface({ activity, onOpen }: { activity: ActivityEntry[]; onOpen: () => void }) {
+  return (
+    <section className="mt-6 rounded-xl border border-line-strong bg-surface p-4 md:p-5 shadow-lift" aria-label="פעילות בתיק">
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="flex items-center gap-1.5 text-caption font-semibold text-foreground-soft">
+          <ChatGlyph size={14} /> פעילות בתיק
+        </h2>
+        <button type="button" onClick={onOpen} className="text-caption text-foreground-faint transition-colors hover:text-foreground-soft">
+          פתח את המשימה <span aria-hidden>‹</span>
+        </button>
+      </div>
+      <ol className="space-y-2">
+        {activity.map((a) => (
+          <li key={a.id} className="flex items-start gap-2.5 text-small">
+            <span className={cx("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-pill", ACTIVITY_DOT[a.tone])} />
+            <span className="text-foreground-soft">{a.textHe}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 

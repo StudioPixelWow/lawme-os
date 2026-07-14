@@ -6,8 +6,12 @@
 import type { Matter } from "../types.ts";
 import type { WorkflowDefinition } from "./engine.ts";
 import { evidenceWorkflow } from "./evidence-task.ts";
+import { documentEvidenceReview } from "./document-evidence.ts";
 
-export const WORKFLOWS: WorkflowDefinition[] = [evidenceWorkflow];
+// Order matters: the blocker opens the first applicable workflow. Slice 1 makes
+// the document→evidence review the primary way to resolve the missing-evidence
+// blocker; the plain evidence workflow remains registered for reuse/composition.
+export const WORKFLOWS: WorkflowDefinition[] = [documentEvidenceReview, evidenceWorkflow];
 
 export function findWorkflow(id: string | null | undefined): WorkflowDefinition | null {
   return WORKFLOWS.find((w) => w.id === id) ?? null;

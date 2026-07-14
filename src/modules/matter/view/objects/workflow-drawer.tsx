@@ -37,6 +37,7 @@ import {
 } from "../../workflow/engine";
 import { DOT, TEXT, WASH } from "./tone";
 import { describeHealthDelta, remainingFocus } from "../health-delta";
+import { DocumentDraft, DocumentReview, DocumentSummary } from "./document-panels";
 
 const MACRO = [
   { key: "task", labelHe: "משימה" },
@@ -282,6 +283,11 @@ function Lifecycle({
   const setField = (key: string, value: string) =>
     dispatch({ type: "wf", event: { type: "update-fields", patch: { fields: { [key]: value } } } });
 
+  const isDocument = def.uiKind === "document";
+
+  if (inst.status === "draft" && isDocument) return <DocumentDraft />;
+  if (inst.status === "in_review" && isDocument) return <DocumentReview />;
+
   if (inst.status === "draft") {
     return (
       <div className="space-y-4">
@@ -418,7 +424,7 @@ function Lifecycle({
   // execution states share the task card + contextual controls
   return (
     <div className="space-y-4">
-      <TaskCard def={def} task={task} status={inst.status} />
+      {isDocument ? <DocumentSummary /> : <TaskCard def={def} task={task} status={inst.status} />}
 
       {inst.status === "rejected" && inst.rejectionReasonHe && (
         <div className="rounded-lg border border-status-risk/30 bg-status-risk-wash/50 p-3.5">
