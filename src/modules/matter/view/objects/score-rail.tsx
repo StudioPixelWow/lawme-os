@@ -24,14 +24,15 @@ const ICON: Record<string, ComponentType<SVGProps<SVGSVGElement> & { size?: numb
  * A short read of the Matter Score: each dimension with its icon and a
  * categorical state (never a percentage), and a route to the full diagnostic.
  */
-export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
+export function ScoreRail({ rail, open }: { rail: ScoreRailVM; open?: (kind: string, param?: string | null) => void }) {
   return (
     <section className="flex flex-col rounded-xl border border-line-strong bg-surface p-5 shadow-lift" aria-label="אבחון התיק">
       <div className="flex items-baseline justify-between">
         <h2 className="text-caption font-semibold text-foreground-soft">מצב תיק כללי</h2>
         <button
           type="button"
-          className="text-caption text-foreground-faint transition-colors hover:text-foreground-soft"
+          onClick={open ? () => open("score") : undefined}
+          className="rounded-sm text-caption text-foreground-faint transition-colors hover:text-foreground-soft"
         >
           אבחון מלא <span aria-hidden>‹</span>
         </button>
@@ -40,8 +41,8 @@ export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
       <dl className="mt-3 divide-y divide-line-strong">
         {rail.rows.map((row) => {
           const Icon = ICON[row.labelHe] ?? DocumentGlyph;
-          return (
-            <div key={row.labelHe} className="flex items-center justify-between gap-3 py-2.5">
+          const content = (
+            <>
               <dd className={cx("flex shrink-0 items-center gap-1.5 text-small font-medium", TEXT[row.tone])}>
                 <span aria-hidden className={cx("h-1.5 w-1.5 rounded-pill", DOT[row.tone])} />
                 {row.stateHe}
@@ -50,7 +51,21 @@ export function ScoreRail({ rail }: { rail: ScoreRailVM }) {
                 <span className="text-foreground-faint">{row.labelHe}</span>
                 <Icon size={16} className="text-foreground-faint" />
               </dt>
-            </div>
+            </>
+          );
+          return open ? (
+            <button
+              key={row.id}
+              type="button"
+              data-score-row
+              onClick={() => open("score", row.id)}
+              aria-label={`ממד ${row.labelHe}: ${row.stateHe} — הצג פירוט`}
+              className="flex w-full items-center justify-between gap-3 rounded-sm py-2.5 text-start transition-colors hover:bg-surface-sunken"
+            >
+              {content}
+            </button>
+          ) : (
+            <div key={row.id} className="flex items-center justify-between gap-3 py-2.5">{content}</div>
           );
         })}
       </dl>

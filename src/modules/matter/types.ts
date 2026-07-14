@@ -97,6 +97,8 @@ export interface Matter {
   fileNoHe?: string | null;
   /** the forum/court this matter is (or will be) heard in — presentation input, optional */
   forumHe?: string | null;
+  /** presentation-only: explicit owner assignment; overrides role-based owner resolution. */
+  assignedOwnerId?: string | null;
   legalDomain: "labor";
   /** the procedure type this matter follows (maps to the procedure graph) */
   procedureType: EmploymentProcedureType;

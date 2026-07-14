@@ -7,7 +7,7 @@ import type { DinoSealVM } from "../types";
  * A sourced observation with what it is based on, and a route to the full
  * analysis. Never a chatbot; always traceable, always human-reviewed.
  */
-export function DinoSeal({ dino }: { dino: DinoSealVM }) {
+export function DinoSeal({ dino, open }: { dino: DinoSealVM; open?: (kind: string, param?: string | null) => void }) {
   return (
     <section className="flex flex-col rounded-xl border border-line-strong bg-surface p-5 shadow-lift" aria-label="דינו">
       <div className="flex items-center justify-between gap-3">
@@ -27,7 +27,13 @@ export function DinoSeal({ dino }: { dino: DinoSealVM }) {
             {dino.provenanceHe.map((p, i) => (
               <li key={i} className="flex gap-1.5">
                 <span aria-hidden className="text-foreground-faint">·</span>
-                <span className="min-w-0">{p}</span>
+                {open ? (
+                  <button type="button" onClick={() => open("provenance", `dino-${i}`)} className="min-w-0 rounded-sm text-start transition-colors hover:text-foreground hover:underline">
+                    {p}
+                  </button>
+                ) : (
+                  <span className="min-w-0">{p}</span>
+                )}
               </li>
             ))}
           </ul>
@@ -36,6 +42,7 @@ export function DinoSeal({ dino }: { dino: DinoSealVM }) {
 
       <button
         type="button"
+        onClick={open ? () => open("dino") : undefined}
         className="mt-auto inline-flex items-center gap-1.5 self-start pt-4 text-small font-medium text-foreground-soft transition-colors hover:text-foreground"
       >
         הצג ניתוח מלא <span aria-hidden>‹</span>

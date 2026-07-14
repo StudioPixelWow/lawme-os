@@ -7,7 +7,7 @@ import type { ActionVM } from "../types";
  * tempo, who acts and under what approval/review, its expected effect, and the
  * one primary control.
  */
-export function ActionCard({ action }: { action: ActionVM }) {
+export function ActionCard({ action, onStart }: { action: ActionVM; onStart?: () => void }) {
   const rows: { label: string; value: string }[] = [];
   if (action.ownerHe) rows.push({ label: "אחראי", value: action.ownerHe });
   rows.push({ label: "אישור", value: action.requiresApproval ? "נדרש" : "אינו נדרש" });
@@ -39,7 +39,7 @@ export function ActionCard({ action }: { action: ActionVM }) {
       </dl>
 
       <div className="mt-auto pt-5">
-        <Button intent="primary" className="w-full gap-1.5">
+        <Button intent="primary" className="w-full gap-1.5" onClick={onStart}>
           התחל בצעד <span aria-hidden>‹</span>
         </Button>
       </div>

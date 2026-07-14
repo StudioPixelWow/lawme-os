@@ -8,7 +8,7 @@
  * audit trail and notifications. No workflow-specific logic lives here; the
  * evidence workflow is just the first definition it drives.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cx } from "@/design-system/utils/cx";
 import { Button } from "@/design-system/primitives/button";
 import {
@@ -81,9 +81,17 @@ const inputCx =
   "w-full rounded-sm border border-line-strong bg-surface px-3 py-2 text-small text-foreground outline-none transition-colors focus:border-ink-500";
 
 export function WorkflowDrawer() {
-  const { state, dispatch, vm, baselineVm } = useRoom();
+  const { state, dispatch, vm, baselineVm, openConfirm, close } = useRoom();
   const [waitReason, setWaitReason] = useState("");
-  const [rejectReason, setRejectReason] = useState("");
+
+  useEffect(() => {
+    if (!state.drawerOpen || state.confirm) return; // confirm dialog owns Esc while open
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") { e.stopPropagation(); close(); }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [state.drawerOpen, state.confirm, close]);
 
   if (!state.drawerOpen) return null;
   const def = findWorkflow(state.activeDefId ?? state.instance?.definitionId);
@@ -96,12 +104,12 @@ export function WorkflowDrawer() {
       <button
         type="button"
         aria-label="סגירה"
-        onClick={() => dispatch({ type: "close-drawer" })}
+        onClick={close}
         className="absolute inset-0 bg-ink-950/40 backdrop-blur-[1px]"
       />
 
       <aside className="relative ms-auto flex h-full w-full max-w-[30rem] flex-col overflow-y-auto border-s border-line-strong bg-surface shadow-raised">
-        <Header def={def} inst={inst} onClose={() => dispatch({ type: "close-drawer" })} />
+        <Header def={def} inst={inst} onClose={close} />
 
         {inst && <Stepper status={inst.status} />}
 
@@ -124,8 +132,8 @@ export function WorkflowDrawer() {
               baselineVm={baselineVm}
               waitReason={waitReason}
               setWaitReason={setWaitReason}
-              rejectReason={rejectReason}
-              setRejectReason={setRejectReason}
+              openConfirm={openConfirm}
+              close={close}
               dispatch={dispatch}
             />
           )}
@@ -261,8 +269,8 @@ function Lifecycle({
   baselineVm,
   waitReason,
   setWaitReason,
-  rejectReason,
-  setRejectReason,
+  openConfirm,
+  close,
   dispatch,
 }: {
   def: WorkflowDefinition;
@@ -272,8 +280,8 @@ function Lifecycle({
   baselineVm: import("../types").RoomViewModel;
   waitReason: string;
   setWaitReason: (v: string) => void;
-  rejectReason: string;
-  setRejectReason: (v: string) => void;
+  openConfirm: ReturnType<typeof useRoom>["openConfirm"];
+  close: ReturnType<typeof useRoom>["close"];
   dispatch: ReturnType<typeof useRoom>["dispatch"];
 }) {
   const task = inst.task;
@@ -410,10 +418,10 @@ function Lifecycle({
         )}
 
         <div className="flex gap-2">
-          <Button intent="primary" className="flex-1" onClick={() => dispatch({ type: "close-drawer" })}>
+          <Button intent="primary" className="flex-1" onClick={close}>
             צפה בתיק המעודכן
           </Button>
-          <Button className="shrink-0" onClick={() => dispatch({ type: "wf", event: { type: "reopen" } })}>
+          <Button className="shrink-0" onClick={() => openConfirm("reopen")}>
             פתח מחדש
           </Button>
         </div>
@@ -505,26 +513,13 @@ function Lifecycle({
             <p className="flex items-center gap-1.5 text-caption font-semibold text-status-reviewed">
               <UserGlyph size={13} /> ממתין לאישור {inst.approverHe ?? ""}
             </p>
-            <p className="mt-1 text-small text-foreground-soft">בדוק את פרטי הביצוע ואשר, או החזר לטיפול עם הערה.</p>
+            <p className="mt-1 text-small text-foreground-soft">בדוק את פרטי הביצוע ואשר, או החזר לטיפול עם הערה (בדיאלוג אישור).</p>
           </div>
-          <input
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-            placeholder="הערת דחייה (אם דוחים)"
-            className={inputCx}
-          />
           <div className="flex gap-2">
-            <Button
-              intent="primary"
-              className="flex-1"
-              onClick={() => dispatch({ type: "wf", event: { type: "approve" } })}
-            >
-              אשר והשלם
+            <Button intent="primary" className="flex-1" onClick={() => openConfirm("approve")}>
+              בדוק ואשר
             </Button>
-            <Button
-              className="flex-1"
-              onClick={() => dispatch({ type: "wf", event: { type: "reject", reasonHe: rejectReason.trim() || "נדרשים פרטים נוספים" } })}
-            >
+            <Button className="flex-1" onClick={() => openConfirm("reject")}>
               דחה
             </Button>
           </div>

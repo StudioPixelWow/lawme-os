@@ -229,6 +229,14 @@ function LinkChip({ label, value }: { label: string; value: string }) {
   );
 }
 
+export function DevStorageNote() {
+  return (
+    <p className="rounded-lg border border-status-waiting/30 bg-status-waiting-wash/40 px-3 py-2 text-caption text-foreground-soft" role="note">
+      אחסון פיתוח בלבד (Preview) — הקבצים נשמרים בזיכרון התהליך ואינם אחסון קבוע/פרודקשן.
+    </p>
+  );
+}
+
 export function DocumentDraft() {
   const { state, dispatch } = useRoom();
   const inst = state.instance!;
@@ -242,6 +250,7 @@ export function DocumentDraft() {
         <p className="text-small leading-relaxed text-foreground-soft">
           העלה את המסמך המעיד על ידיעת המעסיק על ההיריון. הקובץ ייבדק, יקושר לדרישת הראיה, וייבדק על ידי מאשר לפני עדכון התיק.
         </p>
+        <DevStorageNote />
         <UploadZone />
       </div>
     );
@@ -351,8 +360,7 @@ export function DocumentDraft() {
 const DECISIONS: EvidenceDecision[] = ["supports", "contradicts", "inconclusive", "authenticity_uncertain", "incomplete"];
 
 export function DocumentReview() {
-  const { state, dispatch } = useRoom();
-  const [rejectReason, setRejectReason] = useState("");
+  const { state, dispatch, openConfirm } = useRoom();
   const inst = state.instance!;
   const task = inst.task;
   const decision = (task.fields.decision || "") as EvidenceDecision | "";
@@ -364,6 +372,7 @@ export function DocumentReview() {
   return (
     <div className="space-y-4">
       <DocumentSummary />
+      <DevStorageNote />
 
       <div>
         <p className="mb-2 text-caption font-semibold text-foreground-soft">קביעת המאשר — הערך הראייתי</p>
@@ -402,12 +411,11 @@ export function DocumentReview() {
         </div>
       )}
 
-      <input value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} placeholder="נימוק דחייה (אם דוחים)" className={inputCx} />
       <div className="flex gap-2">
-        <Button intent="primary" className="flex-1" disabled={!decision} onClick={() => dispatch({ type: "wf", event: { type: "approve" } })}>
-          אשר
+        <Button intent="primary" className="flex-1" disabled={!decision} onClick={() => openConfirm("approve")}>
+          בדוק ואשר
         </Button>
-        <Button className="flex-1" onClick={() => dispatch({ type: "wf", event: { type: "reject", reasonHe: rejectReason.trim() || "הראיה אינה מספקת לאישור" } })}>
+        <Button className="flex-1" onClick={() => openConfirm("reject")}>
           דחה
         </Button>
       </div>

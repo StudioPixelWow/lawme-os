@@ -121,6 +121,10 @@ function ensurePeriod(s: string): string {
 }
 
 function resolveOwnerHe(matter: Matter): string | null {
+  if (matter.assignedOwnerId) {
+    const assigned = matter.team.find((m) => m.id === matter.assignedOwnerId);
+    if (assigned) return assigned.nameHe;
+  }
   for (const role of OWNER_ROLE_ORDER) {
     const member = matter.team.find((m) => m.role === role);
     if (member) return member.nameHe;
@@ -230,6 +234,9 @@ function resolveSpine(matter: Matter, profile: MatterProfile): SpineVM {
     prevHe: prev,
     currentHe: stripEnglishGloss(snap.currentStageTitleHe ?? "שלב לא מזוהה"),
     nextHe: next ? stripEnglishGloss(next) : null,
+    prevId: ci > 0 ? ordered[ci - 1].id : null,
+    currentId: cur?.id ?? "",
+    nextId: ci >= 0 && ci < ordered.length - 1 ? ordered[ci + 1].id : null,
     stageNumberHe: snap.stageIndex >= 0 ? `שלב ${snap.stageIndex + 1} מתוך ${snap.totalStages}` : `${snap.totalStages} שלבים`,
     blocked,
     blockedReasonHe: blocked ? "המעבר לשלב הבא חסום — חסרות עובדות/ראיות מהותיות" : null,
@@ -313,6 +320,7 @@ function resolveScoreRail(profile: MatterProfile): ScoreRailVM {
     const dim = dimensions.find((d) => d.id === id);
     if (!dim) continue;
     rows.push({
+      id: dim.id,
       labelHe: dim.labelHe,
       stateHe: railStateHe(dim),
       tone: DIMENSION_STATE[dim.state].tone,

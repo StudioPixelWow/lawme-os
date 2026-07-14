@@ -53,6 +53,10 @@ export interface SpineVM {
   prevHe: string | null;
   currentHe: string;
   nextHe: string | null;
+  /** stage ids for deep-linking each node to its milestone detail */
+  prevId: string | null;
+  currentId: string;
+  nextId: string | null;
   stageNumberHe: string;
   /** the current→next transition is blocked */
   blocked: boolean;
@@ -87,6 +91,8 @@ export interface ActionVM {
 
 /** Level 5 — one row of the compact diagnostic rail. */
 export interface ScoreRowVM {
+  /** the dimension id, for deep-linking the row to its dimension detail */
+  id: string;
   labelHe: string;
   stateHe: string;
   tone: Tone;
