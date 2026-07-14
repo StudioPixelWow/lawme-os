@@ -7,7 +7,7 @@ import type { BlockerVM } from "../types";
  * The top blocker (approved concept) — a card: why the matter is stuck, the
  * sourced specifics, and the drill-down to resolve it.
  */
-export function BlockerCard({ blocker }: { blocker: BlockerVM }) {
+export function BlockerCard({ blocker, onAction }: { blocker: BlockerVM; onAction?: () => void }) {
   const rows: { label: string; value: string }[] = [];
   if (blocker.stageHe) rows.push({ label: "שלב", value: blocker.stageHe });
   if (blocker.missingHe.length) rows.push({ label: "חסר", value: blocker.missingHe.join(" · ") });
@@ -36,6 +36,7 @@ export function BlockerCard({ blocker }: { blocker: BlockerVM }) {
 
       <button
         type="button"
+        onClick={onAction}
         className="mt-auto inline-flex items-center gap-1.5 self-start pt-4 text-small font-medium text-foreground-soft transition-colors hover:text-foreground"
       >
         {blocker.actionLabelHe}

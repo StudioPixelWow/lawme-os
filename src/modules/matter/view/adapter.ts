@@ -330,16 +330,23 @@ function resolveDino(profile: MatterProfile, matter: Matter): DinoSealVM | null 
   const target = profile.narrative.reviewRoute?.primaryTarget ?? null;
   const targetHe = target ? REVIEW_TARGET_HE[target] ?? "בדיקה אנושית" : "בדיקה אנושית";
   const areaHe = DOMAIN_HE[matter.legalDomain] ?? matter.legalDomain;
-  const insightHe = `דינו זיהה צוואר בקבוק בכיסוי המשפטי — טעון ${targetHe}.`;
+  // The seal tracks the real state: when legal coverage is the live concern it
+  // names the bottleneck; once coverage is restored it stays honest and reflects
+  // the standing human-review policy rather than a resolved finding.
+  const legalDim = profile.score.dimensions.find((d) => d.id === "legal");
+  const legalConcern = !!legalDim &&
+    (legalDim.state === "requires_review" || legalDim.state === "at_risk" || legalDim.state === "blocked");
+  const insightHe = legalConcern
+    ? `דינו זיהה צוואר בקבוק בכיסוי המשפטי — טעון ${targetHe}.`
+    : `דינו ממליץ על ${targetHe} לפני הסתמכות — בהתאם למדיניות הלקוח.`;
   const policyNoteHe = matter.client.aiPolicy === "allowed_with_review"
     ? "תובנת AI — מותנית בבדיקה אנושית"
     : matter.client.aiPolicy === "prohibited"
       ? "עיבוד AI חסום במדיניות הלקוח"
       : null;
-  const provenanceHe = [
-    "הערכת כיסוי משפטי",
-    `מסלול בדיקה: ${targetHe} · ${areaHe}`,
-  ];
+  const provenanceHe = legalConcern
+    ? ["הערכת כיסוי משפטי", `מסלול בדיקה: ${targetHe} · ${areaHe}`]
+    : ["מדיניות בדיקה אנושית", `מסלול בדיקה: ${targetHe} · ${areaHe}`];
   return { insightHe, policyNoteHe, provenanceHe };
 }
 

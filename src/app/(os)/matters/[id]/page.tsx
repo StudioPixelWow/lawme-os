@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { Workspace } from "@/design-system/patterns/workspace";
-import { buildMatterProfile } from "@/modules/matter";
 import { getDemoMatter } from "@/modules/matter/fixtures/demo";
-import { toRoomViewModel } from "@/modules/matter/view/adapter";
 import { MatterRoom } from "@/modules/matter/view/room";
 
 /**
- * The Matter App — one matter, run from a room (Sprint 1: the structural
- * skeleton). The profile is computed server-side from the matter intelligence
- * engines; only the presentation-ready view-model reaches the client.
+ * The Matter App — one matter, run from a room (Sprint 2: the live room).
+ * The source matter is loaded server-side and seeded into the client store,
+ * which computes the presentation view-model through the real intelligence
+ * engine and recomputes it whenever a workflow mutates the matter.
  * Demo data until the datastore lands.
  */
 export async function generateMetadata({
@@ -27,12 +26,10 @@ export default async function MatterRoomPage({
 }) {
   const { id } = await params;
   const matter = getDemoMatter(id);
-  const profile = buildMatterProfile(matter);
-  const vm = toRoomViewModel(profile, matter);
 
   return (
     <Workspace width="wide">
-      <MatterRoom vm={vm} />
+      <MatterRoom matter={matter} />
     </Workspace>
   );
 }
