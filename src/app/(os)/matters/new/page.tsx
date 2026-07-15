@@ -90,7 +90,7 @@ export default function NewMatterPage() {
           <p role="alert" className="rounded-lg border border-status-risk/30 bg-status-risk-wash/50 p-3 text-small text-status-risk">{error}</p>
         )}
         <div className="flex gap-2 pt-2">
-          <Button intent="primary" disabled={busy || titleHe.trim().length < 2}>{busy ? "פותח…" : "פתח תיק"}</Button>
+          <Button type="submit" intent="primary" disabled={busy || titleHe.trim().length < 2}>{busy ? "פותח…" : "פתח תיק"}</Button>
           <Button type="button" onClick={() => router.push("/matters")}>ביטול</Button>
         </div>
       </form>
