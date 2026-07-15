@@ -4,6 +4,9 @@ import { Workspace } from "@/design-system/patterns/workspace";
 import { MatterRoom } from "@/modules/matter/view/room";
 import { loadMatterForRoom } from "@/modules/matter/view/matter-loader";
 
+// Per-request: a real matter must never be served from a build-time snapshot.
+export const dynamic = "force-dynamic";
+
 /**
  * The Matter App — one matter, run from a room (Capability 2: real matters).
  * The matter is loaded server-side (the frozen demo for slug "demo", otherwise

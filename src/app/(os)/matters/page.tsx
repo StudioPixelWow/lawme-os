@@ -3,10 +3,13 @@ import Link from "next/link";
 import { Workspace } from "@/design-system/patterns/workspace";
 import { PageHeader } from "@/design-system/patterns/page-header";
 import { SectionChapter } from "@/design-system/patterns/section-chapter";
-import { Placeholder } from "@/design-system/patterns/placeholder";
-import { listMattersForPage } from "@/modules/matter/view/matter-loader";
+import { demoSummary, getDurableMatters, composeMatterList } from "@/modules/matter/view/matter-loader";
 
 export const metadata: Metadata = { title: "תיקים" };
+
+// Per-request: the list must reflect matters created at runtime, and must never
+// be frozen to a build-time database snapshot.
+export const dynamic = "force-dynamic";
 
 const PROCEDURE_HE: Record<string, string> = {
   pregnancy_dismissal: "פיטורי הריון", pre_dismissal_dispute: "טרום־פיטורים",
@@ -18,7 +21,10 @@ const PROCEDURE_HE: Record<string, string> = {
 };
 
 export default async function MattersPage() {
-  const { matters } = await listMattersForPage();
+  // The frozen demo is composed independently of the database — it is always present.
+  const demo = demoSummary();
+  const durable = await getDurableMatters();
+  const { matters, errorCode } = composeMatterList(demo, durable);
 
   return (
     <Workspace>
@@ -30,30 +36,33 @@ export default async function MattersPage() {
           תיק חדש
         </Link>
       </PageHeader>
+
+      {errorCode && (
+        <div dir="rtl" role="status" className="mb-4 rounded-lg border border-status-today/40 bg-status-today-wash/40 p-3 text-caption text-foreground-soft">
+          התיקים הקבועים לא נטענו כרגע (סביבת פיתוח/Preview). התיק לדוגמה מוצג כרגיל. קוד לאבחון: <span className="font-mono">{errorCode}</span>
+        </div>
+      )}
+
       <SectionChapter title="התיקים הפעילים" index={0}>
-        {matters.length === 0 ? (
-          <Placeholder headline="עוד אין תיקים" line="הרגע המושלם לפתוח את הראשון." />
-        ) : (
-          <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" dir="rtl">
-            {matters.map((m) => (
-              <li key={m.slug}>
-                <Link
-                  href={`/matters/${m.slug}`}
-                  className="block rounded-xl border border-line-strong bg-surface p-4 transition-colors hover:border-ink-400"
-                >
-                  <p className="truncate text-small font-semibold text-foreground">{m.titleHe}</p>
-                  <p className="mt-1 text-caption text-foreground-soft">
-                    {PROCEDURE_HE[m.procedureType] ?? m.procedureType}
-                    {m.fileNoHe ? ` · תיק ${m.fileNoHe}` : ""}
-                  </p>
-                  <p className="mt-2 text-micro text-foreground-faint">
-                    {m.forumHe ?? "טרם נקבע פורום"} · נפתח {m.openedAt.slice(0, 10)}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" dir="rtl">
+          {matters.map((m) => (
+            <li key={m.slug}>
+              <Link
+                href={`/matters/${m.slug}`}
+                className="block rounded-xl border border-line-strong bg-surface p-4 transition-colors hover:border-ink-400"
+              >
+                <p className="truncate text-small font-semibold text-foreground">{m.titleHe}</p>
+                <p className="mt-1 text-caption text-foreground-soft">
+                  {PROCEDURE_HE[m.procedureType] ?? m.procedureType}
+                  {m.fileNoHe ? ` · תיק ${m.fileNoHe}` : ""}
+                </p>
+                <p className="mt-2 text-micro text-foreground-faint">
+                  {m.forumHe ?? "טרם נקבע פורום"} · נפתח {m.openedAt.slice(0, 10)}
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </SectionChapter>
     </Workspace>
   );
