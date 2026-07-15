@@ -4,11 +4,12 @@
  * response headers: nosniff, a locked-down CSP sandbox, and no-store — so the
  * bytes are never sniffed, never execute script, and never render HTML.
  */
-import { documentStorage } from "@/modules/matter/documents/storage";
+import { selectDocumentStorage } from "@/modules/matter/documents/storage-select";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
+  const documentStorage = selectDocumentStorage();
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
   if (!token) return new Response("missing token", { status: 400 });

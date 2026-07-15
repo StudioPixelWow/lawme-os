@@ -20,6 +20,7 @@ import { ScoreRail } from "./objects/score-rail";
 import { DinoSeal } from "./objects/dino-seal";
 import { WorkflowDrawer } from "./objects/workflow-drawer";
 import { PanelHost } from "./panels/panel-host";
+import { WorkSurface } from "./panels/work-surface";
 import { ConfirmDialog } from "./panels/confirm-dialog";
 import { describeHealthDelta, greenCount } from "./health-delta";
 import { deriveActivity } from "../activity/activity";
@@ -54,10 +55,15 @@ export function RoomView() {
         <button type="button" onClick={() => open("provenance")} className="rounded-sm underline transition-colors hover:text-foreground-soft">
           מקורות הנתונים
         </button>
+        <span aria-hidden>·</span>
+        <button type="button" onClick={() => open("work", "documents")} className="rounded-sm underline transition-colors hover:text-foreground-soft">
+          משטח עבודה — מסמכים
+        </button>
       </p>
 
       <WorkflowDrawer />
       <PanelHost />
+      <WorkSurface />
       <ConfirmDialog />
     </RoomShell>
   );

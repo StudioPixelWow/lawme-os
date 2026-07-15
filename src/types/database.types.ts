@@ -1,10 +1,3 @@
-/**
- * LawME — Supabase database types.
- * GENERATED from the DEVELOPMENT project (udispadsbxqicmawqcuk) schema on
- * 2026-07-11, after applying 20260711173213_legal_intelligence_poc_foundation.
- * Regenerate with `npm run db:types` (or the Supabase MCP) after every
- * migration — never hand-edit (docs/setup/DATABASE_WORKFLOW.md).
- */
 export type Json =
   | string
   | number
@@ -1078,6 +1071,771 @@ export type Database = {
         }
         Relationships: []
       }
+      matter_activity: {
+        Row: {
+          actor_he: string | null
+          actor_id: string | null
+          actor_role: string | null
+          after_state: Json | null
+          before_state: Json | null
+          correlation_id: string | null
+          description_he: string
+          id: string
+          kind: string
+          matter_id: string
+          object_id: string | null
+          object_type: string | null
+          occurred_at: string
+          organization_id: string
+          source_action: string | null
+        }
+        Insert: {
+          actor_he?: string | null
+          actor_id?: string | null
+          actor_role?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          correlation_id?: string | null
+          description_he: string
+          id?: string
+          kind: string
+          matter_id: string
+          object_id?: string | null
+          object_type?: string | null
+          occurred_at?: string
+          organization_id: string
+          source_action?: string | null
+        }
+        Update: {
+          actor_he?: string | null
+          actor_id?: string | null
+          actor_role?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          correlation_id?: string | null
+          description_he?: string
+          id?: string
+          kind?: string
+          matter_id?: string
+          object_id?: string | null
+          object_type?: string | null
+          occurred_at?: string
+          organization_id?: string
+          source_action?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_activity_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_activity_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_activity_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_document_versions: {
+        Row: {
+          byte_size: number
+          change_reason: string | null
+          content_hash: string
+          created_at: string
+          created_by_he: string | null
+          created_by_id: string | null
+          document_id: string
+          id: string
+          matter_id: string
+          mime_type: string
+          organization_id: string
+          prev_version_id: string | null
+          storage_bucket: string
+          storage_path: string
+          verification_status: string
+          version: number
+        }
+        Insert: {
+          byte_size: number
+          change_reason?: string | null
+          content_hash: string
+          created_at?: string
+          created_by_he?: string | null
+          created_by_id?: string | null
+          document_id: string
+          id?: string
+          matter_id: string
+          mime_type: string
+          organization_id: string
+          prev_version_id?: string | null
+          storage_bucket?: string
+          storage_path: string
+          verification_status?: string
+          version: number
+        }
+        Update: {
+          byte_size?: number
+          change_reason?: string | null
+          content_hash?: string
+          created_at?: string
+          created_by_he?: string | null
+          created_by_id?: string | null
+          document_id?: string
+          id?: string
+          matter_id?: string
+          mime_type?: string
+          organization_id?: string
+          prev_version_id?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          verification_status?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_document_versions_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "matter_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_document_versions_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_document_versions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_document_versions_prev_version_id_fkey"
+            columns: ["prev_version_id"]
+            isOneToOne: false
+            referencedRelation: "matter_document_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_documents: {
+        Row: {
+          approval_state: string
+          assigned_reviewer_he: string | null
+          assigned_reviewer_id: string | null
+          confidentiality: string
+          created_at: string
+          deleted_at: string | null
+          document_date: string | null
+          document_type: string
+          evidence_decision: string | null
+          evidence_type: string
+          filename: string
+          id: string
+          latest_version: number
+          legal_issue_id_he: string | null
+          matter_id: string
+          mime_type: string
+          organization_id: string
+          procedure_stage_id: string | null
+          scan_status: string
+          size: number
+          source_type: string
+          title: string
+          updated_at: string
+          uploaded_by_he: string | null
+          uploaded_by_id: string | null
+          verification_state: string
+          workflow_id: string | null
+        }
+        Insert: {
+          approval_state?: string
+          assigned_reviewer_he?: string | null
+          assigned_reviewer_id?: string | null
+          confidentiality?: string
+          created_at?: string
+          deleted_at?: string | null
+          document_date?: string | null
+          document_type: string
+          evidence_decision?: string | null
+          evidence_type: string
+          filename: string
+          id?: string
+          latest_version?: number
+          legal_issue_id_he?: string | null
+          matter_id: string
+          mime_type: string
+          organization_id: string
+          procedure_stage_id?: string | null
+          scan_status?: string
+          size: number
+          source_type: string
+          title: string
+          updated_at?: string
+          uploaded_by_he?: string | null
+          uploaded_by_id?: string | null
+          verification_state?: string
+          workflow_id?: string | null
+        }
+        Update: {
+          approval_state?: string
+          assigned_reviewer_he?: string | null
+          assigned_reviewer_id?: string | null
+          confidentiality?: string
+          created_at?: string
+          deleted_at?: string | null
+          document_date?: string | null
+          document_type?: string
+          evidence_decision?: string | null
+          evidence_type?: string
+          filename?: string
+          id?: string
+          latest_version?: number
+          legal_issue_id_he?: string | null
+          matter_id?: string
+          mime_type?: string
+          organization_id?: string
+          procedure_stage_id?: string | null
+          scan_status?: string
+          size?: number
+          source_type?: string
+          title?: string
+          updated_at?: string
+          uploaded_by_he?: string | null
+          uploaded_by_id?: string | null
+          verification_state?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_documents_assigned_reviewer_id_fkey"
+            columns: ["assigned_reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_documents_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_documents_uploaded_by_id_fkey"
+            columns: ["uploaded_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_evidence: {
+        Row: {
+          created_at: string
+          evidence_type: string
+          id: string
+          label_he: string
+          legal_issue_id_he: string | null
+          linked_document_id: string | null
+          linked_fact_field: string | null
+          mandatory: boolean
+          matter_id: string
+          organization_id: string
+          owner_he: string | null
+          owner_id: string | null
+          procedure_stage_id: string | null
+          provenance: Json
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          evidence_type: string
+          id?: string
+          label_he: string
+          legal_issue_id_he?: string | null
+          linked_document_id?: string | null
+          linked_fact_field?: string | null
+          mandatory?: boolean
+          matter_id: string
+          organization_id: string
+          owner_he?: string | null
+          owner_id?: string | null
+          procedure_stage_id?: string | null
+          provenance?: Json
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          evidence_type?: string
+          id?: string
+          label_he?: string
+          legal_issue_id_he?: string | null
+          linked_document_id?: string | null
+          linked_fact_field?: string | null
+          mandatory?: boolean
+          matter_id?: string
+          organization_id?: string
+          owner_he?: string | null
+          owner_id?: string | null
+          procedure_stage_id?: string | null
+          provenance?: Json
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_evidence_linked_document_id_fkey"
+            columns: ["linked_document_id"]
+            isOneToOne: false
+            referencedRelation: "matter_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_evidence_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_evidence_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_evidence_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_members: {
+        Row: {
+          can_approve: boolean
+          can_review: boolean
+          created_at: string
+          id: string
+          matter_id: string
+          matter_role: string
+          organization_id: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          can_approve?: boolean
+          can_review?: boolean
+          created_at?: string
+          id?: string
+          matter_id: string
+          matter_role: string
+          organization_id: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          can_approve?: boolean
+          can_review?: boolean
+          created_at?: string
+          id?: string
+          matter_id?: string
+          matter_role?: string
+          organization_id?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_members_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_notes: {
+        Row: {
+          archived_at: string | null
+          author_he: string | null
+          author_id: string | null
+          body: string
+          confidentiality: string
+          created_at: string
+          id: string
+          links: Json
+          matter_id: string
+          mentions: Json
+          organization_id: string
+          pinned: boolean
+          revision: number
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          author_he?: string | null
+          author_id?: string | null
+          body: string
+          confidentiality?: string
+          created_at?: string
+          id?: string
+          links?: Json
+          matter_id: string
+          mentions?: Json
+          organization_id: string
+          pinned?: boolean
+          revision?: number
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          author_he?: string | null
+          author_id?: string | null
+          body?: string
+          confidentiality?: string
+          created_at?: string
+          id?: string
+          links?: Json
+          matter_id?: string
+          mentions?: Json
+          organization_id?: string
+          pinned?: boolean
+          revision?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_notes_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_notes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_research_links: {
+        Row: {
+          coverage_state: string | null
+          created_at: string
+          created_by_he: string | null
+          created_by_id: string | null
+          human_review_state: string
+          id: string
+          legal_issue_id_he: string | null
+          linked_object_id: string | null
+          linked_object_type: string | null
+          matter_id: string
+          organization_id: string
+          question_he: string | null
+          research_query_id: string | null
+          research_session_id: string | null
+          title_he: string | null
+        }
+        Insert: {
+          coverage_state?: string | null
+          created_at?: string
+          created_by_he?: string | null
+          created_by_id?: string | null
+          human_review_state?: string
+          id?: string
+          legal_issue_id_he?: string | null
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          matter_id: string
+          organization_id: string
+          question_he?: string | null
+          research_query_id?: string | null
+          research_session_id?: string | null
+          title_he?: string | null
+        }
+        Update: {
+          coverage_state?: string | null
+          created_at?: string
+          created_by_he?: string | null
+          created_by_id?: string | null
+          human_review_state?: string
+          id?: string
+          legal_issue_id_he?: string | null
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          matter_id?: string
+          organization_id?: string
+          question_he?: string | null
+          research_query_id?: string | null
+          research_session_id?: string | null
+          title_he?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_research_links_created_by_id_fkey"
+            columns: ["created_by_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_research_links_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_research_links_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_research_links_research_query_id_fkey"
+            columns: ["research_query_id"]
+            isOneToOne: false
+            referencedRelation: "legal_research_queries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_research_links_research_session_id_fkey"
+            columns: ["research_session_id"]
+            isOneToOne: false
+            referencedRelation: "legal_research_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_tasks: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          creator_he: string | null
+          creator_id: string | null
+          description_he: string | null
+          due_date: string | null
+          id: string
+          linked_object_id: string | null
+          linked_object_type: string | null
+          matter_id: string
+          organization_id: string
+          owner_he: string | null
+          owner_id: string | null
+          priority: string
+          source: string
+          status: string
+          title_he: string
+          updated_at: string
+          workflow_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          creator_he?: string | null
+          creator_id?: string | null
+          description_he?: string | null
+          due_date?: string | null
+          id?: string
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          matter_id: string
+          organization_id: string
+          owner_he?: string | null
+          owner_id?: string | null
+          priority?: string
+          source?: string
+          status?: string
+          title_he: string
+          updated_at?: string
+          workflow_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          creator_he?: string | null
+          creator_id?: string | null
+          description_he?: string | null
+          due_date?: string | null
+          id?: string
+          linked_object_id?: string | null
+          linked_object_type?: string | null
+          matter_id?: string
+          organization_id?: string
+          owner_he?: string | null
+          owner_id?: string | null
+          priority?: string
+          source?: string
+          status?: string
+          title_he?: string
+          updated_at?: string
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_tasks_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_tasks_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_tasks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_tasks_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matters: {
+        Row: {
+          as_of: string | null
+          assigned_owner_id: string | null
+          created_at: string
+          current_stage_id: string
+          deleted_at: string | null
+          file_no_he: string | null
+          forum_he: string | null
+          id: string
+          legal_domain: string
+          opened_at: string
+          organization_id: string
+          procedure_type: string
+          slug: string
+          status: string
+          title_he: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          as_of?: string | null
+          assigned_owner_id?: string | null
+          created_at?: string
+          current_stage_id: string
+          deleted_at?: string | null
+          file_no_he?: string | null
+          forum_he?: string | null
+          id?: string
+          legal_domain?: string
+          opened_at?: string
+          organization_id: string
+          procedure_type: string
+          slug: string
+          status?: string
+          title_he: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          as_of?: string | null
+          assigned_owner_id?: string | null
+          created_at?: string
+          current_stage_id?: string
+          deleted_at?: string | null
+          file_no_he?: string | null
+          forum_he?: string | null
+          id?: string
+          legal_domain?: string
+          opened_at?: string
+          organization_id?: string
+          procedure_type?: string
+          slug?: string
+          status?: string
+          title_he?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matters_assigned_owner_id_fkey"
+            columns: ["assigned_owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matters_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_memberships: {
         Row: {
           created_at: string
@@ -1191,8 +1949,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

@@ -19,7 +19,17 @@ export type PanelKind =
   | "dino"
   | "provenance"
   | "owner"
-  | "approval";
+  | "approval"
+  | "work";
+
+/** The Matter working surface lenses (Capability 1). Only one is active at a time. */
+export type WorkLens = "documents" | "evidence" | "tasks" | "notes" | "activity" | "research";
+export const WORK_LENSES: readonly WorkLens[] = ["documents", "evidence", "tasks", "notes", "activity", "research"];
+const VALID_LENS: ReadonlySet<string> = new Set<WorkLens>(WORK_LENSES);
+/** Normalise a raw lens param, defaulting to the first (documents). */
+export function normalizeLens(raw: string | null | undefined): WorkLens {
+  return raw && VALID_LENS.has(raw) ? (raw as WorkLens) : "documents";
+}
 
 export interface PanelState {
   kind: PanelKind;
@@ -29,7 +39,7 @@ export interface PanelState {
 
 const VALID: ReadonlySet<string> = new Set<PanelKind>([
   "identity", "posture", "review", "situation", "deadline", "action",
-  "blocker", "milestone", "score", "dino", "provenance", "owner", "approval",
+  "blocker", "milestone", "score", "dino", "provenance", "owner", "approval", "work",
 ]);
 
 /** which panels carry a param, and under which query key. */
@@ -37,6 +47,7 @@ const PARAM_KEY: Partial<Record<PanelKind, string>> = {
   score: "dimension",
   milestone: "stage",
   provenance: "source",
+  work: "lens",
 };
 
 export type ConfirmKind = "reject" | "reopen" | "approve";

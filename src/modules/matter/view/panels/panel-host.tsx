@@ -53,6 +53,7 @@ export function PanelHost() {
   }, [panel, close]);
 
   if (!panel) return null;
+  if (panel.kind === "work") return null; // the working surface renders in <WorkSurface/>
   const view: PanelView = buildPanel(panel.kind, panel.param ?? null, profile, state.matter);
 
   function runAction(a: PanelAction) {
