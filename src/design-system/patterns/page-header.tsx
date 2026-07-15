@@ -1,20 +1,24 @@
 import type { ReactNode } from "react";
+import { riseClass } from "./reveal";
 
 /**
  * The editorial opening of every page:
  * one serif display line + one quiet line of context.
+ * `reveal={false}` renders visible on first paint (no opacity-zero entrance).
  */
 export function PageHeader({
   title,
   context,
   children,
+  reveal = true,
 }: {
   title: string;
   context?: ReactNode;
   children?: ReactNode;
+  reveal?: boolean;
 }) {
   return (
-    <header className="animate-rise">
+    <header className={riseClass(reveal)}>
       <h1 className="text-display font-semibold tracking-tight text-balance text-foreground">
         {title}
       </h1>

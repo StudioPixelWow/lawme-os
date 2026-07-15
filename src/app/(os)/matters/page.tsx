@@ -28,7 +28,7 @@ export default async function MattersPage() {
 
   return (
     <Workspace>
-      <PageHeader title="תיקים" context="כל תיקי המשרד — חיים, מסודרים, ומספרים את הסיפור של עצמם.">
+      <PageHeader reveal={false} title="תיקים" context="כל תיקי המשרד — חיים, מסודרים, ומספרים את הסיפור של עצמם.">
         <Link
           href="/matters/new"
           className="inline-flex items-center rounded-md bg-ink-900 px-3 py-1.5 text-small text-surface transition-colors hover:bg-ink-800"
@@ -43,7 +43,7 @@ export default async function MattersPage() {
         </div>
       )}
 
-      <SectionChapter title="התיקים הפעילים" index={0}>
+      <SectionChapter title="התיקים הפעילים" index={0} reveal={false}>
         <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" dir="rtl">
           {matters.map((m) => (
             <li key={m.slug}>
