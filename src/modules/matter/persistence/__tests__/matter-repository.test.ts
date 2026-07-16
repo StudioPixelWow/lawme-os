@@ -18,6 +18,7 @@ function row(over: Partial<MatterRow> = {}): MatterRow {
     title_he: "כהן נ׳ טק־לייף", file_no_he: "23-1", forum_he: "אזורי ת״א",
     legal_domain: "labor", procedure_type: "severance_claim", topic: "severance_claim",
     current_stage_id: "intake", status: "open", assigned_owner_id: null,
+    confidentiality: "client_confidential", ai_policy: "allowed_with_review",
     opened_at: "2026-07-10T00:00:00Z", as_of: null,
     created_at: "2026-07-10T00:00:00Z", updated_at: "2026-07-10T00:00:00Z", deleted_at: null,
     ...over,

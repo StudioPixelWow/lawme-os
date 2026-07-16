@@ -137,6 +137,7 @@ $$;
 create or replace function app.forbid_established_fact_on_insert()
 returns trigger
 language plpgsql
+set search_path = public
 as $$
 begin
   if new.status in ('confirmed', 'document_derived') then

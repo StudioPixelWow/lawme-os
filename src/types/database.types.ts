@@ -196,6 +196,70 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          archived_at: string | null
+          contact_info: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          id_number_he: string | null
+          kind: string
+          name_he: string
+          organization_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          contact_info?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          id_number_he?: string | null
+          kind: string
+          name_he: string
+          organization_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          contact_info?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          id_number_he?: string | null
+          kind?: string
+          name_he?: string
+          organization_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contacts_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_answer_claims: {
         Row: {
           claim_index: number
@@ -1147,6 +1211,79 @@ export type Database = {
           },
         ]
       }
+      matter_deadlines: {
+        Row: {
+          basis_he: string | null
+          confidence: string
+          created_at: string
+          created_by: string | null
+          due_at: string | null
+          id: string
+          label_he: string
+          matter_id: string
+          organization_id: string
+          provenance: Json
+          source: string
+          strict: boolean
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          basis_he?: string | null
+          confidence?: string
+          created_at?: string
+          created_by?: string | null
+          due_at?: string | null
+          id?: string
+          label_he: string
+          matter_id: string
+          organization_id: string
+          provenance?: Json
+          source: string
+          strict?: boolean
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          basis_he?: string | null
+          confidence?: string
+          created_at?: string
+          created_by?: string | null
+          due_at?: string | null
+          id?: string
+          label_he?: string
+          matter_id?: string
+          organization_id?: string
+          provenance?: Json
+          source?: string
+          strict?: boolean
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_deadlines_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_deadlines_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_deadlines_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matter_document_versions: {
         Row: {
           byte_size: number
@@ -1445,6 +1582,77 @@ export type Database = {
           },
         ]
       }
+      matter_facts: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          fact_key: string
+          id: string
+          linked_document_id: string | null
+          matter_id: string
+          organization_id: string
+          provenance: Json
+          statement_he: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          fact_key: string
+          id?: string
+          linked_document_id?: string | null
+          matter_id: string
+          organization_id: string
+          provenance?: Json
+          statement_he: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          fact_key?: string
+          id?: string
+          linked_document_id?: string | null
+          matter_id?: string
+          organization_id?: string
+          provenance?: Json
+          statement_he?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_facts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_facts_linked_document_id_fkey"
+            columns: ["linked_document_id"]
+            isOneToOne: false
+            referencedRelation: "matter_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_facts_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_facts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matter_members: {
         Row: {
           can_approve: boolean
@@ -1569,6 +1777,77 @@ export type Database = {
           },
           {
             foreignKeyName: "matter_notes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matter_participants: {
+        Row: {
+          archived_at: string | null
+          contact_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          matter_id: string
+          notes_he: string | null
+          organization_id: string
+          responsiveness: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          contact_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          matter_id: string
+          notes_he?: string | null
+          organization_id: string
+          responsiveness?: string | null
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          contact_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          matter_id?: string
+          notes_he?: string | null
+          organization_id?: string
+          responsiveness?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_participants_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_participants_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_participants_matter_id_fkey"
+            columns: ["matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_participants_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -1763,8 +2042,10 @@ export type Database = {
       }
       matters: {
         Row: {
+          ai_policy: string
           as_of: string | null
           assigned_owner_id: string | null
+          confidentiality: string
           created_at: string
           current_stage_id: string
           deleted_at: string | null
@@ -1782,8 +2063,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_policy?: string
           as_of?: string | null
           assigned_owner_id?: string | null
+          confidentiality?: string
           created_at?: string
           current_stage_id: string
           deleted_at?: string | null
@@ -1801,8 +2084,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_policy?: string
           as_of?: string | null
           assigned_owner_id?: string | null
+          confidentiality?: string
           created_at?: string
           current_stage_id?: string
           deleted_at?: string | null
