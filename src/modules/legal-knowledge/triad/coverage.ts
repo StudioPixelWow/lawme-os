@@ -54,7 +54,7 @@ export interface TriadInput {
 }
 
 /** topic → the governing legislation refIds that a statutory claim needs */
-const TOPIC_LEGISLATION: Record<string, string[]> = {
+export const TOPIC_LEGISLATION: Record<string, string[]> = {
   pregnancy_dismissal: ["E3B-LEG-007", "E3B-LEG-008"],
   severance: ["E3B-LEG-001"],
   constructive_dismissal: ["E3B-LEG-001"],
@@ -68,7 +68,7 @@ const TOPIC_LEGISLATION: Record<string, string[]> = {
   wage_claims: ["E3B-LEG-010"],
 };
 
-const TOPIC_PROCEDURE: Record<string, EmploymentProcedureType> = {
+export const TOPIC_PROCEDURE: Record<string, EmploymentProcedureType> = {
   pregnancy_dismissal: "pregnancy_dismissal",
   severance: "severance_claim",
   constructive_dismissal: "severance_claim",

@@ -62,8 +62,25 @@ export default function NewMatterPage() {
 
   return (
     <Workspace>
-      <PageHeader title="תיק חדש" context="פתיחת תיק חדש. הפרטים המהותיים — עובדות, ראיות, מועדים — יתווספו בתוך החדר." />
-      <form onSubmit={submit} dir="rtl" className="mt-6 max-w-xl space-y-4">
+      <PageHeader title="תיק חדש" context="בחרו כיצד לפתוח את התיק: אינטייק חכם עם דינו, או אינטייק מודרך." />
+
+      <div dir="rtl" className="mt-6 grid gap-3 sm:grid-cols-2 max-w-2xl">
+        <button
+          type="button"
+          onClick={() => router.push("/matters/new/intelligent")}
+          className="rounded-xl border border-accent/50 bg-gold-100/40 p-4 text-right transition-colors hover:border-accent"
+        >
+          <p className="text-small font-semibold text-foreground">אינטייק חכם (דינו)</p>
+          <p className="mt-1 text-caption text-foreground-soft">תארו את המקרה בשפה חופשית או הדביקו מייל. דינו יזהה משתתפים, טענות, מועדים וסוגיות — הכול לאישורכם.</p>
+        </button>
+        <div className="rounded-xl border border-line-strong bg-surface p-4">
+          <p className="text-small font-semibold text-foreground">אינטייק מודרך</p>
+          <p className="mt-1 text-caption text-foreground-soft">מילוי ידני של פרטי התיק. מתאים כשהפרטים כבר ידועים ומסודרים.</p>
+        </div>
+      </div>
+
+      <h2 className="mt-8 text-title font-semibold text-foreground" dir="rtl">אינטייק מודרך</h2>
+      <form onSubmit={submit} dir="rtl" className="mt-4 max-w-xl space-y-4">
         <div>
           <label className={label} htmlFor="title">כותרת התיק</label>
           <input id="title" required value={titleHe} onChange={(e) => setTitleHe(e.target.value)}
