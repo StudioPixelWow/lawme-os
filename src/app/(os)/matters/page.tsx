@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Workspace } from "@/design-system/patterns/workspace";
 import { PageHeader } from "@/design-system/patterns/page-header";
 import { SectionChapter } from "@/design-system/patterns/section-chapter";
 import { demoSummary, getDurableMatters, composeMatterList } from "@/modules/matter/view/matter-loader";
+import { tryGetServerActorContext } from "@/modules/identity/server";
+import { protectedBoundaryRedirect } from "@/modules/identity/infrastructure/route-protection";
 
 export const metadata: Metadata = { title: "תיקים" };
 
@@ -21,9 +24,15 @@ const PROCEDURE_HE: Record<string, string> = {
 };
 
 export default async function MattersPage() {
+  // Identity (Slice 0.8.2): scope the durable query to the caller's REAL active
+  // organization. The `(os)` layout already gates access; we resolve again here
+  // (defense in depth) and fail closed rather than fall back to a demo tenant.
+  const actor = await tryGetServerActorContext();
+  if (!actor.ok) redirect(protectedBoundaryRedirect(actor.code));
+
   // The frozen demo is composed independently of the database — it is always present.
   const demo = demoSummary();
-  const durable = await getDurableMatters();
+  const durable = await getDurableMatters(actor.actor.organization.id);
   const { matters, errorCode } = composeMatterList(demo, durable);
 
   return (

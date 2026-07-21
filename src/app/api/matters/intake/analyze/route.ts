@@ -5,15 +5,35 @@
  * (and optional pasted email/message) and returns a reviewable MatterIntakeDraft.
  * It PERSISTS NOTHING. No model is called (none is wired). Pasted text is data,
  * never instructions.
+ *
+ * Identity (Capability 0.8, Slice 0.8.2): the tenant is the caller's REAL active
+ * organization, resolved server-side from the verified Supabase session — never
+ * a demo placeholder and never trusted from the request body. Anonymous / no
+ * active org fails CLOSED with the safe JSON envelope. This is the authenticated
+ * boundary only; per-matter/resource authorization is NOT performed here.
  */
 import { runIntakePipeline } from "@/modules/matter/intake/pipeline";
-import { DEMO_SEED } from "@/modules/matter/fixtures/demo-seed";
+import { getServerActorContext } from "@/modules/identity/server";
+import { toSafeApiError } from "@/modules/identity/http";
+import { newCorrelationId } from "@/modules/identity/correlation";
 
 export const runtime = "nodejs";
 
 const MAX = 20000;
 
 export async function POST(request: Request) {
+  const correlationId = newCorrelationId();
+
+  // Fail closed: a verified session with an active organization is required.
+  let organizationId: string;
+  try {
+    const actor = await getServerActorContext({ correlationId });
+    organizationId = actor.organization.id;
+  } catch (error) {
+    const { status, body } = toSafeApiError(error, correlationId);
+    return Response.json(body, { status });
+  }
+
   let body: { storyHe?: string; pastedHe?: string };
   try {
     body = await request.json();
@@ -30,9 +50,9 @@ export async function POST(request: Request) {
   try {
     const draft = await runIntakePipeline(
       {
-        // Org resolution is not persisted here; the demo org id is a placeholder
-        // for the analysis surface. Confirmation resolves the real tenant.
-        organizationId: DEMO_SEED.organizationId,
+        // Real tenant from the verified session — analysis is scoped to the
+        // caller's active organization. Nothing is persisted here.
+        organizationId,
         createdBy: null,
         storyHe,
         pastedHe: pastedHe || null,

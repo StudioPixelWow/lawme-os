@@ -47,8 +47,14 @@ export type DurableMattersResult =
   | { status: "database_error"; code: string };
 
 /** Load the durable matters with an explicit outcome. Never throws; never turns
- *  an error into an empty success. Logs a safe diagnostic line. */
-export async function getDurableMatters(): Promise<DurableMattersResult> {
+ *  an error into an empty success. Logs a safe diagnostic line.
+ *
+ *  Identity (Slice 0.8.2): `organizationId` is the caller's REAL active
+ *  organization, resolved server-side from the verified session by the page —
+ *  no longer the hardcoded demo tenant. The query mechanics and the LIST HOTFIX
+ *  invariants are otherwise unchanged; the frozen demo is still composed by the
+ *  page, independently of this durable query. */
+export async function getDurableMatters(organizationId: string): Promise<DurableMattersResult> {
   const correlationId = randomUUID();
   const mode = documentStorageMode();
   const refExpected = expectedProjectRef();
@@ -66,7 +72,7 @@ export async function getDurableMatters(): Promise<DurableMattersResult> {
   }
   try {
     const repo = new MatterRepository(serviceClient());
-    const r = await repo.list(DEMO_SEED.organizationId);
+    const r = await repo.list(organizationId);
     if (!r.ok) {
       diag({ correlationId, mode, projectRefMatch, orgResolved: true, queryOk: false, durableCount: 0, outcome: "database_error", code: r.code });
       return { status: "database_error", code: `${r.code} [cid:${correlationId}]` };
