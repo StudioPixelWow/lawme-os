@@ -98,6 +98,19 @@ export function TopBar() {
           >
             ד
           </div>
+
+          {/* Minimal logout — POST-only so a cross-site GET can't force it. */}
+          <form action="/logout" method="post" className="flex shrink-0 items-center">
+            <button
+              type="submit"
+              aria-label="התנתקות"
+              title="התנתקות"
+              className="flex h-9 items-center rounded-pill px-3 text-caption text-foreground-soft transition-colors hover:bg-surface-sunken"
+              style={{ transitionDuration: "var(--motion-quick)" }}
+            >
+              יציאה
+            </button>
+          </form>
         </div>
       </div>
     </header>
