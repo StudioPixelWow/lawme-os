@@ -73,3 +73,23 @@ export interface ActivityActorRef {
 export function toActivityActorRef(actor: ActorContext): ActivityActorRef {
   return Object.freeze({ actorType: actor.actor.type, actorProfileId: actor.actor.profileId });
 }
+
+/** Safe identity data for the shell/UI. The role label is for DISPLAY ONLY and
+ *  must never be used as an authorization signal. No tokens/emails/capabilities. */
+export interface SafeIdentityDisplay {
+  readonly profileDisplayName?: string;
+  readonly organizationDisplayName?: string;
+  /** Display-only role label (NOT an authorization input). */
+  readonly roleLabel: string;
+}
+
+export function toSafeIdentityDisplay(
+  actor: ActorContext,
+  names?: { readonly profileDisplayName?: string; readonly organizationDisplayName?: string },
+): SafeIdentityDisplay {
+  return Object.freeze({
+    profileDisplayName: names?.profileDisplayName,
+    organizationDisplayName: names?.organizationDisplayName,
+    roleLabel: actor.membership.role,
+  });
+}

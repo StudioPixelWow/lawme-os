@@ -36,5 +36,5 @@ export { IdentityAuthorizationError, authorizedDecision } from "./errors.ts";
 export { newCorrelationId, isValidCorrelationId, ensureCorrelationId } from "./correlation.ts";
 
 // ── Projections (Bootstrap / Audit / Activity readiness) ──
-export type { BootstrapAuthorizationContext, AuditActorRef, ActivityActorRef } from "./projections.ts";
-export { toBootstrapAuthorizationContext, toAuditActorRef, systemAuditActorRef, serviceAuditActorRef, toActivityActorRef } from "./projections.ts";
+export type { BootstrapAuthorizationContext, AuditActorRef, ActivityActorRef, SafeIdentityDisplay } from "./projections.ts";
+export { toBootstrapAuthorizationContext, toAuditActorRef, systemAuditActorRef, serviceAuditActorRef, toActivityActorRef, toSafeIdentityDisplay } from "./projections.ts";

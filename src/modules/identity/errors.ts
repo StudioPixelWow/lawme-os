@@ -16,7 +16,10 @@ export type IdentityAuthorizationCode =
   | "CAPABILITY_DENIED"
   | "TENANT_MISMATCH"
   | "ACTOR_TYPE_DENIED"
-  | "ACTOR_RESOLUTION_FAILED";
+  | "ACTOR_RESOLUTION_FAILED"
+  // ── session-specific (Slice 0.8.2) ──
+  | "SESSION_EXPIRED"
+  | "INVALID_CREDENTIALS";
 
 /** Decision codes (authorization outcome, incl. success). */
 export type AuthorizationDecisionCode = "AUTHORIZED" | IdentityAuthorizationCode;
@@ -38,6 +41,8 @@ const HTTP_STATUS: Readonly<Record<IdentityAuthorizationCode, number>> = {
   TENANT_MISMATCH: 403,
   ACTOR_TYPE_DENIED: 403,
   ACTOR_RESOLUTION_FAILED: 403,
+  SESSION_EXPIRED: 401,
+  INVALID_CREDENTIALS: 401,
 };
 
 /** Safe, generic Hebrew copy — deliberately non-specific (no tenant/actor data). */
@@ -51,6 +56,8 @@ const SAFE_MESSAGE_HE: Readonly<Record<IdentityAuthorizationCode, string>> = {
   TENANT_MISMATCH: "הבקשה אינה תואמת את הארגון הפעיל.",
   ACTOR_TYPE_DENIED: "סוג השחקן אינו מורשה לפעולה זו.",
   ACTOR_RESOLUTION_FAILED: "לא ניתן לזהות את הקשר הפעולה.",
+  SESSION_EXPIRED: "החיבור פג. יש להתחבר מחדש.",
+  INVALID_CREDENTIALS: "פרטי ההתחברות שגויים.",
 };
 
 export interface IdentityAuthorizationErrorOptions {

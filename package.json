@@ -32,6 +32,7 @@
     "matter:documents:test": "node --test \"src/modules/matter/documents/__tests__/*.test.ts\"",
     "interaction:audit": "node scripts/interaction-audit.mjs",
     "shell:test": "node --test \"src/modules/shell/__tests__/*.test.ts\"",
+    "identity:test": "node --test \"src/modules/identity/__tests__/*.test.ts\"",
     "matter:benchmark": "node src/modules/matter/benchmark/score-narrative-benchmark.ts",
     "intelligence:test": "node --test \"src/modules/intelligence/core/__tests__/*.test.ts\" \"src/modules/intelligence/__tests__/*.test.ts\"",
     "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"
@@ -39,6 +40,7 @@
   "dependencies": {
     "@fontsource-variable/assistant": "^5.2.9",
     "@fontsource-variable/frank-ruhl-libre": "^5.2.8",
+    "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.110.2",
     "next": "16.2.10",
     "react": "19.2.4",
