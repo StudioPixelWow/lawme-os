@@ -7,12 +7,11 @@
  */
 import type { EngineAssessment, Finding, Matter, MatterEngine, RecommendedAction, Severity } from "../types.ts";
 import { currentStage } from "../state-machine.ts";
+import { isEstablishedFactStatus } from "../fact-status.ts";
 import { evaluateTriad } from "../../legal-knowledge/triad/coverage.ts";
 import { action, assessment, finding } from "./framework.ts";
 
 export const LEGAL_ENGINE_VERSION = "matter-legal-1.0.0";
-
-const CONFIRMED = new Set(["confirmed", "document_derived"]);
 
 export const legalEngine: MatterEngine = {
   name: "matter-legal",
@@ -26,7 +25,7 @@ export const legalEngine: MatterEngine = {
     const requiredFacts = stage?.requiredFacts ?? [];
     const factsConfirmed = requiredFacts.every((field) => {
       const f = matter.facts.find((x) => x.field === field);
-      return f !== undefined && CONFIRMED.has(f.status);
+      return f !== undefined && isEstablishedFactStatus(f.status);
     });
 
     const coverage = evaluateTriad({

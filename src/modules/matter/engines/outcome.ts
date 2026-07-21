@@ -10,14 +10,13 @@
  */
 import type { EngineAssessment, Finding, Matter, MatterEngine, RecommendedAction } from "../types.ts";
 import { currentStage } from "../state-machine.ts";
+import { isEstablishedFactStatus } from "../fact-status.ts";
 import { evaluateTriad } from "../../legal-knowledge/triad/coverage.ts";
 import { assessment, daysBetween, finding, score01 } from "./framework.ts";
 
 export const OUTCOME_ENGINE_VERSION = "matter-outcome-1.0.0";
 
 export type OutcomeBand = "position_strong" | "position_moderate" | "position_weak" | "position_uncertain";
-
-const CONFIRMED = new Set(["confirmed", "document_derived"]);
 
 export const outcomeEngine: MatterEngine = {
   name: "matter-outcome",
@@ -31,7 +30,7 @@ export const outcomeEngine: MatterEngine = {
     const requiredFacts = stage?.requiredFacts ?? [];
     const factsConfirmed = requiredFacts.length > 0 && requiredFacts.every((field) => {
       const f = matter.facts.find((x) => x.field === field);
-      return f !== undefined && CONFIRMED.has(f.status);
+      return f !== undefined && isEstablishedFactStatus(f.status);
     });
     const coverage = evaluateTriad({
       topic: matter.topic,
@@ -49,7 +48,7 @@ export const outcomeEngine: MatterEngine = {
     const factRatio = requiredFacts.length === 0 ? 1
       : requiredFacts.filter((field) => {
           const f = matter.facts.find((x) => x.field === field);
-          return f !== undefined && CONFIRMED.has(f.status);
+          return f !== undefined && isEstablishedFactStatus(f.status);
         }).length / requiredFacts.length;
 
     // signal 4: deadline compliance (no strict overdue)

@@ -16,6 +16,7 @@ export {
   blockingConditions, stateSnapshot,
 } from "./state-machine.ts";
 export type { BlockingCondition, StateSnapshot } from "./state-machine.ts";
+export { ESTABLISHED_FACT_STATUSES, isEstablishedFactStatus } from "./fact-status.ts";
 
 export {
   COMPONENT_ENGINES, MATTER_ENGINE_COUNT,

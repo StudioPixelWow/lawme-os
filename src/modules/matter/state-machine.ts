@@ -9,6 +9,7 @@ import { EMPLOYMENT_PROCEDURES } from "../legal-knowledge/procedure/catalog.ts";
 import { nextStages, orderedStages } from "../legal-knowledge/procedure/graph.ts";
 import type { Procedure, ProcedureStage } from "../legal-knowledge/procedure/types.ts";
 import type { Matter } from "./types.ts";
+import { isEstablishedFactStatus } from "./fact-status.ts";
 
 export const MATTER_STATE_MACHINE_VERSION = "matter-state-machine-1.0.0";
 
@@ -34,9 +35,13 @@ export function blockingConditions(matter: Matter): BlockingCondition[] {
   const out: BlockingCondition[] = [];
   if (!stage) return out;
 
-  const knownFacts = new Set(matter.facts.filter((f) => f.status !== "unknown").map((f) => f.field));
+  // A stage's `requiredFacts` are ESTABLISHED-fact requirements: only confirmed
+  // or document_derived facts satisfy them. Allegations (client_alleged /
+  // opposing_alleged / disputed) and unknown never advance a stage — that would
+  // violate the Evidence → Fact confirmation boundary. One shared predicate.
+  const establishedFacts = new Set(matter.facts.filter((f) => isEstablishedFactStatus(f.status)).map((f) => f.field));
   for (const f of stage.requiredFacts) {
-    if (!knownFacts.has(f)) out.push({ code: `fact:${f}`, messageHe: `עובדה חסרה לשלב: ${f}`, kind: "missing_fact" });
+    if (!establishedFacts.has(f)) out.push({ code: `fact:${f}`, messageHe: `עובדה חסרה לשלב: ${f}`, kind: "missing_fact" });
   }
   for (const e of stage.evidence.filter((e) => e.mandatory)) {
     const have = matter.evidence.find((me) => me.id === e.id || me.labelHe === e.labelHe);

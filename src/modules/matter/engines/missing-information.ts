@@ -7,11 +7,10 @@
  */
 import type { EngineAssessment, Finding, Matter, MatterEngine, RecommendedAction } from "../types.ts";
 import { currentStage } from "../state-machine.ts";
+import { isEstablishedFactStatus } from "../fact-status.ts";
 import { action, assessment, finding, score01 } from "./framework.ts";
 
 export const MISSING_INFO_ENGINE_VERSION = "matter-missing-information-1.0.0";
-
-const CONFIRMED_STATUSES = new Set(["confirmed", "document_derived"]);
 
 export const missingInformationEngine: MatterEngine = {
   name: "matter-missing-information",
@@ -34,7 +33,7 @@ export const missingInformationEngine: MatterEngine = {
           `עובדה נדרשת לשלב חסרה: ${field}`, "what_is_missing"));
         actions.push(action(`collect-fact:${field}`, `לברר ולאמת עובדה: ${field}`,
           "lawyer", "העובדה נדרשת לשלב הנוכחי בהליך ועדיין אינה מאומתת", "high"));
-      } else if (!CONFIRMED_STATUSES.has(fact.status)) {
+      } else if (!isEstablishedFactStatus(fact.status)) {
         allegedRequired.push(field);
         findings.push(finding(`unconfirmed-fact:${field}`, "medium",
           `עובדה נדרשת קיימת אך אינה מאומתת (${fact.status}): ${field}`, "what_is_missing"));
