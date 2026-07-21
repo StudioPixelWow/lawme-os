@@ -1,12 +1,21 @@
 -- ============================================================================
 -- LawME — Capability 1: Matter Working Surface (persistence foundation)
--- Migration: 20260714120000_capability1_matter_working_surface
+-- Migration: 20260714194504_capability1_matter_working_surface
+--   (corrected: an earlier header line named 20260714120000; the canonical
+--    version is the filename/remote-history value 20260714194504.)
 --
--- STATUS: PREPARED FOR REVIEW — NOT YET APPLIED.
---   Target (on approval): DEVELOPMENT project udispadsbxqicmawqcuk ONLY.
---   Production is never touched. AGENTS.md requires explicit founder approval
---   before this is applied. A pre-apply security review accompanies this file
---   (docs/database/CAPABILITY_1_MATTER_SURFACE_RLS.md).
+-- STATUS: APPLIED TO DEVELOPMENT (historically reconciled — header only).
+--   Applied to:        DEVELOPMENT project udispadsbxqicmawqcuk ONLY.
+--   Migration version: 20260714194504 (present exactly once in remote history).
+--   Production:        NEVER touched.
+--   Reconciliation:    verified against live schema on 2026-07-21 — all objects
+--     (matters, matter_members, matter_documents/_versions, matter_evidence,
+--      matter_tasks, matter_notes, matter_activity, matter_research_links, the
+--      matter-documents bucket, and app.matter_can_approve with search_path=public)
+--     exist as this file defines. NO executable drift: only the STATUS/version
+--     header above and cosmetic formatting differ from the applied rendering; the
+--     executable SQL below is preserved. A pre-apply security review accompanies
+--     this file (docs/database/CAPABILITY_1_MATTER_SURFACE_RLS.md).
 --
 -- WHAT THIS DOES
 --   Adds the Matter-scoped work-item schema that Capability 1 needs so that an
