@@ -1653,6 +1653,97 @@ export type Database = {
           },
         ]
       }
+      matter_intake_drafts: {
+        Row: {
+          clarification_rounds: Json
+          confidential_input: string | null
+          confirmation_idempotency_key: string | null
+          confirmed_matter_id: string | null
+          correlation_id: string | null
+          created_at: string
+          created_by: string | null
+          engine_version: string
+          expires_at: string | null
+          id: string
+          organization_id: string
+          policy_snapshot: Json
+          provenance: Json
+          provider_mode: string
+          review_state: Json
+          reviewer_ids: string[]
+          status: string
+          structured_draft: Json
+          updated_at: string
+          version_token: string
+        }
+        Insert: {
+          clarification_rounds?: Json
+          confidential_input?: string | null
+          confirmation_idempotency_key?: string | null
+          confirmed_matter_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          engine_version: string
+          expires_at?: string | null
+          id?: string
+          organization_id: string
+          policy_snapshot?: Json
+          provenance?: Json
+          provider_mode?: string
+          review_state?: Json
+          reviewer_ids?: string[]
+          status?: string
+          structured_draft: Json
+          updated_at?: string
+          version_token: string
+        }
+        Update: {
+          clarification_rounds?: Json
+          confidential_input?: string | null
+          confirmation_idempotency_key?: string | null
+          confirmed_matter_id?: string | null
+          correlation_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          engine_version?: string
+          expires_at?: string | null
+          id?: string
+          organization_id?: string
+          policy_snapshot?: Json
+          provenance?: Json
+          provider_mode?: string
+          review_state?: Json
+          reviewer_ids?: string[]
+          status?: string
+          structured_draft?: Json
+          updated_at?: string
+          version_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matter_intake_drafts_confirmed_matter_id_fkey"
+            columns: ["confirmed_matter_id"]
+            isOneToOne: false
+            referencedRelation: "matters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_intake_drafts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matter_intake_drafts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matter_members: {
         Row: {
           can_approve: boolean
