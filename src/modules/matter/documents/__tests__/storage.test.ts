@@ -4,6 +4,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
+// Preview signing now requires a dedicated secret with no fallback. Tests inject
+// a deterministic one explicitly (>= 32 chars) before exercising token signing.
+process.env.LAWME_DOCUMENT_PREVIEW_SIGNING_SECRET = "test-preview-signing-secret-0123456789";
+
 import { documentStorage, assertMatterAccess } from "../storage.ts";
 
 const bytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 1, 2, 3, 4]);
@@ -24,7 +28,7 @@ test("signed token round-trips and rejects tampering + expiry", async () => {
   const now = 1_000_000_000_000;
   const token = documentStorage.signToken(ref, 300, now);
 
-  assert.deepEqual(documentStorage.verifyToken(token, now + 10_000), { ref });
+  assert.deepEqual(documentStorage.verifyToken(token, now + 10_000), { ref, matterId: "demo" });
   // expired (past ttl)
   assert.equal(documentStorage.verifyToken(token, now + 301_000), null);
   // tampered

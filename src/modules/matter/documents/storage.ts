@@ -13,8 +13,9 @@
  * runs here, server-side. The `node:crypto` import also fails a client bundle,
  * so this module cannot be pulled into the browser by accident.
  */
-import { createHash, createHmac, randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { sanitizeFilename } from "./validation.ts";
+import { signPreviewToken, verifyPreviewToken } from "./preview-signing.ts";
 
 export interface StoredObject {
   ref: string;
@@ -41,14 +42,7 @@ export interface DocumentStorage {
   put(input: PutInput): Promise<{ ref: string; hash: string; filename: string }>;
   get(ref: string): Promise<StoredObject | null>;
   signToken(ref: string, ttlSeconds: number, nowMs: number): string;
-  verifyToken(token: string, nowMs: number): { ref: string } | null;
-}
-
-// DEV-ONLY signing secret. Not a production secret; never sent to the browser.
-const DEV_SIGNING_SECRET = "lawme-dev-storage-signing-key-not-for-production";
-
-function b64url(input: Buffer | string): string {
-  return Buffer.from(input).toString("base64url");
+  verifyToken(token: string, nowMs: number): { ref: string; matterId: string } | null;
 }
 
 /** Deterministic development storage — process memory, tenant-aware paths. */
@@ -80,31 +74,11 @@ class DevMemoryStorage implements DocumentStorage {
   }
 
   signToken(ref: string, ttlSeconds: number, nowMs: number): string {
-    const exp = Math.floor(nowMs / 1000) + ttlSeconds;
-    const payload = b64url(JSON.stringify({ ref, exp }));
-    const sig = b64url(createHmac("sha256", DEV_SIGNING_SECRET).update(payload).digest());
-    return `${payload}.${sig}`;
+    return signPreviewToken(ref, ttlSeconds, nowMs);
   }
 
-  verifyToken(token: string, nowMs: number): { ref: string } | null {
-    const dot = token.lastIndexOf(".");
-    if (dot < 0) return null;
-    const payload = token.slice(0, dot);
-    const sig = token.slice(dot + 1);
-    const expected = b64url(createHmac("sha256", DEV_SIGNING_SECRET).update(payload).digest());
-    // constant-time-ish compare
-    if (sig.length !== expected.length) return null;
-    let diff = 0;
-    for (let i = 0; i < sig.length; i++) diff |= sig.charCodeAt(i) ^ expected.charCodeAt(i);
-    if (diff !== 0) return null;
-    try {
-      const { ref, exp } = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-      if (typeof ref !== "string" || typeof exp !== "number") return null;
-      if (Math.floor(nowMs / 1000) > exp) return null; // expired
-      return { ref };
-    } catch {
-      return null;
-    }
+  verifyToken(token: string, nowMs: number): { ref: string; matterId: string } | null {
+    return verifyPreviewToken(token, nowMs);
   }
 }
 

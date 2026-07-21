@@ -11,21 +11,13 @@
  * (service_role). The browser never sees either. node:crypto also fails a
  * client bundle, so this cannot be imported into the browser by accident.
  */
-import { createHash, createHmac, randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { sanitizeFilename } from "./validation.ts";
 import type { DocumentStorage, PutInput, StoredObject } from "./storage.ts";
 import { serviceClient } from "../persistence/supabase-server.ts";
+import { signPreviewToken, verifyPreviewToken } from "./preview-signing.ts";
 
 const BUCKET = "matter-documents";
-// Server-only preview-token secret. Never sent to the browser.
-const SIGNING_SECRET =
-  process.env.MATTER_STORAGE_SIGNING_SECRET ||
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  "lawme-dev-storage-signing-key-not-for-production";
-
-function b64url(input: Buffer | string): string {
-  return Buffer.from(input).toString("base64url");
-}
 
 class SupabaseStorage implements DocumentStorage {
   readonly mode = "supabase-development";
@@ -63,32 +55,11 @@ class SupabaseStorage implements DocumentStorage {
   }
 
   signToken(ref: string, ttlSeconds: number, nowMs: number): string {
-    const exp = Math.floor(nowMs / 1000) + ttlSeconds;
-    const payload = b64url(JSON.stringify({ ref, exp }));
-    const sig = b64url(createHmac("sha256", SIGNING_SECRET).update(payload).digest());
-    return `${payload}.${sig}`;
+    return signPreviewToken(ref, ttlSeconds, nowMs);
   }
 
-  verifyToken(token: string, nowMs: number): { ref: string } | null {
-    const dot = token.lastIndexOf(".");
-    if (dot < 0) return null;
-    const payload = token.slice(0, dot);
-    const sig = token.slice(dot + 1);
-    const expected = b64url(createHmac("sha256", SIGNING_SECRET).update(payload).digest());
-    if (sig.length !== expected.length) return null;
-    let diff = 0;
-    for (let i = 0; i < sig.length; i++) diff |= sig.charCodeAt(i) ^ expected.charCodeAt(i);
-    if (diff !== 0) return null;
-    try {
-      const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-      if (typeof parsed.ref !== "string" || typeof parsed.exp !== "number") return null;
-      if (Math.floor(nowMs / 1000) > parsed.exp) return null;
-      // only ever serve matter-document paths
-      if (!parsed.ref.startsWith("organizations/")) return null;
-      return { ref: parsed.ref };
-    } catch {
-      return null;
-    }
+  verifyToken(token: string, nowMs: number): { ref: string; matterId: string } | null {
+    return verifyPreviewToken(token, nowMs);
   }
 }
 
