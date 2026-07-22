@@ -15,6 +15,7 @@
  */
 import type { Database } from "../../../types/database.types.ts";
 import type { Db } from "./supabase-server.ts";
+import { isCanonicalUuid } from "../../identity/infrastructure/authorization-facts-support.ts";
 import type {
   Matter, MatterDocument, MatterEvidenceItem, MatterStageKind,
 } from "../types.ts";
@@ -142,7 +143,8 @@ export class MatterRepository {
   /** Hydrate a full Matter by id or slug (within the org). */
   async getHydrated(organizationId: string, param: string, nowISO: string): Promise<Result<Matter>> {
     const q = this.db.from("matters").select("*").eq("organization_id", organizationId).is("deleted_at", null).limit(1);
-    const { data, error } = /^[0-9a-f-]{36}$/i.test(param) ? await q.eq("id", param) : await q.eq("slug", param);
+    // Canonical id-vs-slug resolution (shared with the authorization loaders).
+    const { data, error } = isCanonicalUuid(param) ? await q.eq("id", param) : await q.eq("slug", param);
     if (error) return mapErr("getHydrated", error);
     const row = data?.[0];
     if (!row) return err("not_found", "התיק לא נמצא", "getHydrated: no row");
