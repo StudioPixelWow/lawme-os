@@ -33,6 +33,7 @@
     "interaction:audit": "node scripts/interaction-audit.mjs",
     "shell:test": "node --test \"src/modules/shell/__tests__/*.test.ts\"",
     "identity:test": "node --test \"src/modules/identity/__tests__/*.test.ts\"",
+    "identity:authz:test": "node --test \"src/modules/identity/authorization-policy/__tests__/*.test.ts\"",
     "matter:benchmark": "node src/modules/matter/benchmark/score-narrative-benchmark.ts",
     "intelligence:test": "node --test \"src/modules/intelligence/core/__tests__/*.test.ts\" \"src/modules/intelligence/__tests__/*.test.ts\"",
     "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"

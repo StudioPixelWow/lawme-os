@@ -38,3 +38,8 @@ export { newCorrelationId, isValidCorrelationId, ensureCorrelationId } from "./c
 // ── Projections (Bootstrap / Audit / Activity readiness) ──
 export type { BootstrapAuthorizationContext, AuditActorRef, ActivityActorRef, SafeIdentityDisplay } from "./projections.ts";
 export { toBootstrapAuthorizationContext, toAuditActorRef, systemAuditActorRef, serviceAuditActorRef, toActivityActorRef, toSafeIdentityDisplay } from "./projections.ts";
+
+// ── Resource Authorization Policy Engine (Slice 0.8.3) ──
+// "May this actor act on THIS object?" — the per-resource layer, separate from
+// the org-level capability layer above. Re-exported from its dedicated barrel.
+export * from "./authorization-policy/index.ts";
