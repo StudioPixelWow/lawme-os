@@ -37,13 +37,19 @@ export interface ContactAuthorizationFactsRepository {
   loadContactPolicyFacts(actor: ActorContext, contactId: string): Promise<ContactPolicyFacts | null>;
 }
 export interface DocumentAuthorizationFactsRepository {
-  loadDocumentPolicyFacts(actor: ActorContext, documentId: string): Promise<DocumentPolicyFacts | null>;
+  // Matter-bound: a document id is never trusted without its parent matter id.
+  loadDocumentPolicyFacts(actor: ActorContext, matterId: string, documentId: string): Promise<DocumentPolicyFacts | null>;
 }
 export interface EvidenceAuthorizationFactsRepository {
-  loadEvidencePolicyFacts(actor: ActorContext, evidenceOrRequirementId: string): Promise<EvidencePolicyFacts | null>;
+  // Matter-bound: evidence is authorized only within its parent matter.
+  loadEvidencePolicyFacts(actor: ActorContext, matterId: string, evidenceId: string): Promise<EvidencePolicyFacts | null>;
 }
 export interface AuditAuthorizationFactsRepository {
-  loadAuditPolicyFacts(actor: ActorContext, reference: ResourceReference): Promise<AuditPolicyFacts | null>;
+  // `classification` + optional `matterId` (audit has no matter_id column).
+  loadAuditPolicyFacts(
+    actor: ActorContext,
+    query: { classification: "organization" | "matter" | "security"; matterId?: string },
+  ): Promise<AuditPolicyFacts | null>;
 }
 
 /**
