@@ -46,3 +46,26 @@ export type {
 export type { BootstrapValidationResult, ValidationStatistics, SectionStat } from "./validation-result.ts";
 
 export { validateBootstrapDraft } from "./validate.ts";
+
+// ── Matter Aggregate Planner (Slice 1.0.2) ──
+export {
+  MATTER_AGGREGATE_VERSION,
+  MATTER_AGGREGATE_PLANNER_VERSION,
+  SUPPORTED_VALIDATION_VERSIONS,
+  AggregatePlanningError,
+} from "./aggregate-contracts.ts";
+export type {
+  MatterAggregatePlan,
+  PlannedMatter,
+  PlannedMember,
+  PlannedParticipant,
+  PlannedContact,
+  PlannedFact,
+  PlannedDeadline,
+  PlannedEvidence,
+  PlannedAudit,
+  AggregateCounts,
+  AggregatePlanMetadata,
+  ContactClassification,
+} from "./aggregate-contracts.ts";
+export { planMatterAggregate } from "./plan-matter-aggregate.ts";
