@@ -88,11 +88,25 @@ function buildMatterContext(mi: MatterIntelligence, sections: readonly MatterSec
   };
 }
 
+/** The empty MatterContext for general (no-matter) mode. */
+function generalMatterContext(): MatterContext {
+  return {
+    matterId: "",
+    titleHe: "מחקר משפטי כללי",
+    procedureLabelHe: "",
+    stageLabelHe: "",
+    status: "",
+    healthStatus: null,
+    includedSections: [],
+    sections: {},
+  };
+}
+
 export function buildConversationContext(request: ConversationRequest): ConversationContext {
-  const mi = request.intelligence;
+  const mi = request.intelligence ?? null;
   const message = request.message;
   const history: readonly ConversationTurn[] = request.history ?? [];
-  const nowISO = request.nowISO ?? mi.meta.generatedAtISO;
+  const nowISO = request.nowISO ?? mi?.meta.generatedAtISO ?? new Date().toISOString();
 
   // -- classification (with light follow-up inheritance) --------------------
   const priorUserTurns = history.filter((t) => t.role === "user");
@@ -114,17 +128,21 @@ export function buildConversationContext(request: ConversationRequest): Conversa
 
   const cfg = INTENT_CONFIG[intent];
 
-  // -- required / missing facts --------------------------------------------
-  const requiredFacts: RequiredFact[] = cfg.required.map((r) => {
-    const spec = FACT_REQUIREMENTS[r.code];
-    return { code: r.code, labelHe: spec.labelHe, section: spec.section, satisfied: spec.satisfied(mi) };
-  });
-  const missingFacts: MissingFact[] = cfg.required
-    .filter((r) => !FACT_REQUIREMENTS[r.code].satisfied(mi))
-    .map((r) => {
-      const spec = FACT_REQUIREMENTS[r.code];
-      return { code: r.code, labelHe: spec.labelHe, section: spec.section, reasonHe: spec.reasonHe, blocking: r.blocking };
-    });
+  // -- required / missing facts (only meaningful with a matter) ------------
+  const requiredFacts: RequiredFact[] = mi
+    ? cfg.required.map((r) => {
+        const spec = FACT_REQUIREMENTS[r.code];
+        return { code: r.code, labelHe: spec.labelHe, section: spec.section, satisfied: spec.satisfied(mi) };
+      })
+    : [];
+  const missingFacts: MissingFact[] = mi
+    ? cfg.required
+        .filter((r) => !FACT_REQUIREMENTS[r.code].satisfied(mi))
+        .map((r) => {
+          const spec = FACT_REQUIREMENTS[r.code];
+          return { code: r.code, labelHe: spec.labelHe, section: spec.section, reasonHe: spec.reasonHe, blocking: r.blocking };
+        })
+    : [];
 
   // -- clarification questions (request-side ambiguity) --------------------
   const clarifications: ClarificationQuestion[] = [];
@@ -134,7 +152,7 @@ export function buildConversationContext(request: ConversationRequest): Conversa
   if (intent === "draft_request" && !hasNamedDraftTarget(message)) {
     clarifications.push({ code: "DRAFT_TARGET", questionHe: "איזה מסמך תרצה שאכין? (למשל מכתב דרישה, כתב תביעה, תצהיר)", reasonHe: "סוג המסמך לא צוין", blocking: true });
   }
-  if (intent === "prepare_for_hearing" && mi.timing.nearestDeadlineISO === null) {
+  if (intent === "prepare_for_hearing" && (!mi || mi.timing.nearestDeadlineISO === null)) {
     clarifications.push({ code: "HEARING_TARGET", questionHe: "לאיזה דיון להתכונן ומהו מועדו? לא נמצא מועד דיון בתיק.", reasonHe: "לא נמצא מועד דיון בתיק", blocking: false });
   }
   if (intent === "general_question" && confidence < 0.6) {
@@ -156,7 +174,7 @@ export function buildConversationContext(request: ConversationRequest): Conversa
   const answerability: Answerability = { level, score, reasonHe };
 
   // -- matter context + recommended prompt inputs (the adapter seam) --------
-  const matterContext = buildMatterContext(mi, cfg.sections);
+  const matterContext = mi ? buildMatterContext(mi, cfg.sections) : generalMatterContext();
   const openQuestions = [
     ...clarifications.map((c) => c.questionHe),
     ...missingFacts.filter((m) => m.blocking).map((m) => m.reasonHe),

@@ -35,7 +35,9 @@ export function classifyLegalDomain(question: string, hint?: string | null): Leg
   const otherHits = countMatches(text, OTHER_DOMAIN_ANCHORS);
   const hintLabor = hint === "labor" || hint === "employment";
 
-  if (employmentHits.length > 0 || hintLabor) {
+  // A matter's labor hint disambiguates borderline questions, but an explicit
+  // other-domain anchor (ירושה / פלילי / מקרקעין …) always wins over the hint.
+  if (employmentHits.length > 0 || (hintLabor && otherHits.length === 0)) {
     const base = employmentHits.length >= 3 ? 0.95 : employmentHits.length === 2 ? 0.85 : employmentHits.length === 1 ? 0.7 : 0.6;
     const confidence = otherHits.length > 0 ? Math.max(0.5, base - 0.15) : base;
     return {

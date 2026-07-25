@@ -82,7 +82,7 @@ export interface MatterContext {
   readonly procedureLabelHe: string;
   readonly stageLabelHe: string;
   readonly status: string;
-  readonly healthStatus: MatterHealthStatus;
+  readonly healthStatus: MatterHealthStatus | null;   // null in general (no-matter) mode
   readonly includedSections: readonly MatterSection[];
   readonly sections: MatterContextSections;
 }
@@ -156,7 +156,9 @@ export interface ConversationContext {
 }
 
 export interface ConversationRequest {
-  readonly intelligence: MatterIntelligence;
+  /** Absent/null → general (no-matter) mode: intent is still classified, but
+   *  there is no matter context and no matter-derived required/missing facts. */
+  readonly intelligence?: MatterIntelligence | null;
   readonly history?: readonly ConversationTurn[];
   readonly message: string;
   readonly nowISO?: string;

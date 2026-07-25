@@ -2,6 +2,7 @@
 
 import { CloseGlyph, SparkleGlyph } from "@/design-system/icons/glyphs";
 import { cx } from "@/design-system/utils/cx";
+import { DinoConversation } from "@/modules/dino/experience/components/dino-conversation";
 import { useShell } from "./shell-provider";
 
 /**
@@ -53,31 +54,7 @@ export function AssistantPanel() {
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-5">
-        <div className="rounded-md border-s-2 border-accent bg-gold-100 p-4">
-          <p className="text-small text-foreground">
-            שלום, אני דינו. בקרוב אדע לסכם תיקים, לנסח טיוטות, לאתר מועדים
-            במסמכים ולענות על שאלות — הכול בתוך ההקשר שבו אתם עובדים.
-          </p>
-          <p className="mt-3 flex items-center gap-1.5 text-micro text-foreground-faint">
-            <SparkleGlyph size={11} className="text-gold-600" />
-            דינו · דוגמה לאופן שבו תוכן של דינו יופיע
-          </p>
-        </div>
-
-        <p className="mt-6 px-1 text-caption text-foreground-faint">
-          דינו תמיד יציע — ואתם תמיד תחליטו. שום פעולה לא תתבצע בלי אישור
-          שלכם.
-        </p>
-      </div>
-
-      <footer className="border-t border-line p-4">
-        <input
-          disabled
-          placeholder="לכתוב לדינו… (בקרוב)"
-          className="h-11 w-full rounded-sm bg-surface-raised px-4 text-small text-foreground shadow-hairline outline-none disabled:opacity-60"
-        />
-      </footer>
+      <DinoConversation />
     </aside>
   );
 }

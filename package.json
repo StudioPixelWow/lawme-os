@@ -27,6 +27,7 @@
     "dino:test": "node --test \"src/modules/dino/tests/*.test.ts\"",
     "dino:conversation:test": "node --test \"src/modules/dino/conversation/__tests__/*.test.ts\"",
     "legal:research:test": "node --test \"src/modules/legal-research/__tests__/*.test.ts\"",
+    "dino:experience:test": "node --test \"src/modules/dino/experience/__tests__/*.test.ts\"",
     "dino:benchmark": "node src/modules/dino/benchmark/orchestration-benchmark.ts",
     "matter:test": "node --test \"src/modules/matter/__tests__/*.test.ts\"",
     "matter:view:test": "node --test \"src/modules/matter/view/__tests__/*.test.ts\"",
