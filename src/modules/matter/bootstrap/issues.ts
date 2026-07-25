@@ -35,7 +35,13 @@ export type BootstrapIssueCode =
   | "UNKNOWN_ENUM"
   | "SCHEMA_MISMATCH"
   | "MALFORMED_DRAFT"
-  | "UNSUPPORTED_VERSION";
+  | "UNSUPPORTED_VERSION"
+  | "TOO_MANY_CONTACTS"
+  | "TOO_MANY_PARTICIPANTS"
+  | "TOO_MANY_FACTS"
+  | "TOO_MANY_DEADLINES"
+  | "TOO_MANY_EVIDENCE_ITEMS"
+  | "INVALID_MEMBER_COUNT";
 
 export const BOOTSTRAP_ISSUE_CODES: readonly BootstrapIssueCode[] = [
   "DRAFT_NOT_READY",
@@ -60,6 +66,12 @@ export const BOOTSTRAP_ISSUE_CODES: readonly BootstrapIssueCode[] = [
   "SCHEMA_MISMATCH",
   "MALFORMED_DRAFT",
   "UNSUPPORTED_VERSION",
+  "TOO_MANY_CONTACTS",
+  "TOO_MANY_PARTICIPANTS",
+  "TOO_MANY_FACTS",
+  "TOO_MANY_DEADLINES",
+  "TOO_MANY_EVIDENCE_ITEMS",
+  "INVALID_MEMBER_COUNT",
 ] as const;
 
 export function isBootstrapIssueCode(v: unknown): v is BootstrapIssueCode {
@@ -107,6 +119,12 @@ const ISSUE_MESSAGE_HE: Readonly<Record<BootstrapIssueCode, string>> = {
   SCHEMA_MISMATCH: "מבנה הטיוטה אינו תואם לסכימה הנתמכת.",
   MALFORMED_DRAFT: "הטיוטה פגומה או אינה קריאה.",
   UNSUPPORTED_VERSION: "גרסת הטיוטה אינה נתמכת על ידי מנוע האימות.",
+  TOO_MANY_CONTACTS: "הטיוטה כוללת יותר מדי אנשי קשר — יש לצמצם לפני אישור.",
+  TOO_MANY_PARTICIPANTS: "הטיוטה כוללת יותר מדי בעלי דין — יש לצמצם לפני אישור.",
+  TOO_MANY_FACTS: "הטיוטה כוללת יותר מדי עובדות — יש לצמצם לפני אישור.",
+  TOO_MANY_DEADLINES: "הטיוטה כוללת יותר מדי מועדים — יש לצמצם לפני אישור.",
+  TOO_MANY_EVIDENCE_ITEMS: "הטיוטה כוללת יותר מדי פריטי ראיה — יש לצמצם לפני אישור.",
+  INVALID_MEMBER_COUNT: "מבנה חברי התיק אינו תקין.",
 };
 
 /** A single blocking issue. `field`/`path` locate the offending value. */

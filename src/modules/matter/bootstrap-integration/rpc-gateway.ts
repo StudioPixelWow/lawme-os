@@ -31,6 +31,8 @@ export type BootstrapRpcOutcome =
   | { readonly code: "BOOTSTRAP_STALE_DRAFT" }
   | { readonly code: "BOOTSTRAP_IDEMPOTENCY_CONFLICT" }
   | { readonly code: "BOOTSTRAP_NOT_AVAILABLE" }
+  | { readonly code: "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED" }
+  | { readonly code: "BOOTSTRAP_SLUG_CONFLICT" }
   | { readonly code: "BOOTSTRAP_RPC_ERROR"; readonly internalCode: string };
 
 /** Minimal RPC-invoker seam — the route adapts the authenticated Supabase client to this. */
@@ -104,6 +106,10 @@ export function parseBootstrapRpcResult(data: unknown): BootstrapRpcOutcome {
       return { code: "BOOTSTRAP_IDEMPOTENCY_CONFLICT" };
     case "BOOTSTRAP_NOT_AVAILABLE":
       return { code: "BOOTSTRAP_NOT_AVAILABLE" };
+    case "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED":
+      return { code: "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED" };
+    case "BOOTSTRAP_SLUG_CONFLICT":
+      return { code: "BOOTSTRAP_SLUG_CONFLICT" };
     default:
       // Any stable P0001 code the app pre-validated against (VERSION/ENUM/CROSS_TENANT/...) reaching
       // here indicates a server/plan mismatch — surface as an internal adapter error, never raw.

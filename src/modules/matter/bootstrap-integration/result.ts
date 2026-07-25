@@ -14,6 +14,7 @@ export type BootstrapMatterResultKind =
   | "DRAFT_STALE"
   | "IDEMPOTENCY_CONFLICT"
   | "RESOURCE_NOT_AVAILABLE"
+  | "BOOTSTRAP_LIMIT_EXCEEDED"
   | "BOOTSTRAP_UNAVAILABLE"
   | "BOOTSTRAP_INTERNAL_FAILURE";
 
@@ -49,6 +50,7 @@ export type BootstrapMatterApplicationResult =
   | (ResultBase & { readonly kind: "DRAFT_STALE" })
   | (ResultBase & { readonly kind: "IDEMPOTENCY_CONFLICT" })
   | (ResultBase & { readonly kind: "RESOURCE_NOT_AVAILABLE" })
+  | (ResultBase & { readonly kind: "BOOTSTRAP_LIMIT_EXCEEDED" })
   | (ResultBase & { readonly kind: "BOOTSTRAP_UNAVAILABLE" })
   | (ResultBase & { readonly kind: "BOOTSTRAP_INTERNAL_FAILURE" });
 
@@ -60,6 +62,7 @@ const MESSAGES_HE: Record<BootstrapMatterResultKind, string> = {
   DRAFT_STALE: "הטיוטה עודכנה מאז הסקירה. יש לרענן ולסקור מחדש.",
   IDEMPOTENCY_CONFLICT: "בקשת האישור מתנגשת עם אישור קודם של אותה טיוטה.",
   RESOURCE_NOT_AVAILABLE: "הפעולה אינה זמינה.",
+  BOOTSTRAP_LIMIT_EXCEEDED: "האינטייק כולל יותר מדי פריטים. יש לצמצם ולסקור מחדש לפני יצירת התיק.",
   BOOTSTRAP_UNAVAILABLE: "שירות יצירת התיק אינו זמין כרגע.",
   BOOTSTRAP_INTERNAL_FAILURE: "אירעה תקלה פנימית. הבקשה לא הושלמה.",
 };
@@ -76,6 +79,7 @@ export function httpStatusForResult(kind: BootstrapMatterResultKind): number {
     case "MATTER_ALREADY_CREATED":
       return 200;
     case "VALIDATION_BLOCKED":
+    case "BOOTSTRAP_LIMIT_EXCEEDED":
       return 422;
     case "DRAFT_STALE":
     case "IDEMPOTENCY_CONFLICT":

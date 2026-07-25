@@ -167,6 +167,19 @@ test("50 RPC NOT_AVAILABLE stays opaque → RESOURCE_NOT_AVAILABLE", async () =>
   assert.equal(r.kind, "RESOURCE_NOT_AVAILABLE");
 });
 
+test("63 RPC aggregate-limit backstop → BOOTSTRAP_LIMIT_EXCEEDED (safe)", async () => {
+  const h = harness({ outcome: { code: "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED" } });
+  const r = await confirmIntakeDraftAndBootstrapMatter(command, h.deps);
+  assert.equal(r.kind, "BOOTSTRAP_LIMIT_EXCEEDED");
+  assert.equal(JSON.stringify(r).includes("SQL"), false);
+});
+
+test("RPC slug conflict → BOOTSTRAP_INTERNAL_FAILURE (opaque)", async () => {
+  const h = harness({ outcome: { code: "BOOTSTRAP_SLUG_CONFLICT" } });
+  const r = await confirmIntakeDraftAndBootstrapMatter(command, h.deps);
+  assert.equal(r.kind, "BOOTSTRAP_INTERNAL_FAILURE");
+});
+
 test("51 RPC adapter error → BOOTSTRAP_INTERNAL_FAILURE", async () => {
   const h = harness({ outcome: { code: "BOOTSTRAP_RPC_ERROR", internalCode: "db_error" } });
   const r = await confirmIntakeDraftAndBootstrapMatter(command, h.deps);

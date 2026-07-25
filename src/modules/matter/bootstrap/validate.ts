@@ -44,6 +44,7 @@ import {
   type BootstrapValidationIssue,
   type BootstrapValidationWarning,
 } from "./issues.ts";
+import { BOOTSTRAP_AGGREGATE_LIMITS } from "./aggregate-limits.ts";
 import {
   failedResult,
   makeStat,
@@ -320,6 +321,25 @@ export function validateBootstrapDraft(
 
   const draft: StructuredDraft = parsedDraft.data;
   const approvals: Approvals = parsedApprovals.data;
+
+  /* 2b — Hard aggregate ceilings (AggregateLimitPolicy v1). Exceeding any ceiling
+   *      makes the draft invalid — no truncation, no sampling, no silent drop.
+   *      Deterministic order: contacts, participants, facts, deadlines, evidence. */
+  if (draft.contacts.length > BOOTSTRAP_AGGREGATE_LIMITS.contacts) {
+    issues.push(issue("TOO_MANY_CONTACTS", { field: "contacts", developerMessage: `contacts=${draft.contacts.length} > ${BOOTSTRAP_AGGREGATE_LIMITS.contacts}` }));
+  }
+  if (approvals.participants.length > BOOTSTRAP_AGGREGATE_LIMITS.participants) {
+    issues.push(issue("TOO_MANY_PARTICIPANTS", { field: "participants", developerMessage: `participants=${approvals.participants.length} > ${BOOTSTRAP_AGGREGATE_LIMITS.participants}` }));
+  }
+  if (draft.facts.length > BOOTSTRAP_AGGREGATE_LIMITS.facts) {
+    issues.push(issue("TOO_MANY_FACTS", { field: "facts", developerMessage: `facts=${draft.facts.length} > ${BOOTSTRAP_AGGREGATE_LIMITS.facts}` }));
+  }
+  if (draft.deadlines.length > BOOTSTRAP_AGGREGATE_LIMITS.deadlines) {
+    issues.push(issue("TOO_MANY_DEADLINES", { field: "deadlines", developerMessage: `deadlines=${draft.deadlines.length} > ${BOOTSTRAP_AGGREGATE_LIMITS.deadlines}` }));
+  }
+  if (draft.evidenceRequirements.length > BOOTSTRAP_AGGREGATE_LIMITS.evidence) {
+    issues.push(issue("TOO_MANY_EVIDENCE_ITEMS", { field: "evidenceRequirements", developerMessage: `evidence=${draft.evidenceRequirements.length} > ${BOOTSTRAP_AGGREGATE_LIMITS.evidence}` }));
+  }
 
   /* 3 — Draft state. */
   const alreadyConfirmed =

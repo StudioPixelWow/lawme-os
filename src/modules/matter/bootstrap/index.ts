@@ -7,6 +7,8 @@
  */
 
 export { BOOTSTRAP_VALIDATION_VERSION } from "./contracts.ts";
+export { BOOTSTRAP_AGGREGATE_LIMITS, BOOTSTRAP_AGGREGATE_LIMITS_VERSION } from "./aggregate-limits.ts";
+export type { AggregateLimitPolicy } from "./aggregate-limits.ts";
 export type {
   ContactKind,
   RawBootstrapDraft,

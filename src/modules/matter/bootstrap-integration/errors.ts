@@ -34,6 +34,10 @@ export function mapRpcNonSuccess(
       return { kind: "IDEMPOTENCY_CONFLICT", correlationId, messageHe: messageForKind("IDEMPOTENCY_CONFLICT") };
     case "BOOTSTRAP_NOT_AVAILABLE":
       return { kind: "RESOURCE_NOT_AVAILABLE", correlationId, messageHe: messageForKind("RESOURCE_NOT_AVAILABLE") };
+    case "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED":
+      return { kind: "BOOTSTRAP_LIMIT_EXCEEDED", correlationId, messageHe: messageForKind("BOOTSTRAP_LIMIT_EXCEEDED") };
+    case "BOOTSTRAP_SLUG_CONFLICT":
+      return { kind: "BOOTSTRAP_INTERNAL_FAILURE", correlationId, messageHe: messageForKind("BOOTSTRAP_INTERNAL_FAILURE") };
     case "BOOTSTRAP_RPC_ERROR":
       return {
         kind: "BOOTSTRAP_INTERNAL_FAILURE",

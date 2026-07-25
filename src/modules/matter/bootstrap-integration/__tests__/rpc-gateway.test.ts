@@ -61,6 +61,8 @@ test("42 result union parses each stable code", () => {
   assert.equal(parseBootstrapRpcResult({ ok: false, code: "BOOTSTRAP_STALE_DRAFT" }).code, "BOOTSTRAP_STALE_DRAFT");
   assert.equal(parseBootstrapRpcResult({ ok: false, code: "BOOTSTRAP_IDEMPOTENCY_CONFLICT" }).code, "BOOTSTRAP_IDEMPOTENCY_CONFLICT");
   assert.equal(parseBootstrapRpcResult({ ok: false, code: "BOOTSTRAP_NOT_AVAILABLE" }).code, "BOOTSTRAP_NOT_AVAILABLE");
+  assert.equal(parseBootstrapRpcResult({ ok: false, code: "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED" }).code, "BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED");
+  assert.equal(parseBootstrapRpcResult({ ok: false, code: "BOOTSTRAP_SLUG_CONFLICT" }).code, "BOOTSTRAP_SLUG_CONFLICT");
 });
 
 test("43 malformed result and unexpected codes fail closed to RPC_ERROR", () => {
