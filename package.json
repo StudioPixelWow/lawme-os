@@ -29,6 +29,7 @@
     "legal:research:test": "node --test \"src/modules/legal-research/__tests__/*.test.ts\"",
     "dino:experience:test": "node --test \"src/modules/dino/experience/__tests__/*.test.ts\"",
     "legal:reasoning:test": "node --test \"src/modules/legal-reasoning/__tests__/*.test.ts\"",
+    "dino:reasoned:test": "node --test \"src/modules/dino/reasoned/__tests__/*.test.ts\"",
     "dino:benchmark": "node src/modules/dino/benchmark/orchestration-benchmark.ts",
     "matter:test": "node --test \"src/modules/matter/__tests__/*.test.ts\"",
     "matter:view:test": "node --test \"src/modules/matter/view/__tests__/*.test.ts\"",
