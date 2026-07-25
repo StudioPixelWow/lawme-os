@@ -1,5 +1,8 @@
 # Capability 1 — Matter Bootstrap Engine — Production Readiness Audit & Closure
 
+> **STATUS: FROZEN (2026-07-25). Verdict A — Production Ready.** Capability 1 is
+> frozen. Future changes require a new major version. Tag: `capability1-frozen`.
+
 Status record for the Principal Production-Readiness Audit and the Slice 1.0.F
 hardening that closed it. Development project `udispadsbxqicmawqcuk`. Production
 never touched.
@@ -95,16 +98,39 @@ in the production-hardening migration (RPC backstop).
 ## Migration status
 
 - Applied to Development: `20260724120000`, `20260724130000`, `20260724140000`,
-  `20260724150000` (gateway).
-- Prepared, locally validated, **pending a separate founder apply gate**:
-  `20260724160000_capability1_bootstrap_production_hardening.sql`
-  (SHA-256 `74c8070f3ffe6842189c886d9808d0b9b27046e156e1d92c94e6e7952b819f31`).
-  Until it is applied, the RPC aggregate-limit backstop and slug handling are
-  proven locally only; the Validation-Engine ceilings are live via the application.
+  `20260724150000` (gateway), `20260724160000` (production hardening).
+- `20260724160000_capability1_bootstrap_production_hardening.sql`
+  (SHA-256 `74c8070f3ffe6842189c886d9808d0b9b27046e156e1d92c94e6e7952b819f31`)
+  **APPLIED and registered exactly once** on Development (2026-07-25). The live
+  `app.bootstrap_matter_v1` now carries the aggregate-limit backstop
+  (`BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED`) and the narrow
+  `matters_organization_id_slug_key` retry; owner remains `lawme_bootstrap`,
+  actor resolved via `app.actor_uid()`. All preflight + postconditions passed.
+
+## Final freeze — live proof (Development, 2026-07-25)
+
+Seven live proofs executed through the real public gateway
+(`public.bootstrap_matter_v1` → `app.bootstrap_matter_v1`) as authenticated actors,
+against isolated fixtures torn down to baseline afterward (demo org/matter untouched):
+
+| Proof | Result |
+|---|---|
+| Aggregate-limit backstop (501 facts) | `BOOTSTRAP_AGGREGATE_LIMIT_EXCEEDED`, zero writes, draft unchanged |
+| Slug collision (two drafts, shared 18-char prefix) | both `BOOTSTRAP_CREATED`; second slug falls back to full-uuid `m-…8000000000000002` |
+| Happy path (partner, full aggregate) | `BOOTSTRAP_CREATED` (1 contact/participant/fact/deadline/evidence) |
+| Idempotent retry (same key + planHash) | `BOOTSTRAP_ALREADY_COMMITTED`, same matterId, one matter |
+| Rollback (unmapped participant reference) | `BOOTSTRAP_INVALID_REFERENCE` raised, whole RPC rolled back, draft still `ready_for_review` |
+| Authorization (paralegal) | `BOOTSTRAP_NOT_AVAILABLE`, no write |
+| Cross-tenant denial (other-org partner) | `BOOTSTRAP_NOT_AVAILABLE`, no write |
+
+`npm run capability1:freeze-check` — all application gates + all SQL security
+harnesses (rls_alignment, bootstrap_primitives, bootstrap_rpc, actor_resolution,
+production_hardening, alignment_sql, public_gateway) PASS. No regression.
 
 ## Final closure verdict
 
-Capability 1 is a **freeze candidate**: F1–F4 and F8 are CLOSED, F5 is CLOSED, and
-F6/F7 remain intentionally deferred. Full freeze (Verdict A) is contingent on the
-separate apply + live proof of the production-hardening migration; until then the
-capability remains at **B — one apply pending**. Production untouched.
+**Verdict A — Production Ready. Capability 1 STATUS: FROZEN (2026-07-25).**
+F1–F5 and F8 CLOSED; F6/F7 intentionally deferred to their named future owners.
+The production-hardening migration is applied and live-proven on Development, the
+freeze gate is green, and CI enforces it permanently. Capability 1 is frozen —
+future changes require a new major version. Production untouched.
