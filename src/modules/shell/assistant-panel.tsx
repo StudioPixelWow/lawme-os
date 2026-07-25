@@ -2,7 +2,7 @@
 
 import { CloseGlyph, SparkleGlyph } from "@/design-system/icons/glyphs";
 import { cx } from "@/design-system/utils/cx";
-import { DinoConversation } from "@/modules/dino/experience/components/dino-conversation";
+import { ReasonedConversation } from "@/modules/dino/reasoned/components/reasoned-conversation";
 import { useShell } from "./shell-provider";
 
 /**
@@ -54,7 +54,7 @@ export function AssistantPanel() {
         </button>
       </header>
 
-      <DinoConversation />
+      <ReasonedConversation />
     </aside>
   );
 }
