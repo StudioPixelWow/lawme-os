@@ -36,7 +36,9 @@
     "identity:authz:test": "node --test \"src/modules/identity/authorization-policy/__tests__/*.test.ts\"",
     "matter:benchmark": "node src/modules/matter/benchmark/score-narrative-benchmark.ts",
     "intelligence:test": "node --test \"src/modules/intelligence/core/__tests__/*.test.ts\" \"src/modules/intelligence/__tests__/*.test.ts\"",
-    "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts"
+    "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts",
+    "sql:harness": "bash scripts/sql-harness.sh",
+    "capability1:freeze-check": "bash scripts/capability1-freeze-check.sh"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "^5.2.9",

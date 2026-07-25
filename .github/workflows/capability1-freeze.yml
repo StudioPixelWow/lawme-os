@@ -1,0 +1,37 @@
+name: Capability 1 — Bootstrap Freeze Gate
+
+# Permanent required gate protecting the frozen Matter Bootstrap engine, incl. the
+# SECURITY DEFINER public gateway (must remain a pure forward) and the cross-layer
+# authority/procedure/limit alignment invariants. Runs the application checks and
+# the disposable-PostgreSQL SQL security harnesses. Fails the build on any failure.
+
+on:
+  push:
+    branches: [dev-preview, main]
+  pull_request:
+    branches: [dev-preview, main]
+
+jobs:
+  freeze-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install PostgreSQL 16 client + server (disposable clusters)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-16 postgresql-client-16
+          echo "/usr/lib/postgresql/16/bin" >> "$GITHUB_PATH"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Capability 1 freeze-check (app gates + SQL security gate)
+        # The SQL harness creates disposable trust-auth clusters; run it as the
+        # postgres OS user path inside the script. Fails hard on any harness failure.
+        run: npm run capability1:freeze-check
