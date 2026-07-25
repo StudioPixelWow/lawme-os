@@ -81,9 +81,12 @@ test("43: the authorized matter loader uses the authenticated client + policy, n
   assert.ok(!/serviceClient/.test(loader) && !/DEMO_SEED/.test(loader), "matter-loader must be pure");
 });
 
-test("43b: matter room page hydrates only via the authorized loader (no service client)", () => {
+test("43b: matter page hydrates only via the authorized loader (no service client)", () => {
   const src = read(MATTER_ROOM_PAGE);
-  assert.ok(src.includes("loadAuthorizedMatterRoom"), "room must load through the authorized loader");
+  // Capability 2 Slice 2.0.0: the page renders the Matter Workspace, loaded
+  // through the authorized workspace loader (authorizes BEFORE hydrating).
+  assert.ok(src.includes("loadMatterWorkspace"), "page must load through the authorized workspace loader");
+  assert.ok(!/serviceClient/.test(src), "the matter page must not use the service-role client");
   assert.ok(!src.includes("loadMatterForRoom"), "the old service-role room loader is gone");
 });
 

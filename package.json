@@ -30,6 +30,7 @@
     "matter:view:test": "node --test \"src/modules/matter/view/__tests__/*.test.ts\"",
     "matter:workflow:test": "node --test \"src/modules/matter/workflow/__tests__/*.test.ts\"",
     "matter:documents:test": "node --test \"src/modules/matter/documents/__tests__/*.test.ts\"",
+    "matter:workspace:test": "node --test \"src/modules/matter/workspace/__tests__/*.test.ts\"",
     "interaction:audit": "node scripts/interaction-audit.mjs",
     "shell:test": "node --test \"src/modules/shell/__tests__/*.test.ts\"",
     "identity:test": "node --test \"src/modules/identity/__tests__/*.test.ts\"",
