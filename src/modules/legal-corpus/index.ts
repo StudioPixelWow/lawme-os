@@ -25,3 +25,10 @@ export {
   ReuseBasisMissingError,
   InstrumentNotAllowlistedError,
 } from "./adapter.ts";
+export { VerifiedCorpusStore, verifiedCorpus } from "./store.ts";
+export { buildVerifiedLegislationAnswer, classifyDoctrine, BADGE_TEXT } from "./answer.ts";
+export type { VerifiedLegislationAnswer, LegislationAnswerStatus, AnswerRequest } from "./answer.ts";
+export { toCitationView, toWordExportBlock } from "./citation-format.ts";
+export type { CitationView } from "./citation-format.ts";
+export { createVerifiedLegislationAdapter } from "./canonical.ts";
+export { CORPUS_VERSION } from "./seed/verified-legislation.ts";
