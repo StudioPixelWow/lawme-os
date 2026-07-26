@@ -106,18 +106,18 @@ export function TrustHeader(props: {
   coverageLabelHe: string;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-t-md border border-line-strong bg-gradient-to-l from-gold-100/70 to-surface px-3.5 py-2.5">
+    <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 rounded-t-lg border-x border-t border-line-strong bg-surface-raised/50 px-4 py-3">
       <span className={cx(
-        "inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-micro font-semibold animate-rise",
-        props.verified ? "bg-status-completed-wash text-status-completed" : "bg-gold-100 text-gold-800",
+        "inline-flex items-center gap-1.5 text-caption font-semibold",
+        props.verified ? "text-status-completed" : "text-gold-800",
       )}>
-        <ShieldGlyph size={12} /> {props.verifiedLabelHe}
+        <ShieldGlyph size={13} /> {props.verifiedLabelHe}
       </span>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
         <TrustItem label="גרסת קורפוס">{props.versionValue}</TrustItem>
-        <span className="h-6 w-px bg-line" aria-hidden />
+        <span className="h-5 w-px bg-line" aria-hidden />
         <TrustItem label="אומת לאחרונה"><span className="inline-flex items-center gap-1"><ClockGlyph size={10} className="text-foreground-faint" />{props.verifiedAtHe}</span></TrustItem>
-        <span className="h-6 w-px bg-line" aria-hidden />
+        <span className="h-5 w-px bg-line" aria-hidden />
         <TrustItem label="כיסוי"><CoverageMeter level={props.coverageLevel} labelHe={props.coverageLabelHe} /></TrustItem>
       </div>
     </div>
@@ -142,33 +142,39 @@ export function ResponseTrustHeader({ r }: { r: ReasonedDinoResponse }) {
 
 export function PremiumSourceCard({ c }: { c: CitationView }) {
   const [open, setOpen] = useState(false);
+  const metaHe = [c.verificationLabelHe, c.authorityLabelHe, c.officialSource ? "מקור רשמי" : null]
+    .filter(Boolean).join("  ·  ");
   return (
-    <li className="overflow-hidden rounded-md border border-line-strong bg-surface shadow-hairline">
-      <div className="p-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="text-small font-semibold text-foreground">{c.citationHe}</span>
-          {c.sectionHe ? <span className="rounded-xs bg-surface-sunken px-1.5 py-0.5 text-micro text-foreground-soft">{c.sectionHe}</span> : null}
-        </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-          <span className={cx("rounded-xs px-1.5 py-0.5 text-micro font-medium", c.authorityLabelHe === "מחייב" ? "bg-status-completed-wash text-status-completed" : "bg-surface-sunken text-foreground-soft")}>{c.authorityLabelHe}</span>
-          <span className={cx("inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 text-micro font-medium animate-rise", c.verification === "verified" ? "bg-status-completed-wash text-status-completed" : "bg-status-risk-wash text-status-risk")}>
-            {c.verification === "verified" ? <CheckGlyph size={9} /> : null}{c.verificationLabelHe}
-          </span>
-          {c.officialSource ? <span className="rounded-xs bg-status-progress-wash px-1.5 py-0.5 text-micro font-medium text-status-progress">מקור רשמי</span> : null}
-        </div>
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <button type="button" onClick={() => setOpen((v) => !v)} className="inline-flex items-center gap-1 rounded-xs border border-line px-2 py-0.5 text-micro font-medium text-foreground-soft transition-colors hover:bg-surface-sunken" style={{ transitionDuration: "var(--motion-quick)" }}>
-            <PreviewGlyph size={10} /> {open ? "הסתר פרטים" : "פרטי מקור"}
-          </button>
-          <CopyButton text={`${c.citationHe}${c.sectionHe ? `, ${c.sectionHe}` : ""}`} label="העתק ציטוט" />
-          {c.url ? <a href={c.url} target="_blank" rel="noreferrer" className="rounded-xs border border-line px-2 py-0.5 text-micro font-medium text-gold-700 transition-colors hover:bg-surface-sunken">פתח מקור ↗</a> : null}
-        </div>
+    <li className="group rounded-md border border-line/60 bg-surface px-3.5 py-3 transition-colors hover:border-line-strong" style={{ transitionDuration: "var(--motion-quick)" }}>
+      {/* title + single quiet verification mark — authority shown by weight, not colour */}
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="min-w-0 text-small leading-relaxed">
+          {c.url
+            ? <a href={c.url} target="_blank" rel="noreferrer" className="font-medium text-foreground decoration-line/60 underline-offset-4 hover:underline hover:decoration-accent">{c.citationHe}</a>
+            : <span className="font-medium text-foreground">{c.citationHe}</span>}
+          {c.sectionHe ? <span className="text-foreground-soft"> · {c.sectionHe}</span> : null}
+        </p>
+        {c.verification === "verified"
+          ? <CheckGlyph size={13} className="mt-1 shrink-0 text-accent" />
+          : null}
       </div>
+
+      {/* metadata as typography, not chips */}
+      <p className="mt-1 text-micro tracking-wide text-foreground-faint">{metaHe}</p>
+
+      {/* actions — quiet on desktop until hover/focus; always available on touch */}
+      <div className="mt-2 flex flex-wrap items-center gap-2.5 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100" style={{ transitionDuration: "var(--motion-quick)" }}>
+        <button type="button" onClick={() => setOpen((v) => !v)} className="inline-flex items-center gap-1 text-micro font-medium text-foreground-soft hover:text-foreground">
+          <PreviewGlyph size={10} /> {open ? "הסתר" : "פרטים"}
+        </button>
+        <CopyButton text={`${c.citationHe}${c.sectionHe ? `, ${c.sectionHe}` : ""}`} label="העתק" />
+        {c.url ? <a href={c.url} target="_blank" rel="noreferrer" className="text-micro font-medium text-gold-700 hover:underline">פתח מקור ↗</a> : null}
+      </div>
+
       {open ? (
-        <div className="animate-rise border-t border-line bg-surface-raised/50 p-3 text-caption text-foreground-soft">
-          <p><span className="text-foreground-faint">סעיף:</span> {c.sectionHe ?? "—"}</p>
-          <p className="mt-0.5"><span className="text-foreground-faint">הפניה נקודתית:</span> {c.pinpointHe ?? c.pinpointStatusHe}</p>
-          <p className="mt-0.5"><span className="text-foreground-faint">מעמד:</span> {c.authorityLabelHe} · {c.verificationLabelHe}{c.usableForClaim ? "" : " · אינו מבסס מסקנה"}</p>
+        <div className="mt-2 border-t border-line/60 pt-2 text-caption leading-relaxed text-foreground-soft">
+          <p><span className="text-foreground-faint">הפניה נקודתית:</span> {c.pinpointHe ?? c.pinpointStatusHe}</p>
+          {!c.usableForClaim ? <p className="mt-0.5 text-foreground-faint">אינו מבסס מסקנה — לגילוי בלבד.</p> : null}
         </div>
       ) : null}
     </li>
