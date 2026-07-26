@@ -69,7 +69,9 @@ export type WorkstreamId =
   | "H_regulatory_guidance"
   | "I_legislative_history"
   | "J_licensed_providers"
-  | "K_firm_owned";
+  | "K_firm_owned"
+  | "L_public_secondary"   // Kol-Zchut, professional commentary, public articles/FAQs
+  | "M_academic";          // university / academic legal publications (open access)
 
 // ---------------------------------------------------------------------------
 // Authority tier (breadth must not erase source distinctions)
@@ -80,6 +82,8 @@ export type AuthorityTier =
   | "persuasive_primary" // lower-court / persuasive judgments
   | "official_regulatory"
   | "licensed_editorial"
+  | "academic"           // university / academic legal publications
+  | "professional_commentary"
   | "secondary_explanation"
   | "discovery_material"
   | "firm_internal";

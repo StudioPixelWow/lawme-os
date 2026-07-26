@@ -7,8 +7,8 @@ import type { CanonicalSourceRecord } from "../types.ts";
 import { sourceByKey } from "../registry.ts";
 
 const AUTHORITY_TIERS = new Set([
-  "binding_primary", "persuasive_primary", "official_regulatory",
-  "licensed_editorial", "secondary_explanation", "discovery_material", "firm_internal",
+  "binding_primary", "persuasive_primary", "official_regulatory", "licensed_editorial",
+  "academic", "professional_commentary", "secondary_explanation", "discovery_material", "firm_internal",
 ]);
 const MODES = new Set([
   "FULL_TEXT", "STRUCTURED_METADATA", "METADATA_AND_LINK", "DISCOVERY_ONLY", "BLOCKED",

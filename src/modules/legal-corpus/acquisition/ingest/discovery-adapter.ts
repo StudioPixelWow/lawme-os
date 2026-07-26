@@ -18,6 +18,7 @@ import type {
   SourceStatus,
 } from "../../../legal-research/types.ts";
 import type { CanonicalSourceRecord } from "../types.ts";
+import { rankByAuthority, authorityClassOf, AUTHORITY_CLASS_LABEL_HE } from "../classification.ts";
 
 function authorityLevelFor(r: CanonicalSourceRecord): AuthorityLevel {
   switch (r.authorityTier) {
@@ -66,7 +67,7 @@ function toCanonical(r: CanonicalSourceRecord, matched: readonly string[]): Cano
     matchedTerms: matched,
     citationFrequency: 0,
     publisherHe: r.sourceOwner,
-    provenanceHe: `${r.sourceOwner} · ${r.acquisitionMode} · ${r.verificationStatus}`,
+    provenanceHe: `${r.sourceOwner} · ${AUTHORITY_CLASS_LABEL_HE[authorityClassOf(r)]} · ${r.acquisitionMode} · ${r.verificationStatus}`,
     limitationsHe: ["רשומה שנקלטה וטרם אומתה — נגישה לגילוי בלבד, אינה מבססת מסקנה."],
   };
 }
@@ -87,18 +88,20 @@ export function createIngestedDiscoveryAdapter(
     available: true,
     async search(plan: SearchPlan): Promise<AdapterSearchResult> {
       const terms = [...plan.queryTerms, ...plan.topics, ...plan.sections];
-      const hits: CanonicalSource[] = [];
-      for (const r of records) {
-        // discovery is inclusive: match on terms, or return all when no terms
-        const m = matches(r, terms);
-        if (terms.length === 0 || m.length > 0) hits.push(toCanonical(r, m));
-      }
+      // Collect matching records, rank by AUTHORITY (higher above lower), then
+      // emit — the reasoning engine receives sources in authority order.
+      const matched = records
+        .map((r) => ({ r, m: matches(r, terms) }))
+        .filter((x) => terms.length === 0 || x.m.length > 0);
+      const ranked = rankByAuthority(matched.map((x) => x.r));
+      const termsByRecord = new Map(matched.map((x) => [x.r.recordId, x.m]));
+      const hits = ranked.map((r) => toCanonical(r, termsByRecord.get(r.recordId) ?? []));
       return {
         sourceId: "ingested-discovery",
         sourceKind: "legislation",
         matchedCount: hits.length,
         sources: hits,
-        notesHe: [`רשומות גילוי שנקלטו: ${hits.length} (טרם אומתו)`],
+        notesHe: [`רשומות גילוי שנקלטו: ${hits.length} (טרם אומתו, מדורגות לפי סמכות)`],
       };
     },
   };

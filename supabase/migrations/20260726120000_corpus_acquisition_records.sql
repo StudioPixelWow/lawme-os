@@ -48,8 +48,8 @@ create table if not exists corpus.source_records (
   authority_tier     text not null
                        check (authority_tier in
                          ('binding_primary','persuasive_primary','official_regulatory',
-                          'licensed_editorial','secondary_explanation','discovery_material',
-                          'firm_internal')),
+                          'licensed_editorial','academic','professional_commentary',
+                          'secondary_explanation','discovery_material','firm_internal')),
   issuing_body       text,
   instrument_number  text,
   title_he           text,

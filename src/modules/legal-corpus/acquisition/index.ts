@@ -26,3 +26,11 @@ export {
   ingestedCoverage,
 } from "./metrics.ts";
 export type { RegistryCoverage, IngestedCoverage } from "./metrics.ts";
+export {
+  authorityClassOf,
+  authorityRankOf,
+  rankByAuthority,
+  authorityClassCounts,
+  AUTHORITY_CLASS_LABEL_HE,
+} from "./classification.ts";
+export type { AuthorityClass } from "./classification.ts";
