@@ -15,6 +15,7 @@ import {
   PremiumSourceCard, MatterApplication, NextActions, ConfidenceExplainer,
   ResearchTimeline, SourceComparison,
 } from "./presentation";
+import { LegalWorkspace } from "./legal-workspace";
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -106,6 +107,9 @@ export function ReasonedAnswer({ r }: { r: ReasonedDinoResponse }) {
           <ResearchTimeline r={r} />
           {r.researchTrace.recommendedFollowUpsHe.length ? <p className="mt-2 text-micro text-foreground-faint">חיפושי המשך מומלצים: {r.researchTrace.recommendedFollowUpsHe.join("; ")}</p> : null}
         </Block>
+
+        {/* Workbench — the answer becomes the beginning of legal work */}
+        <LegalWorkspace r={r} />
 
         <p className="mt-4 flex items-center gap-1.5 text-micro text-foreground-faint">
           <SparkleGlyph size={11} className="text-gold-600" /> {r.provider.labelHe} · אין להסתמך ללא בדיקת עורך דין
