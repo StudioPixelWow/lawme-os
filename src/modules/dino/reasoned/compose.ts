@@ -19,8 +19,14 @@ export const REASONED_DINO_VERSION = "reasoned-dino-v1";
 const STATUS_LABEL: Record<ReasonedStatus, string> = {
   answered: "מבוסס", provisional: "מותנה", needs_facts: "חסרות עובדות מהותיות",
   no_verified_authority: "אין אסמכתה מאומתת", conflicting_authority: "אסמכתאות סותרות",
-  insufficient_coverage: "כיסוי חלקי", out_of_scope: "מחוץ לתחום",
+  insufficient_coverage: "כיסוי חלקי", out_of_scope: "מחוץ לקורפוס המאומת",
 };
+
+// Positioning: when a topic is outside the verified corpus, the limitation
+// belongs to the corpus — never to Dino. Dino remains a general legal-research
+// engine; this version's verified corpus simply hasn't reached the topic yet.
+const OUT_OF_SCOPE_BOTTOM_LINE_HE =
+  "נושא משפטי זה נמצא כרגע מחוץ לקורפוס המאומת הזמין בגרסה זו של LawME. דינו יכול עדיין לסייע במחקר וניתוח משפטי כללי, אך נושא זה טרם אומת לרמת הראיה של LawME.";
 const CONF_LABEL: Record<string, string> = { high: "גבוה", moderate: "בינוני", low: "נמוך", none: "לא ניתן לקבוע" };
 const COVERAGE_LABEL: Record<CoverageLevel, string> = { complete: "מלא", substantial: "משמעותי", partial: "חלקי", insufficient: "לא מספק" };
 const CAT_LABEL: Record<string, string> = { contrary_authority: "אסמכתה סותרת", alternative_interpretation: "פרשנות חלופית", procedural_obstacle: "מכשול דיוני", jurisdictional_limitation: "מגבלת סמכות", statutory_exception: "חריג חוקי", factual_weakness: "חולשה עובדתית" };
@@ -114,7 +120,7 @@ export function composeReasonedResponse(p: ComposeReasonedParams): ReasonedDinoR
     contextKind: p.contextKind,
     matterId: p.matterId,
     question: p.question,
-    bottomLine: { statementHe: p.prose.bottomLineHe, direction: o.preliminaryConclusion.direction, isProvisional: o.preliminaryConclusion.isProvisional, statusLabelHe: STATUS_LABEL[status] },
+    bottomLine: { statementHe: status === "out_of_scope" ? OUT_OF_SCOPE_BOTTOM_LINE_HE : p.prose.bottomLineHe, direction: o.preliminaryConclusion.direction, isProvisional: o.preliminaryConclusion.isProvisional, statusLabelHe: STATUS_LABEL[status] },
     legalIssue: { statementHe: o.issue.issueStatementHe, issueType: o.issue.issueType, procedureTitleHe: o.issue.procedureTitleHe },
     applicationToMatter: {
       hasMatter: p.contextKind === "matter",

@@ -18,7 +18,7 @@ export function AssistantPanel() {
 
   return (
     <aside
-      aria-label="דינו — הדינו המשפטי"
+      aria-label="דינו — מנוע האינטליגנציה המשפטית של המשרד"
       inert={!assistantOpen}
       className={cx(
         "glass fixed z-40 flex flex-col rounded-xl",
@@ -40,7 +40,7 @@ export function AssistantPanel() {
             דינו
           </p>
           <p className="text-caption text-foreground-faint">
-            הדינו המשפטי של המשרד
+            מנוע האינטליגנציה המשפטית של המשרד
           </p>
         </div>
         <button
