@@ -7,6 +7,7 @@ import type { ReasonedDinoResponse } from "../types";
 import { ReasonedAnswer } from "./reasoned-answer";
 import { CompactAnswer } from "./compact-answer";
 import { InvestigationProgress } from "./investigation-progress";
+import { ConversationMemory } from "./presentation";
 
 function useDinoContext(): { matterId: string | null; labelHe: string } {
   const pathname = usePathname();
@@ -70,7 +71,14 @@ export function ReasonedConversation() {
         ))}
       </div>
 
-      <form onSubmit={onSubmit} className="border-t border-line p-4">
+      <form onSubmit={onSubmit} className="space-y-2 border-t border-line p-4">
+        {turns.length > 0 ? (
+          <ConversationMemory
+            matterActive={matterId !== null}
+            factsCount={[...turns].reverse().find((t) => t.response)?.response?.applicationToMatter.established.length ?? 0}
+            priorQuestions={turns.map((t) => t.question)}
+          />
+        ) : null}
         <input value={input} onChange={(e) => setInput(e.target.value)} disabled={busy} placeholder="שאל את דינו שאלה משפטית…" className="h-11 w-full rounded-sm bg-surface-raised px-4 text-small text-foreground shadow-hairline outline-none focus:ring-2 focus:ring-accent/40 disabled:opacity-60" />
       </form>
 
