@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { SparkleGlyph, CloseGlyph } from "@/design-system/icons/glyphs";
+import { CloseGlyph } from "@/design-system/icons/glyphs";
 import type { ReasonedDinoResponse } from "../types";
 import { ReasonedAnswer } from "./reasoned-answer";
+import { CompactAnswer } from "./compact-answer";
+import { InvestigationProgress } from "./investigation-progress";
 
 function useDinoContext(): { matterId: string | null; labelHe: string } {
   const pathname = usePathname();
@@ -58,14 +60,11 @@ export function ReasonedConversation() {
           <div key={t.id} className="space-y-2">
             <div className="ms-auto w-fit max-w-[85%] rounded-md bg-surface-sunken px-3 py-2 text-small text-foreground">{t.question}</div>
             {t.response ? (
-              <div>
-                <ReasonedAnswer r={t.response} />
-                <button type="button" onClick={() => setFull(t.response)} className="mt-1.5 text-micro font-medium text-gold-700 hover:underline">הרחב לתצוגת מחקר מלאה →</button>
-              </div>
+              <CompactAnswer r={t.response} onExpand={() => setFull(t.response)} />
             ) : t.error ? (
               <p className="text-caption text-status-urgent">{t.error}</p>
             ) : (
-              <p className="flex items-center gap-1.5 text-caption text-foreground-faint"><SparkleGlyph size={12} className="animate-breath text-gold-600" /> דינו חוקר, מנתח ובוחן טענות נגד…</p>
+              <InvestigationProgress />
             )}
           </div>
         ))}
