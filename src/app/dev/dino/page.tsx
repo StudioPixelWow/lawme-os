@@ -12,6 +12,7 @@ import { reasonedFixtureResponse, type ReasonedScenario } from "@/modules/dino/r
 import { ReasonedAnswer } from "@/modules/dino/reasoned/components/reasoned-answer";
 import { DinoDevPreview } from "@/modules/dino/reasoned/components/dino-dev-preview";
 import { InvestigationProgress } from "@/modules/dino/reasoned/components/investigation-progress";
+import { ConversationMemory } from "@/modules/dino/reasoned/components/presentation";
 import { isDevInterfaceEnabled } from "../legal-intelligence/gate";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +59,15 @@ export default async function ReasonedDinoPreview({ searchParams }: { searchPara
             ? <InvestigationProgress activeStage={Number.isNaN(stageIdx as number) ? 2 : stageIdx} />
             : <DinoDevPreview r={r} />}
         </div>
+        {view !== "loading" ? (
+          <div className="border-t border-line p-4">
+            <ConversationMemory
+              matterActive={r.matterId !== null}
+              factsCount={r.applicationToMatter.established.length}
+              priorQuestions={[r.question, "התמקד רק בבית הדין הארצי"]}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
