@@ -53,7 +53,7 @@ export function ReasonedConversation() {
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-5">
         {turns.length === 0 ? (
           <div className="rounded-md border-s-2 border-accent bg-gold-100 p-4">
-            <p className="text-small text-foreground">שלום, אני דינו. שאל שאלה משפטית בדיני עבודה — אבצע מחקר מבוסס מקורות, אנתח את חוות הדעת מול עובדות התיק, ואשיב עם המסקנה, הטיעון הנגדי ורמת הביטחון.</p>
+            <p className="text-small leading-relaxed text-foreground">שלום, אני דינו. שאל שאלה משפטית בדיני עבודה. אבחין בבירור בין חקיקה מאומתת לבין חומרי גילוי שאינם מבססים מסקנה, ואומר בכנות כאשר נושא נמצא מחוץ לקורפוס המאומת. הקורפוס המאומת מוגבל כרגע, ואין להסתמך ללא בדיקת עורך דין.</p>
           </div>
         ) : null}
 

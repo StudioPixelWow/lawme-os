@@ -70,7 +70,7 @@ export function toCitationView(r: ResolvedProvision, license: LegalLicensePolicy
     sectionHe,
     verifiedBadgeHe: r.version.verificationStatus === "verified" ? "מאומת" : "טעון אימות",
     officialBadge,
-    officialSourceLabelHe: "אומת מול מקור משפטי מוסמך",
+    officialSourceLabelHe: "אומת מול מקור משני (Kol-Zchut) — לא הפרסום הרשמי",
     effectiveDateHe: effectiveHe,
     currentnessHe: r.canSupport ? "נוסח תקף" : "לא ניתן לביסוס במועד המבוקש",
     link: r.version.permalink,

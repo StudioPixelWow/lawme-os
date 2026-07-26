@@ -53,7 +53,7 @@ export const approvedLicense: LegalLicensePolicy = deepFreeze({
   redistributionAllowed: false,
   exportToWorkProductAllowed: true,
   attributionRequired: true,
-  attributionTextHe: "המקור אומת מול מאגר משפטי מוסמך.",
+  attributionTextHe: "המקור אומת מול מאגר זכויות ציבורי (Kol-Zchut); אינו הפרסום הרשמי (רשומות).",
   retentionObligations: null,
   territory: "IL",
   termsRef: "reuse-basis:founder-confirmed-2026-07",
@@ -111,7 +111,7 @@ function verify(versionId: string, reVerifyDueDate: string | null): LegalVerific
     checkedFields: { ...ALL_CHECKED },
     timestamp: INGESTED_AT,
     reVerifyDueDate,
-    notes: "אומת מול מקור משפטי מוסמך; טקסט הוראה תמציתי בלבד.",
+    notes: "אומת מול מקור משני (Kol-Zchut); לא הפרסום הרשמי; טקסט הוראה תמציתי בלבד.",
   });
 }
 

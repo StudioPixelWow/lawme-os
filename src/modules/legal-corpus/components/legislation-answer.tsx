@@ -97,10 +97,17 @@ export function LegislationAnswer({ a }: { a: VerifiedLegislationAnswer }) {
       ) : null}
 
       {a.wordExportBlock ? (
-        <div className="mt-4 flex items-center gap-1.5 border-t border-line pt-3">
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line pt-3">
           <CopyButton text={a.wordExportBlock} label="ייצוא לוורד (בלוק ציטוט)" />
-          {a.reproKey ? <span className="text-micro text-foreground-faint">מזהה שחזור: {a.corpusVersion}</span> : null}
+          <span className="text-micro text-foreground-faint">גרסת קורפוס: {a.corpusVersion}</span>
         </div>
+      ) : null}
+
+      {/* currentness — never imply the numbers are guaranteed current */}
+      {a.citations.length > 0 ? (
+        <p className="mt-2 text-micro leading-relaxed text-foreground-faint">
+          הנתונים נכונים למועד האימות המצוין; אין ערובה לעדכניות מאוחרת יותר. יש לוודא מול הפרסום הרשמי (רשומות) לפני הסתמכות.
+        </p>
       ) : null}
     </div>
   );

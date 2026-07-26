@@ -97,26 +97,30 @@ function TrustItem({ label, children }: { label: string; children: ReactNode }) 
   );
 }
 
+type TrustTone = "verified" | "discovery" | "outside";
+const TRUST_TONE: Record<TrustTone, string> = {
+  verified: "text-status-completed",
+  discovery: "text-status-today",
+  outside: "text-foreground-soft",
+};
+
 export function TrustHeader(props: {
-  verified: boolean;
-  verifiedLabelHe: string;
+  tone: TrustTone;
+  labelHe: string;
   versionValue: string;
-  verifiedAtHe: string;
+  generatedAtHe: string;
   coverageLevel: string;
   coverageLabelHe: string;
 }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2.5 rounded-t-lg border-x border-t border-line-strong bg-surface-raised/50 px-4 py-3">
-      <span className={cx(
-        "inline-flex items-center gap-1.5 text-caption font-semibold",
-        props.verified ? "text-status-completed" : "text-gold-800",
-      )}>
-        <ShieldGlyph size={13} /> {props.verifiedLabelHe}
+      <span className={cx("inline-flex items-center gap-1.5 text-caption font-semibold", TRUST_TONE[props.tone])}>
+        <ShieldGlyph size={13} /> {props.labelHe}
       </span>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
-        <TrustItem label="גרסת קורפוס">{props.versionValue}</TrustItem>
+        <TrustItem label="גרסת מנוע">{props.versionValue}</TrustItem>
         <span className="h-5 w-px bg-line" aria-hidden />
-        <TrustItem label="אומת לאחרונה"><span className="inline-flex items-center gap-1"><ClockGlyph size={10} className="text-foreground-faint" />{props.verifiedAtHe}</span></TrustItem>
+        <TrustItem label="נוצר בתאריך"><span className="inline-flex items-center gap-1"><ClockGlyph size={10} className="text-foreground-faint" />{props.generatedAtHe}</span></TrustItem>
         <span className="h-5 w-px bg-line" aria-hidden />
         <TrustItem label="כיסוי"><CoverageMeter level={props.coverageLevel} labelHe={props.coverageLabelHe} /></TrustItem>
       </div>
@@ -124,14 +128,26 @@ export function TrustHeader(props: {
   );
 }
 
+/**
+ * The trust indicator reflects REALITY, never the premium 'verified' lockup for
+ * answers that are discovery-only or outside the verified corpus. Only verified
+ * LEGISLATION that can support a claim earns the verified state — Dino has no
+ * verified case law, so it never claims verified 'sources' in the plural.
+ */
 export function ResponseTrustHeader({ r }: { r: ReasonedDinoResponse }) {
-  const verified = r.citations.verified.length > 0;
+  const verifiedLeg = r.citations.verified.filter((c) => c.kind === "legislation" && c.usableForClaim);
+  const outside = r.status === "out_of_scope" || r.status === "no_verified_authority";
+  const tone: TrustTone = outside ? "outside" : verifiedLeg.length > 0 ? "verified" : "discovery";
+  const labelHe =
+    tone === "verified" ? "מבוסס על חקיקה מאומתת"
+    : tone === "outside" ? "נושא זה מחוץ לקורפוס המאומת"
+    : "מבוסס על חומרי גילוי — טרם אומתו";
   return (
     <TrustHeader
-      verified={verified}
-      verifiedLabelHe={verified ? "תשובה מבוססת מקורות מאומתים" : "מבוסס מקורות · ראה הסתייגויות"}
+      tone={tone}
+      labelHe={labelHe}
       versionValue={r.meta.version}
-      verifiedAtHe={formatHeDate(r.meta.generatedAtISO)}
+      generatedAtHe={formatHeDate(r.meta.generatedAtISO)}
       coverageLevel={r.coverage.level}
       coverageLabelHe={r.coverage.labelHe}
     />
@@ -142,7 +158,9 @@ export function ResponseTrustHeader({ r }: { r: ReasonedDinoResponse }) {
 
 export function PremiumSourceCard({ c }: { c: CitationView }) {
   const [open, setOpen] = useState(false);
-  const metaHe = [c.verificationLabelHe, c.authorityLabelHe, c.officialSource ? "מקור רשמי" : null]
+  // Every source declares its own role; authority is never implied to be equal.
+  const roleHe = c.kind === "legislation" ? "חקיקה ראשית" : "פסיקה";
+  const metaHe = [roleHe, c.authorityLabelHe, c.verificationLabelHe, c.officialSource ? "פרסום רשמי" : null]
     .filter(Boolean).join("  ·  ");
   return (
     <li className="group rounded-md border border-line/60 bg-surface px-3.5 py-3 transition-colors hover:border-line-strong" style={{ transitionDuration: "var(--motion-quick)" }}>
@@ -174,6 +192,7 @@ export function PremiumSourceCard({ c }: { c: CitationView }) {
       {open ? (
         <div className="mt-2 border-t border-line/60 pt-2 text-caption leading-relaxed text-foreground-soft">
           <p><span className="text-foreground-faint">הפניה נקודתית:</span> {c.pinpointHe ?? c.pinpointStatusHe}</p>
+          {!c.officialSource ? <p className="mt-0.5 text-foreground-faint">הקישור מפנה למקור משני, לא לפרסום הרשמי (רשומות).</p> : null}
           {!c.usableForClaim ? <p className="mt-0.5 text-foreground-faint">אינו מבסס מסקנה — לגילוי בלבד.</p> : null}
         </div>
       ) : null}
@@ -426,7 +445,7 @@ export function ConversationMemory({ matterActive, factsCount, priorQuestions }:
 /* -------------------------------------------------- trust chip */
 
 export function TrustChip({ r }: { r: ReasonedDinoResponse }) {
-  const stmt = r.trustStatementsHe[0] ?? "מבוסס מקורות מאומתים.";
+  const stmt = r.trustStatementsHe[0] ?? "מבוסס מקורות; ראה סיווג כל מקור.";
   return (
     <span className="inline-flex items-center gap-1 rounded-pill bg-gold-100 px-2 py-0.5 text-micro font-medium text-gold-800">
       <ShieldGlyph size={11} /> {stmt}
