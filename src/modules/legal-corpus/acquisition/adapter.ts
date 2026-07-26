@@ -50,12 +50,20 @@ export function createOpenOfficialAdapter(source: RegisteredSource): Acquisition
       return items.map((item, idx) => {
         const canHoldThisItem = holdFull && item.fullText !== null;
         const fullText = canHoldThisItem ? item.fullText : null;
+        // Report the mode actually ACQUIRED: if full text was permitted but no
+        // bytes were provided, we only obtained metadata + link.
+        const acquisitionMode =
+          fullText !== null
+            ? "FULL_TEXT"
+            : resolved.mode === "FULL_TEXT"
+              ? "METADATA_AND_LINK"
+              : resolved.mode;
         const rec: CanonicalSourceRecord = {
           recordId: recordIdFor(source, item, idx),
           sourceKey: source.sourceKey,
           sourceOwner: source.sourceOwner,
           sourceUrl: item.sourceUrl ?? source.homeUrl,
-          acquisitionMode: resolved.mode,
+          acquisitionMode,
           authorityTier: source.authorityTier,
           issuingBody: item.issuingBody,
           instrumentNumber: item.instrumentNumber,
@@ -75,7 +83,10 @@ export function createOpenOfficialAdapter(source: RegisteredSource): Acquisition
           ingestedAt: ctx.nowISO,
           lastCheckedAt: ctx.nowISO,
           tenantId: source.classification === "FIRM_OWNED_FULL_TEXT" ? item.tenantId : null,
-          verificationStatus: "discovery_only",
+          // Discovery-only sources stay discovery-only; everything else enters
+          // as ingested-unverified and can be promoted only by the release gates.
+          verificationStatus:
+            source.classification === "DISCOVERY_ONLY" ? "discovery_only" : "ingested_unverified",
         };
         return rec;
       });

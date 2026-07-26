@@ -50,9 +50,14 @@ export interface IngestedCoverage {
 
 function yearOf(r: CanonicalSourceRecord): string {
   const iso = r.decisionDate ?? r.effectiveDate ?? r.publicationDate;
-  if (!iso) return "unknown";
-  const y = iso.slice(0, 4);
-  return /^\d{4}$/.test(y) ? y : "unknown";
+  if (iso && /^\d{4}/.test(iso)) return iso.slice(0, 4);
+  // Fall back to a 4-digit year carried on the version label (e.g. an
+  // enactment year) — a real sourced year, never a guessed full date.
+  if (r.version) {
+    const m = r.version.match(/\d{4}/);
+    if (m) return m[0];
+  }
+  return "unknown";
 }
 
 export function ingestedCoverage(

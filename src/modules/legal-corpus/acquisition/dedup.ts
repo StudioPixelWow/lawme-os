@@ -12,9 +12,12 @@ export function canonicalKey(r: CanonicalSourceRecord): string {
   const body = (r.issuingBody ?? "").trim().toLowerCase();
   const num = (r.instrumentNumber ?? "").trim().toLowerCase();
   const ver = (r.version ?? "").trim().toLowerCase();
-  if (body || num) return `id:${body}|${num}|${ver}`;
   const title = (r.titleHe ?? "").trim().toLowerCase();
-  return `title:${title}|${ver}`;
+  // With an instrument/case number, that is the identity. Without one, fall
+  // back to (body, title, version) so two untitled-number items don't collide.
+  if (num) return `id:${body}|${num}|${ver}`;
+  if (title) return `title:${body}|${title}|${ver}`;
+  return `id:${body}||${ver}`;
 }
 
 export interface DedupResult {

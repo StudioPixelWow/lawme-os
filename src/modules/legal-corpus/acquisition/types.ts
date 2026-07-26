@@ -138,8 +138,9 @@ export interface CanonicalSourceRecord {
   ingestedAt: string;           // ISO
   lastCheckedAt: string;        // ISO
   tenantId: string | null;      // firm ownership where applicable; null = shared
-  /** Retrieval is never verification: everything enters as discovery. */
-  verificationStatus: "discovery_only" | "verified";
+  /** Retrieval is never verification. New records enter unverified; promotion
+   *  to "verified" requires the editorial release gates (never automatic). */
+  verificationStatus: "ingested_unverified" | "discovery_only" | "verified";
 }
 
 // ---------------------------------------------------------------------------

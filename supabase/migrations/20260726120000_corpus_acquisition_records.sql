@@ -70,8 +70,8 @@ create table if not exists corpus.source_records (
   ingested_at        timestamptz not null default now(),
   last_checked_at    timestamptz not null default now(),
   tenant_id          uuid,                                 -- null = shared corpus
-  verification_status text not null default 'discovery_only'
-                       check (verification_status in ('discovery_only','verified')),
+  verification_status text not null default 'ingested_unverified'
+                       check (verification_status in ('ingested_unverified','discovery_only','verified')),
   -- A record that holds full text must name the basis under which it is held.
   constraint full_text_requires_basis
     check (full_text_available = false or license_ref is not null)

@@ -115,7 +115,7 @@ test("A2: open-official with §6 basis holds full text and hashes it", async () 
   assert.equal(rec.acquisitionMode, "FULL_TEXT");
   assert.equal(rec.fullTextAvailable, true);
   assert.ok(rec.sourceHash && rec.sourceHash.length === 64);
-  assert.equal(rec.verificationStatus, "discovery_only"); // retrieval ≠ verification
+  assert.equal(rec.verificationStatus, "ingested_unverified"); // retrieval ≠ verification
   assert.equal(rec.titleHe, null); // nothing invented
 });
 
