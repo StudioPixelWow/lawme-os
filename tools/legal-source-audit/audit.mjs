@@ -18,6 +18,37 @@ const UA = "LegalAIIsrael-Research/0.1 (+contact: operator-provided)";
 const MAX_REQUESTS = 15;
 const MAX_SAMPLES = 3;
 
+// Known official API probes for portal-type sources (public, no auth, no bypass).
+// Kept small; each probe counts against the ≤15 request budget.
+const API_PROBES = {
+  data_gov_il: [
+    "https://data.gov.il/api/3/action/status_show",
+    "https://data.gov.il/api/3/action/package_search?q=%D7%9E%D7%A9%D7%A4%D7%98&rows=1",
+  ],
+};
+
+// UA-aware robots.txt: does the ruleset for `*` (or our UA) disallow the base path?
+function robotsDisallowsRoot(text, uaToken) {
+  const lines = text.split(/\r?\n/).map((l) => l.trim());
+  let groups = [];
+  let cur = null;
+  for (const line of lines) {
+    if (/^user-agent:/i.test(line)) {
+      const ua = line.split(":")[1].trim().toLowerCase();
+      if (!cur || cur.rules.length > 0) { cur = { agents: [ua], rules: [] }; groups.push(cur); }
+      else cur.agents.push(ua);
+    } else if (/^disallow:/i.test(line) && cur) {
+      cur.rules.push(line.split(":").slice(1).join(":").trim());
+    }
+  }
+  const applies = (g) => g.agents.includes("*") || g.agents.some((a) => uaToken.toLowerCase().includes(a) && a.length > 2);
+  for (const g of groups) {
+    if (!applies(g)) continue;
+    if (g.rules.some((r) => r === "/" )) return true;
+  }
+  return false; // no applicable group disallows root
+}
+
 const SOURCES = {
   data_gov_il: "https://data.gov.il/",
   supreme_court: "https://supremedecisions.court.gov.il/",
@@ -103,9 +134,39 @@ async function main() {
         await writeFile(`${dir}/evidence/robots.txt`, robots);
         artifact.robots.found = true;
         artifact.robots.sha256 = sha256(robots);
-        artifact.robots.disallowsRelevantPaths = /Disallow:\s*\/(?!\s*$)/i.test(robots);
+        // UA-aware: only a `*` (or our-UA) group disallowing "/" counts against us.
+        artifact.robots.disallowsRelevantPaths = robotsDisallowsRoot(robots, UA);
       }
     } catch { /* leave robots as not found */ }
+
+    // Official-API probe for portal-type sources (public, no auth, within budget).
+    const probes = API_PROBES[source] ?? [];
+    for (const probeUrl of probes) {
+      if (budget.count >= MAX_REQUESTS) break;
+      try {
+        const pr = await politeFetch(probeUrl, budget);
+        if (pr.ok && /json/i.test(pr.headers.get("content-type") ?? "")) {
+          const j = await pr.json();
+          if (j && j.success === true) {
+            artifact.access.apiHints.push(probeUrl.replace(base, "/").replace(/\?.*$/, ""));
+            artifact.access.publicDocumentOpenableWithoutAuth = true; // API returns data without auth
+            artifact.access.hasPublicSearch = true;
+            // CKAN package_search → confirm stable dataset ids + read a license.
+            const rec = j.result?.results?.[0];
+            if (rec) {
+              if (rec.id || rec.name) artifact.access.stableIdentifiersFound = true;
+              const licTitle = rec.license_title ?? null;
+              const licUrl = rec.license_url ?? null;
+              if (licTitle || licUrl) {
+                artifact.policies.termsUrl = licUrl ?? artifact.policies.termsUrl;
+                artifact.operatorNotes += ` [license: ${licTitle ?? "?"}${licUrl ? " " + licUrl : ""}]`;
+              }
+            }
+          }
+        }
+      } catch { /* probe failed; leave hints as-is */ }
+    }
+    artifact.access.apiHints = [...new Set(artifact.access.apiHints)].slice(0, 20);
   } catch (e) {
     artifact.operatorNotes += ` [fetch error: ${String(e.message ?? e)}]`;
   }
