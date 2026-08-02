@@ -73,14 +73,19 @@ export class DataGovIlCollector extends BaseCollector {
 
   async audit(): Promise<SourceAuditResult> {
     try {
-      const status = (await this.http.json(`${BASE}/api/3/action/status_show`)) as { success?: boolean };
-      const ok = status?.success === true;
+      // Probe the confirmed-public search endpoint (not status_show, which
+      // data.gov.il gates). A 403 here means bot protection — which we do NOT
+      // bypass; it surfaces as NO_GO, not as a reason to spoof a browser.
+      const body = (await this.http.json(
+        `${BASE}/api/3/action/package_search?q=${encodeURIComponent(LEGAL_QUERY)}&rows=1`,
+      )) as { success?: boolean; result?: { count?: number } };
+      const ok = body?.success === true;
       return {
         reachable: ok, hasPublicApi: ok, apiKind: "ckan", requiresLogin: false, hasCaptcha: false,
         robotsChecked: false, robotsAllowsPath: "unknown", termsChecked: false,
         automatedAccessStatus: ok ? "apparently_allowed" : "unclear",
         decision: ok ? "LIMITED_GO" : "NO_GO",
-        notesHe: ok ? "CKAN API ציבורי מגיב." : "ה-API לא אישר success.",
+        notesHe: ok ? `CKAN package_search מגיב (count=${body.result?.count ?? "?"}).` : "ה-API לא אישר success.",
       };
     } catch (e) {
       return {
