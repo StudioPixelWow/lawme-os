@@ -1,7 +1,9 @@
 -- ============================================================================
 -- LEGAL AI ISRAEL — Source Registry + audit-support foundation (Phase 1)
 --
--- STATUS: LOCAL ONLY — NOT APPLIED to any remote project by this change.
+-- STATUS: APPLIED to the LawME development project (udispadsbxqicmawqcuk) on
+-- 2026-08-02 with founder approval. Additive `legalai` schema only; the app's
+-- public/app tables were not touched.
 -- Scope: the Source Registry, source-copy/provenance, discovery windows, and
 -- ingestion tracking needed for the Source Audit + Pilot. The full document /
 -- section / citation / embedding schema is Phase 2 (see the ADR).

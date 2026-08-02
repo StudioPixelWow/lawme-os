@@ -2,7 +2,8 @@
 -- LEGAL AI ISRAEL — Phase 2: documents, sections, citations, statutes, topics,
 -- jobs, quality, search analytics.
 --
--- STATUS: LOCAL ONLY — NOT APPLIED remotely by this change. Builds on
+-- STATUS: APPLIED to the LawME development project (udispadsbxqicmawqcuk) on
+-- 2026-08-02 with founder approval. Builds on
 -- 20260726140000_legal_ai_israel_source_registry.sql. RLS deny-by-default; the
 -- registry safety checks from Phase 1 are untouched.
 --
@@ -14,7 +15,7 @@
 
 create extension if not exists vector;
 create extension if not exists pg_trgm;
-create extension if not exists unaccent;
+-- (unaccent intentionally omitted — not used by this schema; add later if needed)
 
 -- Extend the Phase-1 canonical document table -------------------------------
 alter table legalai.legal_documents
@@ -42,7 +43,8 @@ alter table legalai.legal_documents
   add column if not exists parser_version text,
   add column if not exists source_metadata jsonb default '{}'::jsonb,
   add column if not exists derived_metadata jsonb default '{}'::jsonb,
-  add column if not exists published_at timestamptz;
+  add column if not exists published_at timestamptz,
+  add column if not exists source_removed_at timestamptz;
 
 create index if not exists ld_decision_date_idx on legalai.legal_documents (decision_date);
 create index if not exists ld_court_idx on legalai.legal_documents (court_name);
