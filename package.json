@@ -20,6 +20,7 @@
     "legal:ingest:file": "node tools/legal-ingest/ingest-file.mjs",
     "legal:pilot:data-gov": "node tools/legal-ingest/pilot-data-gov.mjs",
     "legal:pilot:supreme": "node tools/legal-ingest/pilot-supreme-court.mjs",
+    "legal:pilot:supreme:browser": "node tools/legal-ingest/pilot-supreme-browser.mjs",
     "legalai:test": "node --test \"src/modules/legal-ai-israel/**/*.test.ts\"",
     "legal:case-number:test": "node --test \"src/lib/legal/case-number/__tests__/*.test.ts\"",
     "legal:poc:test": "node --test \"src/lib/legal/case-number/__tests__/*.test.ts\" \"src/modules/legal-knowledge/tests/*.test.ts\"",
