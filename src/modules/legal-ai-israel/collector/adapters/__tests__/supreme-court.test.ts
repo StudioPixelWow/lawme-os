@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   SupremeCourtCollector, createSupremeCourtDiscoveryCollector,
-  parseVerdictRefs, buildSearchBody,
+  parseVerdictRefs, buildSearchBody, isBlockPage, SupremeCourtBlockedError,
 } from "../supreme-court.ts";
 import type { SupremeHttp } from "../supreme-court.ts";
 import { CollectorDisabledError } from "../../base.ts";
@@ -76,6 +76,26 @@ test("download fetches the HTML text layer + hashes it", async () => {
 test("discovery_only mode blocks downloads", async () => {
   const c = new SupremeCourtCollector({ code: "supreme_court", mode: "discovery_only", enabled: true }, mockHttp());
   await assert.rejects(() => c.download({ externalId: "p|f", url: "x", caseNumberRaw: null, courtName: null, proceedingType: null, decisionDate: null }), CollectorDisabledError);
+});
+
+const BLOCK_HTML = "<HTML><HEAD><TITLE>חסימת בקשה לא מורשית</TITLE></HEAD><BODY>הבקשה נחסמה</BODY></HTML>";
+
+test("isBlockPage detects the anti-bot block page", () => {
+  assert.equal(isBlockPage(BLOCK_HTML), true);
+  assert.equal(isBlockPage(RESULTS_HTML), false);
+});
+
+test("audit: anti-bot block page → NO_GO / prohibited (never treated as success)", async () => {
+  const c = createSupremeCourtDiscoveryCollector(mockHttp({ async postForHtml() { return { status: 200, text: BLOCK_HTML }; } }));
+  const a = await c.audit();
+  assert.equal(a.decision, "NO_GO");
+  assert.equal(a.automatedAccessStatus, "prohibited");
+  assert.equal(a.hasPublicApi, false);
+});
+
+test("discover: block page throws SupremeCourtBlockedError (not a silent 0)", async () => {
+  const c = createSupremeCourtDiscoveryCollector(mockHttp({ async postForHtml() { return { status: 200, text: BLOCK_HTML }; } }));
+  await assert.rejects(() => c.discover("2026-07-01T00:00:00.000Z|2026-07-31T00:00:00.000Z"), SupremeCourtBlockedError);
 });
 
 test("disabled collector cannot discover", async () => {

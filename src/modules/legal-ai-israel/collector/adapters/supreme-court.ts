@@ -13,6 +13,13 @@
  *
  * Judgment text is §6-exempt from copyright. Extends BaseCollector so the
  * enabled+mode guard applies. HTTP is injected → unit-testable offline.
+ *
+ * IMPORTANT FINDING (2026-08-02): the site is ANTI-BOT protected. A real browser
+ * search works, but SERVER-SIDE programmatic POSTs to SearchVerdicts receive a
+ * "חסימת בקשה לא מורשית" block page (HTTP 200). We do NOT bypass this (no token
+ * spoofing, no challenge defeat). audit()/discover() detect the block and fail
+ * closed. The lawful route for this source is public browser automation (which
+ * the operator approves) or an official data-feed request — see the audit doc.
  */
 import { BaseCollector } from "../base.ts";
 import type { CollectorConfig } from "../base.ts";
@@ -74,6 +81,20 @@ export interface VerdictRef {
   fileName: string;
 }
 
+export class SupremeCourtBlockedError extends Error {
+  constructor() {
+    super("supremedecisions.court.gov.il blocked the programmatic request (anti-bot). Not bypassed.");
+    this.name = "SupremeCourtBlockedError";
+  }
+}
+
+/** The site returns a "חסימת בקשה לא מורשית" page (HTTP 200) to programmatic
+ *  requests. Detect it so we never treat a block as a success — and never try
+ *  to defeat it (that would be bypassing a protection mechanism). */
+export function isBlockPage(html: string): boolean {
+  return /חסימת\s*בקשה|לא\s*מורשית/.test(html);
+}
+
 /** Parse the results HTML for unique judgment references (via the type=2 links). */
 export function parseVerdictRefs(html: string): VerdictRef[] {
   const re = /Home\/Download\?path=([^&"'\s]+)&fileName=([^&"'\s]+)&type=2/g;
@@ -104,14 +125,24 @@ export class SupremeCourtCollector extends BaseCollector {
     try {
       // A tiny 1-day window probe — success = the search endpoint is reachable.
       const body = buildSearchBody("2026-07-31T00:00:00.000Z", "2026-08-01T00:00:00.000Z");
-      const { status } = await this.http.postForHtml(`${BASE}/Home/SearchVerdicts`, body);
-      const ok = status === 200;
+      const { status, text } = await this.http.postForHtml(`${BASE}/Home/SearchVerdicts`, body);
+      // HTTP 200 is NOT success here: the site returns a block page (200) to
+      // programmatic access. Verified: server-side requests are anti-bot blocked.
+      if (isBlockPage(text)) {
+        return {
+          reachable: true, hasPublicApi: false, apiKind: "rest", requiresLogin: false, hasCaptcha: false,
+          robotsChecked: false, robotsAllowsPath: "unknown", termsChecked: false,
+          automatedAccessStatus: "prohibited", decision: "NO_GO",
+          notesHe: "האתר חוסם גישה תוכנתית ל-API (anti-bot). דפדפן אמיתי עובד; אין לעקוף. מסלול חוקי: אוטומציית דפדפן ציבורית או בקשת feed רשמי.",
+        };
+      }
+      const hasResults = status === 200 && /Home\/Download/.test(text);
       return {
-        reachable: ok, hasPublicApi: ok, apiKind: "rest", requiresLogin: false, hasCaptcha: false,
+        reachable: status === 200, hasPublicApi: hasResults, apiKind: "rest", requiresLogin: false, hasCaptcha: false,
         robotsChecked: false, robotsAllowsPath: "unknown", termsChecked: false,
-        automatedAccessStatus: ok ? "apparently_allowed" : "unclear",
-        decision: ok ? "LIMITED_GO" : "NO_GO",
-        notesHe: ok ? "SearchVerdicts מגיב (HTML). ללא login/CAPTCHA; טקסט פטור §6." : `סטטוס ${status}`,
+        automatedAccessStatus: hasResults ? "apparently_allowed" : "unclear",
+        decision: hasResults ? "LIMITED_GO" : "NO_GO",
+        notesHe: hasResults ? "SearchVerdicts החזיר תוצאות עם קישורי הורדה." : `לא זוהו תוצאות (status ${status}).`,
       };
     } catch (e) {
       return {
@@ -129,6 +160,8 @@ export class SupremeCourtCollector extends BaseCollector {
     const [fromISO, toISO] = cursor.split("|");
     const body = buildSearchBody(fromISO, toISO);
     const { status, text } = await this.http.postForHtml(`${BASE}/Home/SearchVerdicts`, body);
+    // Never treat the anti-bot block page as an empty result — surface it.
+    if (isBlockPage(text)) throw new SupremeCourtBlockedError();
     if (status !== 200) return { items: [], nextCursor: null, windowLabel: `${fromISO}..${toISO} (status ${status})` };
     const refs = parseVerdictRefs(text);
     const items: DiscoveredItem[] = refs.map((r) => ({
