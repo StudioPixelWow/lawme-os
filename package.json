@@ -16,6 +16,7 @@
     "db:reset:local": "supabase db reset --local",
     "db:lint": "supabase db lint --local",
     "legal:audit": "node tools/legal-source-audit/audit.mjs",
+    "legal:sources:audit": "node tools/legal-source-audit/run-audits.mjs",
     "legal:audit:import": "node tools/legal-source-audit/import.mjs",
     "legal:ingest:file": "node tools/legal-ingest/ingest-file.mjs",
     "legal:pilot:data-gov": "node tools/legal-ingest/pilot-data-gov.mjs",
