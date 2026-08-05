@@ -101,7 +101,7 @@ begin
           audit_status = 'completed'
           and technical_access_status in ('open','partially_open','rate_limited')
           and legal_reuse_status in ('open_license','public_reuse_allowed','commercial_permission_required')
-          and requires_captcha = false
+          and has_captcha = false
           and requires_login = false
         )
       );
