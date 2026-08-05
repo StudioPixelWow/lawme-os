@@ -1,0 +1,8 @@
+code,source,terms_url,license_url,automated_access,commercial_use,full_text_storage,redistribution,attribution,confidence,previous_verdict,new_verdict,required_action
+data_gov_il:judgments,"data.gov.il — מאגר פסקי דין",https://data.gov.il/api/3/action/package_show?id=judgments,https://data.gov.il/api/3/action/license_show?id=other-open,allowed,allowed,allowed,allowed,not_required,0.9,REVIEW,OPEN,"build via CKAN API"
+data_gov_il,"data.gov.il (domain)",https://data.gov.il/api/3/action/license_list,,allowed,per_dataset,per_dataset,per_dataset,per_dataset,0.74,REVIEW,REVIEW,"classify each legal dataset"
+judgments_org_il,Judgments.org.il,https://judgments.org.il/תנאי-שימוש-באתר/,,prohibited_without_permission,prohibited_without_written,requires_permission,prohibited_without_written,n/a,0.95,REVIEW,ASK,"obtain written permission"
+judicial_authority,הרשות השופטת,https://www.gov.il/he/pages/gov_terms_of_use,,restricted_interface_only,allowed_content_s6,allowed_content_s6,allowed_content_s6,cite_source,0.9,REVIEW,ASK,"official data feed"
+supreme_court,בית המשפט העליון,https://www.gov.il/he/pages/gov_terms_of_use,,restricted_interface_only_plus_antibot,allowed_content_s6,allowed_content_s6,allowed_content_s6,cite_source,0.9,REVIEW,ASK,"official data feed"
+unicourt_tribunals,מערכת בתי הדין,https://www.gov.il/he/pages/gov_terms_of_use,,restricted_interface_only,allowed_content_s6,allowed_content_s6,allowed_content_s6,cite_source,0.9,REVIEW,ASK,"official data feed"
+isa_securities,רשות ניירות ערך,,,unknown,unknown,unknown,unknown,unknown,0.4,REVIEW,REVIEW,"fetch isa.gov.il terms"
