@@ -59,3 +59,7 @@ supabase/.branches/
 
 # POC local run telemetry
 .poc-runs/
+
+# LEGAL AI ISRAEL pilot outputs (runtime corpus artifacts, not source)
+pilot-out/
+pilot-live/

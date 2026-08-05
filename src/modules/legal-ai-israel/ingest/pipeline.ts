@@ -10,8 +10,11 @@ import { createHash } from "node:crypto";
 import { validateFile } from "../parser/filetype.ts";
 import { normalizeHebrewLegalText } from "../parser/hebrew-normalize.ts";
 import { segmentDocument, chunkSections } from "../parser/segment.ts";
+import type { DocumentSection, RetrievalChunk } from "../parser/segment.ts";
 import { extractCitations } from "../citation/extract.ts";
+import type { CitationMatch } from "../citation/extract.ts";
 import { extractStatuteCitations } from "../citation/statute.ts";
+import type { StatuteCitation } from "../citation/statute.ts";
 import { evaluatePublishGates } from "../quality/gates.ts";
 import type { GateResult } from "../quality/gates.ts";
 
@@ -57,7 +60,26 @@ export function deriveDocumentId(sourceCode: string, sha256: string): string {
   return `${sourceCode}:${sha256.slice(0, 16)}`;
 }
 
-export function ingestFile(input: IngestInput): IngestReport {
+/**
+ * Full parsed artifacts of a single ingest. `ingestFile` returns only the
+ * summary counts (`report`); persistence needs the actual sections/citations,
+ * so `buildIngestArtifacts` exposes them. Same pure pipeline, no DB, no network.
+ */
+export interface IngestArtifacts {
+  documentId: string;
+  sha256: string;
+  fileType: string;
+  normalizedText: string;
+  transformsApplied: number;
+  sections: DocumentSection[];
+  chunks: RetrievalChunk[];
+  citations: CitationMatch[];
+  statutes: StatuteCitation[];
+  gate: GateResult;
+  report: IngestReport;
+}
+
+export function buildIngestArtifacts(input: IngestInput): IngestArtifacts {
   if (!input.operatorAffirmsPublicAndLawful) throw new OperatorAffirmationRequiredError();
 
   const validation = validateFile(input.bytes);
@@ -87,7 +109,7 @@ export function ingestFile(input: IngestInput): IngestReport {
     looksLikeError: false,
   });
 
-  return {
+  const report: IngestReport = {
     documentId,
     sha256,
     fileType: validation.type,
@@ -99,4 +121,14 @@ export function ingestFile(input: IngestInput): IngestReport {
     status: gate.publishable ? "unpublished_pending_review" : "unpublished_gate_failed",
     transformsApplied: norm.transforms.length,
   };
+
+  return {
+    documentId, sha256, fileType: validation.type,
+    normalizedText: norm.normalizedText, transformsApplied: norm.transforms.length,
+    sections, chunks, citations, statutes, gate, report,
+  };
+}
+
+export function ingestFile(input: IngestInput): IngestReport {
+  return buildIngestArtifacts(input).report;
 }
