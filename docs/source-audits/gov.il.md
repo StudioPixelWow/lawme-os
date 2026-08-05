@@ -1,6 +1,6 @@
 # Source Audit — ארכיון המדינה (gov.il)
 
-Verdict: **UNDETERMINED** · audit_status: `incomplete` · confidence: 0.3
+Verdict: **BLOCKED** · audit_status: `incomplete` · confidence: 0.3
 Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
 
 ## 1. Source summary
@@ -15,7 +15,7 @@ Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
 - Coverage score: 0/100 (volume/years/courts/topics/updates — see evidence)
 
 ## 4. Access findings
-- access_status: `unknown` · technical_access_status: `unknown`
+- access_status: `blocked` · technical_access_status: `waf_blocked`
 - requires login: no · CAPTCHA: no
 - Access score: 10/100
 
@@ -50,7 +50,7 @@ Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
 - legal_reuse_status: `unknown` · legal clarity score: 0/100
 
 ## 13. Technical risks
-- Fragile if: WAF/anti-bot, JS-only content, or missing stable ids. technical_access_status=`unknown`.
+- Fragile if: WAF/anti-bot, JS-only content, or missing stable ids. technical_access_status=`waf_blocked`.
 
 ## 14. Legal uncertainty
 - Reuse terms not conclusively established → MANUAL LEGAL REVIEW required before any collection.
@@ -64,14 +64,14 @@ Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
 ## 17. Collector recommendation
 - Priority score: 3/100
 - Build gate: **DENIED**
-- Reasons: audit not completed; technical access 'unknown' is not usable; legal reuse status unknown; no recommended access method; audit confidence 0.3 < 0.6
+- Reasons: audit not completed; technical access 'waf_blocked' is not usable; legal reuse status unknown; no recommended access method; audit confidence 0.3 < 0.6
 - Required actions: run and complete a full audit; resolve access (allowlist/API) or mark blocked; complete legal review (manual); determine access method during audit; raise audit confidence (more evidence)
 
 ## 18. Final status
-- **UNDETERMINED** — manual legal review required
+- **BLOCKED** — do not use (blocked/prohibited)
 
 ## 19. Evidence and dates
-- [homepage] https://www.gov.il/he/departments/israel_state_archives → HTTP 403 · homepage status 403 · 2026-08-05T16:07:19.254Z · sha256:f239d83338dc
+- [homepage] https://www.gov.il/he/departments/israel_state_archives → HTTP 403 · homepage status 403 · 2026-08-05T16:39:35.851Z · sha256:0afcf6e9af2b
 
 ## 20. Manual actions required
 - run and complete a full audit

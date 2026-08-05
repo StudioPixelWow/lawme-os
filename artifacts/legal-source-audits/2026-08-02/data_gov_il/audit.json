@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1",
+  "sourceCode": "data_gov_il",
+  "auditedAt": "2026-08-02T12:53:03.563Z",
+  "userAgent": "LegalAIIsrael-Research/0.1 (+contact: operator-provided)",
+  "requestCount": 4,
+  "dns": {
+    "resolved": true,
+    "addresses": []
+  },
+  "tls": {
+    "ok": true,
+    "protocol": null
+  },
+  "http": {
+    "status": 200,
+    "redirects": [],
+    "contentType": "text/html; charset=utf-8",
+    "headers": {
+      "alt-svc": "h3=\":443\"; ma=2592000",
+      "cache-control": "no-cache, private, no-transform, no-store",
+      "content-encoding": "gzip",
+      "content-type": "text/html; charset=utf-8",
+      "date": "Sun, 02 Aug 2026 12:53:07 GMT",
+      "expires": "Thu, 01 Jan 1970 00:01:48 GMT",
+      "p3p": "CP=\"IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT\"",
+      "pragma": "no-cache",
+      "server": "",
+      "strict-transport-security": "max-age=16070400; includeSubDomains",
+      "transfer-encoding": "chunked",
+      "vary": "Accept-Encoding",
+      "via": "1.1 google",
+      "x-content-type-options": "nosniff"
+    },
+    "rateLimitHeaders": {},
+    "retryAfter": null
+  },
+  "robots": {
+    "found": true,
+    "sha256": "e4faa5942c7a35c3560a36987ee9a569225513930c0a09840be4413352ccbf0d",
+    "disallowsRelevantPaths": false
+  },
+  "policies": {
+    "termsUrl": null,
+    "privacyUrl": null,
+    "sitemapUrl": null,
+    "termsSha256": null
+  },
+  "access": {
+    "hasPublicSearch": true,
+    "apiHints": [
+      "/api/3/action/package_search"
+    ],
+    "cookiesRequired": false,
+    "loginRequired": false,
+    "captchaDetected": false,
+    "publicDocumentOpenableWithoutAuth": true,
+    "sampleDocumentUrl": null,
+    "stableIdentifiersFound": true,
+    "formFields": [],
+    "jsEndpointHints": []
+  },
+  "sampleDocumentsFetched": 0,
+  "operatorNotes": " [license: אחר (פתוח)]"
+}

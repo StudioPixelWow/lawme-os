@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1",
+  "sourceCode": "supreme_court",
+  "auditedAt": "2026-08-02T14:15:09.582Z",
+  "userAgent": "LegalAIIsrael-Research/0.1 (+contact: operator-provided)",
+  "requestCount": 1,
+  "dns": {
+    "resolved": false,
+    "addresses": []
+  },
+  "tls": {
+    "ok": false,
+    "protocol": null
+  },
+  "http": {
+    "status": null,
+    "redirects": [],
+    "contentType": null,
+    "headers": {},
+    "rateLimitHeaders": {},
+    "retryAfter": null
+  },
+  "robots": {
+    "found": false,
+    "sha256": null,
+    "disallowsRelevantPaths": null
+  },
+  "policies": {
+    "termsUrl": null,
+    "privacyUrl": null,
+    "sitemapUrl": null,
+    "termsSha256": null
+  },
+  "access": {
+    "hasPublicSearch": false,
+    "apiHints": [],
+    "cookiesRequired": false,
+    "loginRequired": false,
+    "captchaDetected": false,
+    "publicDocumentOpenableWithoutAuth": null,
+    "sampleDocumentUrl": null,
+    "stableIdentifiersFound": false,
+    "formFields": [],
+    "jsEndpointHints": []
+  },
+  "sampleDocumentsFetched": 0,
+  "operatorNotes": " [fetch error: fetch failed]"
+}

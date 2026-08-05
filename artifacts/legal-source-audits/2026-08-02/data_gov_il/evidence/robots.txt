@@ -1,0 +1,7 @@
+User-agent: laboraybot
+User-agent: YandexBot
+User-agent: SemrushBot
+User-agent: Barkrowler
+User-agent: PetalBot
+Disallow: /
+

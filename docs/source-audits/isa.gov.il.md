@@ -1,31 +1,31 @@
 # Source Audit — רשות ניירות ערך (isa.gov.il)
 
-Verdict: **UNDETERMINED** · audit_status: `incomplete` · confidence: 0.3
-Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
+Verdict: **REVIEW** · audit_status: `manual_review_required` · confidence: 0.74
+Generated from 8 bounded probe(s). Claims below reflect observed evidence only.
 
 ## 1. Source summary
 - URL: https://www.isa.gov.il/
 - CMS/platform: unknown
-- HTTPS: yes · reachable: no · homepage HTTP: 403
+- HTTPS: yes · reachable: yes · homepage HTTP: 200
 
 ## 2. Ownership
 - Normalized domain: isa.gov.il
 
 ## 3. Coverage
-- Coverage score: 0/100 (volume/years/courts/topics/updates — see evidence)
+- Coverage score: 15/100 (volume/years/courts/topics/updates — see evidence)
 
 ## 4. Access findings
-- access_status: `unknown` · technical_access_status: `unknown`
+- access_status: `public` · technical_access_status: `open`
 - requires login: no · CAPTCHA: no
-- Access score: 10/100
+- Access score: 50/100
 
 ## 5. robots findings
-- found: no · disallows relevant paths: unknown · crawl-delay: none
-- declared sitemaps: 0
+- found: yes · disallows relevant paths: no · crawl-delay: none
+- declared sitemaps: 1
 - (robots is a technical signal only — NOT a license.)
 
 ## 6. Sitemap findings
-- found: no · kind: none · child sitemaps: 0 · est. urls: 0
+- found: yes · kind: index · child sitemaps: 5 · est. urls: 0
 - likely judgment urls (sample): 0 · likely pdf: 0
 
 ## 7. API findings
@@ -50,7 +50,7 @@ Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
 - legal_reuse_status: `unknown` · legal clarity score: 0/100
 
 ## 13. Technical risks
-- Fragile if: WAF/anti-bot, JS-only content, or missing stable ids. technical_access_status=`unknown`.
+- Fragile if: WAF/anti-bot, JS-only content, or missing stable ids. technical_access_status=`open`.
 
 ## 14. Legal uncertainty
 - Reuse terms not conclusively established → MANUAL LEGAL REVIEW required before any collection.
@@ -59,23 +59,22 @@ Generated from 1 bounded probe(s). Claims below reflect observed evidence only.
 - not established by this audit
 
 ## 16. Recommended access method
-- none determined
+- sitemap-driven fetch
 
 ## 17. Collector recommendation
-- Priority score: 3/100
+- Priority score: 17/100
 - Build gate: **DENIED**
-- Reasons: audit not completed; technical access 'unknown' is not usable; legal reuse status unknown; no recommended access method; audit confidence 0.3 < 0.6
-- Required actions: run and complete a full audit; resolve access (allowlist/API) or mark blocked; complete legal review (manual); determine access method during audit; raise audit confidence (more evidence)
+- Reasons: audit not completed; legal reuse status unknown
+- Required actions: run and complete a full audit; complete legal review (manual)
 
 ## 18. Final status
-- **UNDETERMINED** — manual legal review required
+- **REVIEW** — manual legal review required
 
 ## 19. Evidence and dates
-- [homepage] https://www.isa.gov.il/ → HTTP 403 · homepage status 403 · 2026-08-05T16:07:13.710Z · sha256:e490c2dbcab7
+- [homepage] https://www.new.isa.gov.il/ → HTTP 200 · homepage status 200 · 2026-08-05T16:39:29.375Z · sha256:447225a31c1b
+- [robots] https://www.new.isa.gov.il/robots.txt → HTTP 200 · robots status 200 · 2026-08-05T16:39:29.375Z · sha256:407a7077c2c0
+- [sitemap] https://www.new.isa.gov.il/sitemap.xml → HTTP 200 · sitemap index, ~0 urls · 2026-08-05T16:39:29.375Z · sha256:7cc2d715c3cf
 
 ## 20. Manual actions required
 - run and complete a full audit
-- resolve access (allowlist/API) or mark blocked
 - complete legal review (manual)
-- determine access method during audit
-- raise audit confidence (more evidence)
