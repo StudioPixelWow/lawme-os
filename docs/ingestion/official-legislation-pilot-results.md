@@ -37,15 +37,25 @@ checkpoint per law.
 Document-type distribution: `original_enactment 8`, `amendment_law 8` (עקיף),
 `correction 18` (ישיר), `official_gazette_pdf 1`.
 
-## Why downloads/extraction/sections are 0
+## Update 2026-08-06 — live PDF fetch + extraction executed
 
-This session's container has **no network egress**. Live fetches ran through the
-Claude-in-Chrome browser; **bulk PDF download + text extraction is the operator
-step**. The fetch (`pdf-fetch.ts`) and extraction (`pdf-extract.ts`) code is
-fully implemented and offline-tested behind injected transports/engines, and
-section parsing + amendment-operation parsing run the moment extracted text
-exists. These figures are **not invented** — they are honestly zero because the
-network step has not run here.
+The metadata-tier zeros above were superseded by an actual live run (browser
+carried the network, since the container is air-gapped from `fs.knesset.gov.il`).
+See `knesset-pdf-extraction-report.md` + `artifacts/knesset-live-pdf-pilot.*`:
+
+| Metric | Value |
+|---|---|
+| PDFs downloaded | 31 / 31 (100%) |
+| PDFs rejected / quarantined | 0 / 2 |
+| Text extraction success | 100% (93.5% high-confidence) |
+| OCR used | 0 |
+| Total bytes / pages / chars | 7.65 MB / 340 / 968,067 |
+| Sections parsed (real parser, sample) | 3/3 (pub 147462) — persisted + FTS-searchable |
+| Amendment operations (real parser, sample) | 4 (3 parsed, 1 needs_review) — persisted |
+
+Extraction metadata (sha256, size, pages, confidence, raw_text_hash) persisted
+to all 31 `law_publications`; nothing published. Decision for the broad backfill:
+**GO_WITH_FIXES** (see `knesset-backfill-decision.md`) — so no backfill started.
 
 ## Data-quality findings (real, surfaced not hidden)
 

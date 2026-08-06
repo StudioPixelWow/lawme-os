@@ -50,11 +50,19 @@ community-maintained and may lag the newest official amendment.
   (`legislation/citation-contract.ts`) may back an answer: published +
   license-allowed + provenance-complete + not quarantined + current version +
   complete citation.
-- `legalai.law_publications` and `law_publication_edges` are RLS deny-by-default
-  (service-role only); nothing is `published` (verified on dev: 0 published
-  publications, 0 published chunks/sections). The demonstration/demo legislation
-  remains gated (`non_authoritative_demo`, `published=false`) and is never
-  searchable or RAG-served.
+- `legalai.law_publications`, `law_publication_edges`, and
+  `amendment_operations` are RLS deny-by-default (service-role only); nothing is
+  `published` (verified on dev after the live PDF run: 0 published publications,
+  0 published chunks, 0 published sections). Real sections extracted from
+  official PDFs (`source_platform='knesset_legislation_pdf'`) are stored
+  `version_status='validated'` with `published=false` and license
+  `statutory_exemption_sec6` — indexed and FTS-searchable via the service role,
+  but not served until they pass the citation gate + review. The demonstration/
+  demo legislation remains gated (`non_authoritative_demo`, `published=false`)
+  and is never searchable or RAG-served.
+- Amendment operations are stored as assertions with `status` in
+  (`parsed`/`needs_review`/`unsupported`) and a confidence; `needs_review` /
+  `unsupported` operations never drive an authoritative modification claim.
 - A DB CHECK (`law_publications_no_publish_as_consolidated_chk`) blocks
   publishing a publication row as an authoritative consolidated text.
 
