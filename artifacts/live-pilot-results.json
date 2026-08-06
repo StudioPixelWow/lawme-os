@@ -1,0 +1,62 @@
+{
+  "pilot": "LAW ME — Live Production Pilot (First Canonical Ingestion Slice)",
+  "date": "2026-08-06",
+  "dev_project": "udispadsbxqicmawqcuk (LawME, development — verified not production)",
+  "migration_applied": "20260806120000 canonical_ingestion_v1 (result: success)",
+  "fetch_path": "Real public JSON APIs fetched over the operator network via the browser (Knesset OData ParliamentInfo; data.gov.il CKAN datastore_search). No auth, no bypass. Mapping/validation/dedup/versioning ran through the real pipeline in the container; results persisted to dev via Supabase MCP.",
+  "note_on_scope": "Bounded real sample per source (browser-mediated fetch). Full 500-cap run is available via the --live CLI from an unblocked network. All figures below are REAL (live data, real pipeline, real dev DB).",
+  "connection_tests": {
+    "knesset_odata": "connected",
+    "data_gov_il_ararim": "connected",
+    "data_gov_il_mishmoret": "connected",
+    "data_gov_il_judgments": "connected"
+  },
+  "qualification_findings": {
+    "knesset_KNS_IsraelLaw": "fields Id, Name, KnessetNum, IsBasicLaw, PublicationDate, LawValidityDesc (mapper corrected from LawID/LawTypeDesc/LawValidity)",
+    "knesset_KNS_Bill": "fields Id, Name, SubTypeDesc, StatusID (no StatusDesc), Number, PublicationDate",
+    "ararim": "METADATA-ONLY case index (מספר תיק, בית דין, שם דיין, תאריך החלטה, סוג בקשה, נושא); NO decision text; PDF resource is an instruction sheet. Total 66,394 rows. license cc-by.",
+    "mishmoret": "METADATA-ONLY + document link on rfa.justice.gov.il (DIFFERENT DOMAIN — license NOT inherited) + PII (detainee number, nationality). Total 181,903 rows. license cc-by.",
+    "judgments": "SUMMARY (פירוט ההחלטה) + parties + district + outcome + costs. ContainPrivateData=No. Total 310 rows. license other-open."
+  },
+  "per_source": [
+    {"source": "knesset_odata", "dataset": "legislation (KNS_IsraelLaw+KNS_Bill)", "license": "open (legislation, no §6 copyright)", "attribution_required": false,
+     "records_fetched": 11, "canonical_entities": 11, "versions": 11, "relationships": 0, "duplicates": 0, "quarantined": 0,
+     "content": {"full_text": 0, "summary": 0, "metadata_only": 11}, "validation_pct": 100, "provenance_pct": 100, "indexing_pct": 100,
+     "search": "law/bill title search returns real laws; external-id (knesset_law_id/knesset_bill_id) lookup works",
+     "ai_readiness": "RAG_READY_WITH_LIMITATIONS (metadata+titles; full law text via KNS_DocumentIsraelLaw not yet ingested)",
+     "go_decision": "GO"},
+    {"source": "data_gov_il", "dataset": "ararim", "license": "cc-by", "attribution_required": true,
+     "records_fetched": 8, "canonical_entities": 8, "versions": 8, "relationships": 8, "duplicates": 0, "quarantined": 0,
+     "content": {"full_text": 0, "summary": 0, "metadata_only": 8}, "validation_pct": 100, "provenance_pct": 100, "indexing_pct": 100,
+     "search": "case-number + court + topic search works; graph Case→Authority→Decision resolves",
+     "ai_readiness": "NOT_RAG_READY (metadata only, no decision text)",
+     "go_decision": "GO_WITH_FIXES", "required_fixes": ["record + display cc-by attribution before exposing to users"]},
+    {"source": "data_gov_il", "dataset": "mishmoret", "license": "cc-by", "attribution_required": true,
+     "records_fetched": 8, "canonical_entities": 7, "versions": 7, "relationships": 8, "duplicates": 1, "quarantined": 0,
+     "content": {"full_text": 0, "summary": 0, "metadata_only": 8}, "validation_pct": 100, "provenance_pct": 100, "indexing_pct": 100,
+     "search": "case/authority/document-source resolve; doc link stored as DocumentSource (cross-domain, license flagged)",
+     "ai_readiness": "NOT_RAG_READY (metadata only; document text on another domain, unlicensed)",
+     "go_decision": "GO_WITH_FIXES", "required_fixes": ["PII minimization — do not ingest detainee number / nationality", "record cc-by attribution", "do NOT fetch/store rfa.justice.gov.il documents without a separate license check"]},
+    {"source": "data_gov_il", "dataset": "judgments", "license": "other-open", "attribution_required": false,
+     "records_fetched": 3, "canonical_entities": 8, "versions": 8, "relationships": 9, "duplicates": 2, "quarantined": 1,
+     "content": {"full_text": 0, "summary": 2, "metadata_only": 6}, "validation_pct": 91, "provenance_pct": 100, "indexing_pct": 100,
+     "search": "case-number, court, party, summary FTS all work; restricted (איסור פרסום) decision correctly quarantined",
+     "ai_readiness": "RAG_READY_WITH_LIMITATIONS (decision summaries + parties + outcomes; not full reasoning)",
+     "go_decision": "GO_WITH_FIXES", "required_fixes": ["display source link/attribution", "label summary-only clearly in UI"]}
+  ],
+  "totals_persisted_to_dev": {
+    "canonical_entities": 34, "by_type": {"Law": 3, "Bill": 8, "Authority": 3, "Case": 7, "Court": 1, "DocumentSource": 2, "Topic": 2, "Decision": 6, "Party": 2},
+    "external_ids": 34, "versions": 34, "relationships": 25, "quarantined": 1, "metric_runs": 4,
+    "content_level": {"metadata_only": 32, "summary": 2, "full_text": 0}, "provenance_coverage_pct": 100
+  },
+  "verifications": {
+    "idempotency": "PASS (re-insert existing entity → no duplicate; count stable at 34)",
+    "version_chain": "PASS (simulated status change on Law 2000001 → v2 created, is_current pointer moved to v2)",
+    "quarantine": "PASS (restricted decision absent from canonical_entities; recorded in ingestion_quarantine with reason publication_restricted)",
+    "provenance": "PASS (34/34 = 100% carry platform/url/raw_hash/external_id/content_hash)",
+    "content_level_accuracy": "PASS (summary never full_text; metadata never mislabeled)",
+    "search_structured": "PASS", "search_fts": "PASS (Hebrew token match e.g. ביטוח)", "graph_traversal": "PASS",
+    "rls": "deny-by-default on all 8 new tables (service-role only)"
+  },
+  "backfill": {"started": false, "reason": "Backfill deferred to the operator --live run (up to 10k Knesset / 5k per CKAN dataset). Only knesset_odata is GO; ararim/mishmoret/judgments are GO_WITH_FIXES pending the listed fixes."}
+}

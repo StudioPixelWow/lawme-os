@@ -55,9 +55,13 @@ export function gateRecord(record: CanonicalRecord, cfg: ValidationConfig): stri
     reasons.push("unmarked_partial_content");
   }
 
-  // publication-restriction notices (איסור פרסום, קטין, חסוי, …) → refuse
-  if (record.primaryText && record.primaryText.raw) {
-    const hits = detectRestrictionNotices(record.primaryText.raw);
+  // publication-restriction notices (איסור פרסום, קטין, חסוי, …) → refuse.
+  // Scan the primary text AND any summary/detail field, so metadata/summary
+  // rows carrying restriction language are caught even without full text.
+  const summary = typeof record.fields.summary === "string" ? record.fields.summary : "";
+  const textToScan = `${record.primaryText ? record.primaryText.raw : ""} ${summary}`.trim();
+  if (textToScan.length > 0) {
+    const hits = detectRestrictionNotices(textToScan);
     if (hits.length > 0) reasons.push("publication_restricted");
   }
 

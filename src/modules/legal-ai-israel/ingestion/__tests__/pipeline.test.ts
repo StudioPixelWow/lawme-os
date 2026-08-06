@@ -54,14 +54,14 @@ test("pilot e2e: Knesset collector ingests all entity sets across pages", async 
   assert.equal(res.finalCheckpoint.done, true);
 });
 
-test("pilot e2e: data.gov ararim ingests Decisions with full_text accounting", async () => {
+test("pilot e2e: data.gov ararim ingests Decisions as metadata_only (real datastore has no text)", async () => {
   const store = new InMemoryCanonicalStore();
   const collector = new DataGovCkanCollector(ckanHttp("res-ararim", ARARIM_ROWS), store, ararimCfg());
   const res = await runIngestion(collector, store, RUN);
   assert.equal(res.stopped, false);
   assert.ok(store.byType("Decision").length >= 1);
-  // at least the two full-text rows counted as full_text
-  assert.ok(res.metrics.documentsWithFullText >= 2);
+  assert.equal(res.metrics.documentsWithFullText, 0);
+  assert.ok(res.metrics.documentsWithMetadataOnly >= 1);
 });
 
 test("judgments: documents counted as summary-only, never full_text", async () => {
@@ -91,12 +91,13 @@ test("update detection: changed source content creates a NEW version", async () 
   const store = new InMemoryCanonicalStore();
   const cfg = ararimCfg();
   await runIngestion(new DataGovCkanCollector(ckanHttp("res-ararim", ARARIM_ROWS), store, cfg), store, RUN);
-  // change the decision text of row 1 → same identity, new content
+  // change a CONTENT field that is part of the Decision payload (costs) but not
+  // its identity (case+court+date) → same canonical id, new version.
   const changed = ARARIM_ROWS.map((r) => ({ ...r }));
-  changed[0] = { ...changed[0], "נוסח ההחלטה": "החלטה\nהערר נדחה לאחר עיון מחודש.\nסוף דבר\nנדחה." };
+  changed[0] = { ...changed[0], "הוצאות לעותר": "9999" };
   await store.saveCheckpoint({ source: "data_gov_il", dataset: "ararim", mode: "backfill", cursor: "0", page: 0, lastModified: null, done: false, fetched: 0 });
   const res = await runIngestion(new DataGovCkanCollector(ckanHttp("res-ararim", changed), store, cfg), store, RUN);
-  assert.ok(res.metrics.updatesDetected >= 1, "a changed decision yields an update/new version");
+  assert.ok(res.metrics.updatesDetected >= 1, "a changed decision field yields an update/new version");
   const decision = store.byType("Decision").find((d) => (d.record.fields.caseNumberRaw as string) === "ערר 1234-01-23");
   assert.ok(decision && decision.versionNumber >= 2, "version number incremented");
 });
@@ -129,17 +130,17 @@ test("fail-closed: a 403 access block STOPS the source cleanly, no bypass", asyn
   assert.equal(store.size(), 0, "nothing ingested when blocked");
 });
 
-test("quarantine: an invalid record is quarantined with reasons, not published", async () => {
+test("quarantine: records are quarantined (not published) when the license forbids ingestion", async () => {
   const store = new InMemoryCanonicalStore();
-  // license forbids full text → the two full-text ararim decisions get quarantined
   const cfg = ararimCfg();
   const collector = new DataGovCkanCollector(
     ckanHttp("res-ararim", ARARIM_ROWS), store, cfg,
-    { minConfidence: 0.5, license: { ingestionAllowed: true, fullTextAllowed: false } },
+    { minConfidence: 0.5, license: { ingestionAllowed: false, fullTextAllowed: false } },
   );
   const res = await runIngestion(collector, store, RUN);
   assert.ok(res.metrics.recordsQuarantined > 0);
-  assert.ok(store.quarantined.some((q) => q.reasons.includes("full_text_not_licensed")));
+  assert.equal(res.metrics.recordsPersisted, 0, "nothing persisted when ingestion is unlicensed");
+  assert.ok(store.quarantined.some((q) => q.reasons.includes("license_forbids_ingestion")));
 });
 
 test("indexing + attribution: persisted records are indexed and fully attributed", async () => {

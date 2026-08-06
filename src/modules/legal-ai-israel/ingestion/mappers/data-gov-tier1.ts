@@ -31,18 +31,22 @@ export interface Tier1DatasetConfig {
   hasFullDocuments: boolean;
 }
 
+// Corrected against LIVE data (2026-08-06): ararim + mishmoret are METADATA-ONLY
+// case indexes (no decision text in the datastore; mishmoret links to a doc on a
+// DIFFERENT domain — rfa.justice.gov.il — whose license is NOT inherited).
+// judgments carries a decision SUMMARY (פירוט ההחלטה), never full text.
 export const TIER1_DATASETS: Readonly<Record<string, Tier1DatasetConfig>> = {
   ararim: {
     datasetId: "ararim", courtEntityType: "Authority",
-    defaultCourtName: "בתי הדין לעררים", contentLevel: "full_text", hasFullDocuments: true,
+    defaultCourtName: "בתי הדין לעררים", contentLevel: "metadata_only", hasFullDocuments: false,
   },
   mishmoret: {
     datasetId: "mishmoret", courtEntityType: "Authority",
-    defaultCourtName: "בתי הדין למשמורת", contentLevel: "full_text", hasFullDocuments: true,
+    defaultCourtName: "בתי הדין למשמורת", contentLevel: "metadata_only", hasFullDocuments: false,
   },
   judgments: {
     datasetId: "judgments", courtEntityType: "Court",
-    defaultCourtName: "בתי המשפט", contentLevel: "summary", hasFullDocuments: false,
+    defaultCourtName: "בתי המשפט המחוזיים והעליון", contentLevel: "summary", hasFullDocuments: false,
   },
 };
 
@@ -53,16 +57,21 @@ function pick(raw: Record<string, unknown>, keys: readonly string[]): string | n
   return null;
 }
 
-const K_CASE = ["מספר הליך", "מספר תיק", "case_number", "caseNumber", "מספר"];
-const K_PARTIES = ["צדדים", "שמות הצדדים", "parties", "מבקש", "משיב"];
-const K_COURT = ["ערכאה", "בית הדין", "בית המשפט", "court", "authority", "רשות"];
-const K_DATE = ["תאריך החלטה", "תאריך מתן ההחלטה", "תאריך", "decision_date", "date"];
-const K_SUMMARY = ["תמצית", "תקציר", "summary", "עיקרי ההחלטה"];
+// Key candidates verified against the LIVE datastore schemas (2026-08-06):
+//   ararim:    מספר תיק · בית דין · שם דיין · תאריך החלטה · סוג בקשה · נושא
+//   mishmoret: מספר מוחזק או אסיר · תאריך החלטה · מדינה · שם דיין · קישור למסמך החלטה
+//   judgments: מחוז · מספר הליך · עותרים · משיבים · תאריך פסק הדין · מעמד המשיב ·
+//              נושא העתירה · הוצאות · פירוט ההחלטה · החלטה
+const K_CASE = ["מספר הליך", "מספר תיק", "case_number", "caseNumber"]; // NOT detainee no.
+const K_PARTIES = ["עותרים", "משיבים", "צדדים", "שמות הצדדים", "parties"];
+const K_COURT = ["ערכאה", "בית דין", "בית הדין", "בית המשפט", "court", "authority", "רשות"];
+const K_DATE = ["תאריך החלטה", "תאריך פסק הדין", "תאריך מתן ההחלטה", "תאריך", "decision_date", "date"];
+const K_SUMMARY = ["פירוט ההחלטה", "תמצית", "תקציר", "summary", "עיקרי ההחלטה"];
 const K_DISTRICT = ["מחוז", "district"];
-const K_TOPIC = ["נושא", "topic", "תחום"];
-const K_PDF = ["קישור", "קישור למסמך", "url", "pdf", "document_url", "מסמך"];
-const K_FULLTEXT = ["decisionText", "full_text", "טקסט מלא", "נוסח ההחלטה"];
-const K_COST = ["הוצאות", "costs"];
+const K_TOPIC = ["נושא העתירה", "נושא", "topic", "תחום"];
+const K_PDF = ["קישור למסמך החלטה", "קישור", "קישור למסמך", "url", "pdf", "document_url", "מסמך"];
+const K_FULLTEXT = ["decisionText", "full_text", "טקסט מלא", "נוסח ההחלטה"]; // none present live
+const K_COST = ["הוצאות לעותר", "הוצאות", "costs"];
 
 export function mapDataGovTier1Row(datasetId: string, rec: RawRecord, ctx: MapContext): CanonicalRecord[] {
   const cfg = TIER1_DATASETS[datasetId];

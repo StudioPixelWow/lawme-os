@@ -33,17 +33,20 @@ function base(entityType: CanonicalRecord["entityType"]): Pick<CanonicalRecord, 
 
 export function mapKnessetLaw(rec: RawRecord, ctx: MapContext): CanonicalRecord[] {
   const r = rec.raw;
-  const lawId = str(r.LawID) ?? rec.externalId;
+  // Real KNS_IsraelLaw fields: Id, Name, KnessetNum, IsBasicLaw, PublicationDate,
+  // LawValidityDesc, LastUpdatedDate (verified live 2026-08-06).
+  const lawId = str(r.Id) ?? str(r.LawID) ?? rec.externalId;
   const title = str(r.Name);
   const publicationDate = isoDate(r.PublicationDate);
+  const lawType = r.IsBasicLaw === true ? "basic_law" : str(r.LawTypeDesc) ?? "statute";
   const canonicalId = lawIdentity({
     knessetLawId: lawId, officialNumber: str(r.OfficialLawNumber),
     title, publicationDate,
   });
   const fields = {
     title,
-    lawType: str(r.LawTypeDesc),
-    status: str(r.LawValidity) ?? "unknown",
+    lawType,
+    status: str(r.LawValidityDesc) ?? str(r.LawValidity) ?? "unknown",
     knessetNumber: str(r.KnessetNum),
     enactmentDate: publicationDate,
   };
@@ -71,7 +74,9 @@ export function mapKnessetLaw(rec: RawRecord, ctx: MapContext): CanonicalRecord[
 
 export function mapKnessetBill(rec: RawRecord, ctx: MapContext): CanonicalRecord[] {
   const r = rec.raw;
-  const billId = str(r.BillID) ?? rec.externalId;
+  // Real KNS_Bill fields: Id, Name, KnessetNum, TypeDesc, SubTypeDesc, StatusID,
+  // Number, PublicationDate, PrivateNumber, CommitteeID (verified live 2026-08-06).
+  const billId = str(r.Id) ?? str(r.BillID) ?? rec.externalId;
   const canonicalId = billIdentity({
     knessetBillId: billId, billNumber: str(r.Number),
     knessetNumber: str(r.KnessetNum), sessionNumber: str(r.SessionNum),
@@ -80,7 +85,9 @@ export function mapKnessetBill(rec: RawRecord, ctx: MapContext): CanonicalRecord
     title: str(r.Name),
     billType: str(r.SubTypeDesc),
     knessetNumber: str(r.KnessetNum),
-    status: str(r.StatusDesc) ?? "unknown",
+    // KNS_Bill exposes StatusID (numeric); the human status desc needs a
+    // KNS_Status lookup (deferred) — store the code, never a fabricated label.
+    status: str(r.StatusDesc) ?? str(r.StatusID) ?? "unknown",
     publicationDate: isoDate(r.PublicationDate),
   };
   return [{

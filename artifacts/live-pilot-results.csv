@@ -1,0 +1,5 @@
+source,dataset,license,attribution_required,records_fetched,canonical_entities,duplicates,quarantined,validation_pct,provenance_pct,indexing_pct,ai_readiness,go_decision
+knesset_odata,legislation (KNS_IsraelLaw+KNS_Bill),open (legislation, no §6 copyright),false,11,11,0,0,100,100,100,RAG_READY_WITH_LIMITATIONS (metadata+titles; full law text via KNS_DocumentIsraelLaw not yet ingested),GO
+data_gov_il,ararim,cc-by,true,8,8,0,0,100,100,100,NOT_RAG_READY (metadata only, no decision text),GO_WITH_FIXES
+data_gov_il,mishmoret,cc-by,true,8,7,1,0,100,100,100,NOT_RAG_READY (metadata only; document text on another domain, unlicensed),GO_WITH_FIXES
+data_gov_il,judgments,other-open,false,3,8,2,1,91,100,100,RAG_READY_WITH_LIMITATIONS (decision summaries + parties + outcomes; not full reasoning),GO_WITH_FIXES

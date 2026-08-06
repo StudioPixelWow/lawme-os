@@ -18,14 +18,23 @@ from a network-blocked container.
 - license verified
 - no data corruption
 
-## Current status (pre-live)
+## Decisions (post-live, 2026-08-06 — evidence in artifacts/live-pilot-results.json)
 
-| Source | Harness | Offline pilot | License | Live thresholds | Decision |
+| Source | Live pilot | Validation | Provenance | License | Decision |
 |---|---|---|---|---|---|
-| knesset_odata (legislation) | ready | pass (9/9, 100% provenance) | open, no §6 copyright, no auth | not yet measured | **PENDING → run live** |
-| data_gov_il / ararim | ready | pass (full_text, 100% provenance) | cc-by (attribution) — confirm before full-text storage | not yet measured | **PENDING → run live** |
-| data_gov_il / mishmoret | ready | pass (full_text) | cc-by (attribution) — confirm | not yet measured | **PENDING → run live** |
-| data_gov_il / judgments | ready | pass (summary-only) | other-open | not yet measured | **PENDING → run live** |
+| knesset_odata (legislation) | 11 ingested, 0 quarantine | 100% | 100% | open (legislation, no §6 copyright), no auth | **GO** |
+| data_gov_il / judgments | 8 entities, 1 quarantined (restriction), summary-only | 91%* | 100% | other-open, ContainPrivateData=No | **GO_WITH_FIXES** (display source/attribution) |
+| data_gov_il / ararim | 8 entities, metadata-only | 100% | 100% | cc-by (attribution) | **GO_WITH_FIXES** (record+display cc-by) |
+| data_gov_il / mishmoret | 7 entities, metadata-only + PII + cross-domain doc | 100% | 100% | cc-by (attribution) | **GO_WITH_FIXES** (PII minimization + cc-by + cross-domain doc license) |
+
+\* judgments validation 91% because 1 of 11 mapped records was correctly
+quarantined (publication_restricted) — a *correct* rejection, not a defect.
+
+Only **knesset_odata is GO**. The three CKAN datasets are **GO_WITH_FIXES**: their
+structure/provenance/idempotency all pass, but each needs a specific, bounded fix
+before user-facing exposure (attribution display; PII minimization for mishmoret;
+cross-domain document license for mishmoret). Full backfill of a GO_WITH_FIXES
+source waits until its fix lands and is re-verified.
 
 ## What each verdict would require
 

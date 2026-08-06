@@ -84,13 +84,14 @@ export const JUDGMENTS_ROWS: Record<string, unknown>[] = [
   },
 ];
 
-// A restricted document (איסור פרסום) → must be quarantined.
+// A restricted decision whose SUMMARY carries a publication-restriction notice
+// (איסור פרסום) → must be quarantined (judgments-style, since real datasets ship
+// a summary, not full text).
 export const ARARIM_RESTRICTED: Record<string, unknown>[] = [
   {
-    _id: 99, "מספר הליך": "ערר 4444-04-23", "ערכאה": "בית הדין לעררים",
-    "צדדים": "קטין נ' המדינה", "תאריך החלטה": "2023-08-01",
-    "קישור": "https://data.gov.il/ararim/4444.pdf",
-    "נוסח ההחלטה": "צו איסור פרסום\nחל איסור פרסום על פרטי הקטין.",
+    _id: 99, "מספר הליך": "עת'מ 4444-04-23", "מחוז": "ירושלים",
+    "תאריך פסק הדין": "2023-08-01",
+    "פירוט ההחלטה": "צו איסור פרסום - חל איסור פרסום על פרטי הקטין.",
   },
 ];
 

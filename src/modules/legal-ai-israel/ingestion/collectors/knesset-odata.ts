@@ -99,7 +99,7 @@ export class KnessetODataCollector implements CanonicalCollector {
     const records: RawRecord[] = rows.map((row) => {
       const raw = { ...row, [RESERVED_ENTITYSET]: entitySet };
       const externalId =
-        str(row.LawID) ?? str(row.BillID) ?? str(row.DocumentBillID) ??
+        str(row.Id) ?? str(row.LawID) ?? str(row.BillID) ?? str(row.DocumentBillID) ??
         str(row.SubjectID) ?? str(row.PersonID) ?? hashObject(row).slice(0, 12);
       return {
         externalId,

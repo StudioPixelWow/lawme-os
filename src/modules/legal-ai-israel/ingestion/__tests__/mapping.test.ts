@@ -57,14 +57,14 @@ test("dispatch returns [] for an unknown entity set (never fabricate)", () => {
   assert.deepEqual(mapKnessetRecord("KNS_Unknown", raw({}, "x"), CTX), []);
 });
 
-test("ararim full-text row → Decision(full_text)+Case+Authority+Party+Topic+DocumentSource", () => {
+test("ararim row → Case+Authority+Decision(metadata_only)+... (no full text in the real datastore)", () => {
   const recs = mapDataGovTier1Row("ararim", raw(ARARIM_ROWS[0], "ararim:1"), CTX);
   const types = recs.map((r) => r.entityType).sort();
   assert.deepEqual(types, ["Authority", "Case", "Decision", "DocumentSource", "Party", "Topic"].sort());
   const decision = recs.find((r) => r.entityType === "Decision")!;
-  assert.equal(decision.envelope.contentLevel, "full_text");
-  assert.ok(decision.primaryText && decision.primaryText.raw.includes("הערר מתקבל"));
-  // relationships wired
+  // ararim is a metadata case index — no decision text is published in the datastore
+  assert.equal(decision.envelope.contentLevel, "metadata_only");
+  assert.equal(decision.primaryText, null);
   assert.ok(decision.relationships.some((r) => r.type === "inCase"));
   assert.ok(decision.relationships.some((r) => r.type === "backedBy"));
 });
@@ -93,18 +93,25 @@ test("identity keys are deterministic + case-number normalized", () => {
   assert.equal(d1, d2);
 });
 
-test("license gate: full_text without full-text license → quarantined", () => {
-  const recs = mapDataGovTier1Row("ararim", raw(ARARIM_ROWS[0], "ararim:1"), CTX);
-  const res = validateCanonicalRecords(recs, {
+test("license gate: a full_text record without full-text license → quarantined", () => {
+  // Construct a full_text record directly (no live Tier-1 dataset ships full text)
+  // to exercise the gate independent of any source.
+  const base = mapDataGovTier1Row("judgments", raw(JUDGMENTS_ROWS[0], "judgments:1"), CTX);
+  const decision = base.find((r) => r.entityType === "Decision")!;
+  const fullTextRecord = {
+    ...decision,
+    primaryText: { raw: "נוסח מלא של פסק הדין לצורך בדיקת שער הרישוי.", contentHash: "x", language: "he" },
+    envelope: { ...decision.envelope, contentLevel: "full_text" as const },
+  };
+  const res = validateCanonicalRecords([fullTextRecord], {
     minConfidence: 0.5, license: { ingestionAllowed: true, fullTextAllowed: false },
   });
-  const decisionQuarantined = res.quarantined.find((q) => q.record.entityType === "Decision");
-  assert.ok(decisionQuarantined, "full_text Decision should be quarantined when full text is unlicensed");
-  assert.ok(decisionQuarantined!.reasons.includes("full_text_not_licensed"));
+  assert.equal(res.valid.length, 0);
+  assert.ok(res.quarantined[0].reasons.includes("full_text_not_licensed"));
 });
 
 test("restriction notice (איסור פרסום / קטין) → quarantined publication_restricted", () => {
-  const recs = mapDataGovTier1Row("ararim", raw(ARARIM_RESTRICTED[0], "ararim:99"), CTX);
+  const recs = mapDataGovTier1Row("judgments", raw(ARARIM_RESTRICTED[0], "judgments:99"), CTX);
   const res = validateCanonicalRecords(recs, DEFAULT_VALIDATION);
   const q = res.quarantined.find((x) => x.record.entityType === "Decision");
   assert.ok(q, "restricted decision must be quarantined");

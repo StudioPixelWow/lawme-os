@@ -101,9 +101,12 @@ create table if not exists legalai.canonical_relationships (
   assertion_status   text not null default 'asserted'
                        check (assertion_status in ('asserted','resolved','inferred','disputed','retracted')),
   provenance         jsonb not null default '{}',
-  created_at         timestamptz not null default now(),
-  unique (type, from_canonical_id, coalesce(to_canonical_id,''), coalesce(to_external_ref,''))
+  created_at         timestamptz not null default now()
 );
+-- edge uniqueness treats a null target as a value (dangling refs are distinct):
+-- expressions require a unique INDEX, not a table constraint.
+create unique index if not exists cr_uniq_edge on legalai.canonical_relationships
+  (type, from_canonical_id, coalesce(to_canonical_id,''), coalesce(to_external_ref,''));
 create index if not exists cr_from_idx on legalai.canonical_relationships (from_canonical_id, type);
 create index if not exists cr_to_idx on legalai.canonical_relationships (to_canonical_id, type);
 
