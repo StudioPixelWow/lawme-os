@@ -1,0 +1,19 @@
+{
+  "storage_version": "legal-object-store-1",
+  "bucket": "legal-source-files",
+  "bucket_public": false,
+  "object_key_scheme": "knesset/laws/<IsraelLawID>/publications/<publicationItemId>/<sha256>.pdf",
+  "dedup": "content-addressed by sha256; one binary stored once; publication→object many-to-one",
+  "registered_objects": 31,
+  "distinct_sha256": 31,
+  "storage_status_breakdown": {
+    "pending": 31,
+    "verified": 0
+  },
+  "upload_success_rate": 0,
+  "checksum_verification_rate": 0,
+  "round_trip_verification": "implemented + unit-tested (in-memory client); not run against live bucket",
+  "access_policy": "bucket private + no permissive storage.objects policy → deny-by-default; service-role only; users get signed URL via reviewed backend only",
+  "blocker": "physical byte upload requires the storage service key AND a network path to fs.knesset.gov.il for the bytes. This container is air-gapped from fs.knesset.gov.il and the browser cannot authenticate to storage without exposing the service key. Upload is the operator step.",
+  "gate": "NOT_GO (upload_success 0% < 100%)"
+}

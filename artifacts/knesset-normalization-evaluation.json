@@ -1,0 +1,79 @@
+{
+  "normalization_version": "legal-normalize-1",
+  "method": "deterministic, no LLM",
+  "layers": [
+    "raw_extracted_text",
+    "normalized_legal_text",
+    "structured_parse_output"
+  ],
+  "section_numbering_accuracy_sample": {
+    "law": "2000048 / pub 147462",
+    "sections_expected": 3,
+    "sections_parsed": 3,
+    "accuracy": 1
+  },
+  "header_footer_contamination_after": 0,
+  "glyph_remap_note": "context-bounded lone 'פ' → ';' at 0.5 confidence, flagged needs_review; never touches פ inside a word",
+  "samples": [
+    {
+      "pubId": "147018",
+      "rulesApplied": [
+        "collapse_spaces",
+        "remove_running_head",
+        "fix_reversed_parens",
+        "fix_glued_year",
+        "fix_missing_hyphen",
+        "glyph_remap",
+        "line_rejoin"
+      ],
+      "warnings": [],
+      "confidence": 1,
+      "reversedParensFixed": 4,
+      "gluedYearsFixed": 0,
+      "glyphRemaps": 0,
+      "lineRejoins": 3,
+      "runningHeadsRemoved": 0,
+      "runningHeadContaminationRemaining": false
+    },
+    {
+      "pubId": "173930",
+      "rulesApplied": [
+        "collapse_spaces",
+        "remove_running_head",
+        "fix_reversed_parens",
+        "fix_glued_year",
+        "fix_missing_hyphen",
+        "glyph_remap",
+        "line_rejoin"
+      ],
+      "warnings": [],
+      "confidence": 1,
+      "reversedParensFixed": 2,
+      "gluedYearsFixed": 0,
+      "glyphRemaps": 0,
+      "lineRejoins": 0,
+      "runningHeadsRemoved": 0,
+      "runningHeadContaminationRemaining": false
+    },
+    {
+      "pubId": "2140800",
+      "rulesApplied": [
+        "collapse_spaces",
+        "remove_running_head",
+        "fix_reversed_parens",
+        "fix_glued_year",
+        "fix_missing_hyphen",
+        "glyph_remap",
+        "line_rejoin"
+      ],
+      "warnings": [],
+      "confidence": 1,
+      "reversedParensFixed": 2,
+      "gluedYearsFixed": 0,
+      "glyphRemaps": 0,
+      "lineRejoins": 3,
+      "runningHeadsRemoved": 3,
+      "runningHeadContaminationRemaining": false
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "started": false,
+  "reason": "Overall gate is GO_WITH_FIXES (storage byte-upload not achievable from available tools); backfill runs only on a full GO.",
+  "laws_backfilled": 0,
+  "publications_backfilled": 0,
+  "guardrails_when_go": {
+    "batch_size": "10-25",
+    "concurrency": 2,
+    "checkpoint": "per (IsraelLawID, correctionNumber)",
+    "daily_cap": true,
+    "auto_stop_on": [
+      "download<98%",
+      "extraction<95%",
+      "normalization_failure>2%",
+      "high_confidence_parser_error",
+      "quarantine>5%",
+      "storage_verification_failure",
+      "403",
+      "429",
+      "schema_drift"
+    ]
+  }
+}

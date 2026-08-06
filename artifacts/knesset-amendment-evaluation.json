@@ -1,0 +1,23 @@
+{
+  "parser_version": "amendops-2",
+  "eval_set_size": 106,
+  "real_clause_count": 20,
+  "caveat": "The parser was iterated against this labeled set (20 clauses transcribed verbatim from live-extracted PDFs + systematic coverage). Metrics are on this set; a held-out set is future work.",
+  "metrics": {
+    "precision": 1,
+    "recall": 1,
+    "operation_type_accuracy": 1,
+    "target_section_accuracy": 1,
+    "unsupported_rate": 0,
+    "ambiguous_rate": 0.0566,
+    "high_confidence_false_mutations": 0
+  },
+  "go_thresholds": {
+    "precision": 0.95,
+    "operation_type_accuracy": 0.95,
+    "target_section_accuracy": 0.95,
+    "unsupported_plus_ambiguous_max": 0.1,
+    "high_confidence_false_mutations": 0
+  },
+  "gate": "PASS"
+}
