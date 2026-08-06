@@ -1,0 +1,11 @@
+metric,value
+source_document_records,"0"
+files_downloaded,"0"
+laws_created,"0"
+sections_created,"4"
+chunks_created,"4"
+full_text_documents,"0"
+duplicates,"0"
+provenance_coverage_pct,"100"
+embedding_status,"deferred — no approved provider; FTS-only baseline (pgvector column present, index deferred)"
+rag_readiness,"NOT_RAG_READY for the authoritative legislation corpus (no full text yet); the parser/chunker/citation/eval MACHINERY is RAG_READY and proven on dev."

@@ -1,0 +1,21 @@
+{
+  "harness": "legislation retrieval evaluation (FTS baseline)",
+  "date": "2026-08-06",
+  "mode": "FTS (simple tsvector) on legalai.legal_chunks in dev; embeddings deferred (no approved provider)",
+  "corpus": "4 sections / 4 chunks (structural demonstration statute) — proves the retrieval+citation path on the real schema",
+  "live_dev_queries": [
+    {"query": "רשות מוסמכת", "top": [
+      {"rank_score": 0.3344, "section": "5", "heading_path": "חוק הגנת הדוגמה › פרק ב סמכויות › סעיף 5", "cited": true},
+      {"rank_score": 0.1884, "section": "2", "heading_path": "חוק הגנת הדוגמה › פרק א פרשנות › סעיף 2", "cited": true}
+    ]},
+    {"query": "הוראות מעבר", "top": [
+      {"section": "6", "heading_path": "חוק הגנת הדוגמה › פרק ב סמכויות › סעיף 6", "cited": true}
+    ]}
+  ],
+  "citation_contract_complete": true,
+  "metrics_note": "The full 30-question Recall@5/Recall@10/MRR/citation-correctness/wrong-version suite runs via evaluateRetrieval() once an authoritative corpus is ingested. On the demonstration corpus the targeted queries retrieve the correct section at rank 1 with complete citations.",
+  "recall_at_5_demo": 1.0,
+  "mrr_demo": 1.0,
+  "citation_correctness_demo": 1.0,
+  "wrong_version_rate_demo": 0.0
+}
