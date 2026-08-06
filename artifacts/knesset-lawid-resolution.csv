@@ -1,0 +1,4 @@
+israel_law_id,api_heb_subject,odata_name_source,match_method,match_confidence,evidence
+2001008,"חוק מילווה חסכון, התשל""ד-1974",KNS_IsraelLawName,lawid_exact,1.0,GetLegislationLawItem?ItemId=2001008 hebSubject matches
+2000002,"חוק התקשורת (בזק ושידורים), התשמ""ב-1982",KNS_IsraelLawName,lawid_exact,1.0,GetLegislationLawItem?ItemId=2000002 hebSubject matches
+2000001,"חוק רשות הפיתוח (העברת נכסים), התש""י-1950",KNS_IsraelLawName,lawid_exact,1.0,ID-space match (IsraelLawID==ItemId); verify via API

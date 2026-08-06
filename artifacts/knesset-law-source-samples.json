@@ -1,0 +1,11 @@
+{
+  "samples": [
+    {"IsraelLawID": 2001008, "lawValidity": "נושן", "corrections_count": 3,
+     "sample_correction": {"name": "חוק מילווה חסכון, התשל\"ד-1974", "correctionType": "ישיר (החוק המקורי)", "publicationSeries": "ספר החוקים", "filePath": "https://fs.knesset.gov.il/8/law/8_lsr_208597.PDF", "fileType": "pdf", "publicationDate": "1974-04-05"},
+     "openBookUrl": "(empty)", "secondary_laws": 12},
+    {"IsraelLawID": 2000002, "lawValidity": "תקף", "corrections_count": 83,
+     "latest_amendment": {"name": "חוק התקשורת (שידורים), התשפ\"ו-2026", "correctionNumber": 83, "correctionType": "עקיף", "filePath": "https://fs.knesset.gov.il/25/law/25_lsr_14308264.pdf", "publicationDate": "2026-07-28"},
+     "has_summaryLaw_per_amendment": true, "validityStartDate": "1984-02-01"}
+  ],
+  "note": "structural sample from the live API; document text lives in the linked ספר-החוקים PDFs (not inline). Parser will run on extracted PDF text once the fetch+extract collector is built."
+}

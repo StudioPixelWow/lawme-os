@@ -66,8 +66,8 @@ const secTuples = law.sections.map((s) => {
   return `(${[
     q(cid), q("Section"), q("knesset_legislation_web"), q("knesset"), q("demo_law"), q("demo_law"),
     q(src), q(`${LAW_ID}:${s.sectionNumber}`), q(NOW), q(NOW), q("html"), q("legis-section-1"),
-    q("legis-map-1"), "0.9", q(s.contentHash), q(hash(s.bodyText)), q("full_text"), "1", q("published"),
-    jb(fields), jb({}), jb({}), q(s.bodyText), q("he"), "false",
+    q("legis-map-1"), "0.9", q(s.contentHash), q(hash(s.bodyText)), q("full_text"), "1", q("quarantined"),
+    jb(fields), jb({}), jb({ non_authoritative_demo: true }), q(s.bodyText), q("he"), "false",
   ].join(",")})`;
 });
 
@@ -76,7 +76,7 @@ const chunkTuples = chunks.map((c) =>
   `(${[q(LAW_ID), q(c.sectionId), q(c.documentVersionId), q(c.sectionNumber), q(c.headingPath),
      String(c.ordinal), String(c.chunkIndex), q(c.text), `to_tsvector('simple', ${q(c.text)})`,
      String(c.sourceSpanStart), String(c.sourceSpanEnd), String(c.tokenCount), q(c.contentHash),
-     q("he"), q(src), q("statutory_exemption"), "true"].join(",")})`);
+     q("he"), q(src), q("non_authoritative_demo"), "false"].join(",")})`);
 
 const sql = [
   "insert into legalai.canonical_entities (canonical_id,entity_type,source_platform,source_publisher,source_dataset,source_resource,source_url,external_record_id,first_seen_at,last_verified_at,extraction_method,parser_version,mapping_version,confidence,content_hash,raw_record_hash,content_level,version_number,version_status,fields,extracted_metadata,source_extras,primary_text,primary_text_language,tombstoned) values",

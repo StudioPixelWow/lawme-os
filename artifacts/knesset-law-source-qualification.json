@@ -1,0 +1,59 @@
+{
+  "epic": "Knesset Full-Law Source Qualification & LawID Resolution",
+  "date": "2026-08-06",
+  "official_source": {
+    "name": "מאגר החקיקה הלאומי (Knesset National Legislation Database)",
+    "owner": "official (Knesset)",
+    "spa_url": "https://main.knesset.gov.il/apps/legislation/main/laws/{IsraelLawID}",
+    "content_api": "https://www.knesset.gov.il/WebSiteApi/knessetapi/LegislationItem/GetLegislationLawItem?ItemId={IsraelLawID}",
+    "api_format": "XML (WCF datacontract) / public JSON-style; no auth, no token",
+    "document_files": "PDFs on https://fs.knesset.gov.il/<knesset>/law/<n>_lsr_<id>.PDF (ספר החוקים — original enactment + each amendment)",
+    "consolidated_text_route": "ספר החוקים הפתוח / OpenLawBook (openBookUrl field) — PARTIAL coverage; often empty",
+    "kolzchut_link": "kolZchutUrl (secondary rights guide, not primary law)"
+  },
+  "content_returned_by_api": {
+    "general": "hebSubject, lawValidity (תקף/נושן/בטל), publicationDate, latestPublicationDate, openBookUrl, kolZchutUrl, knsName, validity dates",
+    "corrections.listCorrections[]": "per amendment: itemId, name, correctionType (ישיר/עקיף), correctionNumber, publicationDate, publicationSeries (ספר החוקים), magazineNumber, pageNumber, filePath (PDF), fileType, summaryLaw",
+    "secondaryLawInstalled[]": "regulations (תקנות) under the law",
+    "full_consolidated_text_inline": false
+  },
+  "document_type_finding": {
+    "available": ["original_enactment (PDF)", "amendment_law (PDF)", "official_gazette_pdf (ספר החוקים)"],
+    "consolidated_current_text": "PARTIAL — only via OpenLawBook (openBookUrl) for a subset of laws; not comprehensive/inline",
+    "conclusion": "The API + site provide law METADATA + the full amendment-PUBLICATION document set (PDFs). A comprehensive official free CONSOLIDATED current text (נוסח משולב) does NOT exist for all laws."
+  },
+  "lawid_resolution": {
+    "method": "EXACT structural: GetLegislationLawItem ItemId == OData IsraelLawID (KNS_IsraelLaw.Id / KNS_IsraelLawName.IsraelLawID)",
+    "confirmed_samples": [
+      {"IsraelLawID": 2001008, "api_hebSubject": "חוק מילווה חסכון, התשל\"ד-1974", "match": "exact"},
+      {"IsraelLawID": 2000002, "api_hebSubject": "חוק התקשורת (בזק ושידורים), התשמ\"ב-1982", "match": "exact"}
+    ],
+    "fuzzy_needed": false,
+    "coverage": "2,180 IsraelLawIDs in KNS_IsraelLawName resolve 1:1 by the formula; per-law existence verifiable via GetLegislationLawItem returning matching hebSubject"
+  },
+  "terms_robots_reuse": {
+    "robots_main.knesset.gov.il": "Disallow / for named aggressive bots only (Yandex, Semrush, MJ12, dotbot, PetalBot, ...). No User-agent:* disallow → a polite identified collector is NOT blocked.",
+    "robots_www.knesset.gov.il": "404 (no robots) — API host unrestricted",
+    "content_reuse_basis": "statutory_exemption (§6 Copyright Act — no copyright in laws) → content OPEN",
+    "technical_access_permission": "apparently_allowed (public gov API, no auth; robots permits *)",
+    "site_terms": "gov/Knesset ToS to be recorded as evidence (license_evidence_url + hash)",
+    "document_license": "official gazette PDFs are public government documents"
+  },
+  "versioning": {
+    "capability": "PUBLICATION_HISTORY (full) — every amendment dated (correctionNumber, publicationDate, itemId, ספר החוקים page); lawValidity gives repeal status",
+    "consolidated_point_in_time": "CURRENT_ONLY where OpenLawBook exists; else publication-history-only",
+    "incremental_sync": "poll GetLegislationLawItem per law; new correctionNumber / latestPublicationDate = update; checkpoint key = IsraelLawID + max(correctionNumber); dedup key = correction itemId + PDF content hash"
+  },
+  "access_recommendation": "official_api (metadata + amendment index, keyed by IsraelLawID) + direct_pdf (fetch ספר-החוקים PDFs from fs.knesset.gov.il) + PDF text extraction + the existing section parser. OpenLawBook (openBookUrl) for consolidated text where available.",
+  "decision": {
+    "source_route_verdict": "GO_WITH_FIXES",
+    "fixes": [
+      "PDF fetch + text-extraction pipeline for fs.knesset.gov.il documents (with OCR fallback only where no text layer)",
+      "qualify OpenLawBook (openBookUrl) coverage — how many laws have consolidated נוסח משולב",
+      "record Knesset ToS as license_evidence (url + hash); implement attribution/source-link",
+      "policy for laws WITHOUT consolidated text: ingest amendment documents at document-level, clearly labelled 'not a consolidated current text' — never presented as נוסח נכון-לתאריך"
+    ],
+    "consolidated_current_text_for_rag_beta": "PARTIAL / ASK — a comprehensive official free consolidated text does not exist; RAG Beta on consolidated text is possible only for the OpenLawBook subset. Do NOT build a corpus as if full נוסח משולב exists for all laws."
+  },
+  "next_task": "Qualify OpenLawBook (ספר החוקים הפתוח) consolidated-text coverage + endpoint, and build the fs.knesset.gov.il PDF fetch+extract collector feeding the existing section parser."
+}
