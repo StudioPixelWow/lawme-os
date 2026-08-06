@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>מפת כיסוי ידע משפטי לאומי — LAW ME</title>
+<style>
+  :root { --ink:#1a1f2b; --muted:#5b6472; --line:#e4e7ec; --bg:#f7f8fa; --card:#fff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Segoe UI',Arial,'Noto Sans Hebrew',sans-serif; background:var(--bg); color:var(--ink); line-height:1.5; }
+  header { background:linear-gradient(135deg,#12233f,#1f3a5f); color:#fff; padding:28px 32px; }
+  header h1 { margin:0 0 6px; font-size:24px; }
+  header p { margin:0; opacity:.85; font-size:14px; }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px 32px 60px; }
+  .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:24px 0; }
+  .kpi { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .kpi .n { font-size:30px; font-weight:700; }
+  .kpi .l { font-size:12px; color:var(--muted); }
+  .note { background:#fff8e6; border:1px solid #f0dca0; border-radius:10px; padding:12px 16px; font-size:13px; margin:16px 0; }
+  section { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin:20px 0; }
+  h2 { font-size:18px; margin:0 0 14px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th,td { text-align:right; padding:8px 10px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-weight:600; font-size:12px; }
+  td.name { font-weight:600; }
+  td.roi { font-weight:700; }
+  td.real { color:#a12b2b; font-weight:600; }
+  .bar { display:inline-block; width:120px; height:9px; background:#eef0f3; border-radius:5px; overflow:hidden; vertical-align:middle; margin-left:6px; }
+  .bar span { display:block; height:100%; }
+  .conf { font-size:11px; padding:2px 7px; border-radius:20px; color:#fff; }
+  .conf.VERIFIED { background:#1a7f45; } .conf.ESTIMATED { background:#b8860b; } .conf.UNKNOWN { background:#888; }
+  .quad { font-size:11px; padding:2px 8px; border-radius:20px; color:#fff; white-space:nowrap; }
+  .sev { display:inline-block; min-width:30px; text-align:center; color:#fff; padding:2px 7px; border-radius:6px; font-weight:700; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:14px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:#fcfcfd; }
+  .card .sprint { font-size:11px; color:#2a7fb8; font-weight:700; letter-spacing:.04em; }
+  .card h3 { margin:4px 0 8px; font-size:15px; }
+  .card .why { font-size:12.5px; color:var(--muted); margin:0 0 8px; }
+  .card ul { margin:0; padding-right:18px; font-size:12.5px; }
+  .card .unblocks { font-size:12px; color:#1a7f45; margin:8px 0 0; }
+  code { background:#eef0f3; padding:1px 5px; border-radius:4px; font-size:12px; }
+  footer { color:var(--muted); font-size:12px; text-align:center; padding:20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>מפת כיסוי ידע משפטי לאומי — National Legal Knowledge Coverage Map</h1>
+  <p>LAW ME · LAW ME — National Legal Knowledge Coverage Map · סינתזה בלבד (ללא רשת / מסד / איסוף)</p>
+</header>
+<div class="wrap">
+
+  <div class="kpis">
+    <div class="kpi"><div class="n" style="color:#b8860b">50</div><div class="l">כיסוי זמין (משוקלל) / 100</div></div>
+    <div class="kpi"><div class="n" style="color:#a12b2b">0</div><div class="l">כיסוי ממומש (נאסף בפועל)</div></div>
+    <div class="kpi"><div class="n">7</div><div class="l">תחומי ידע</div></div>
+    <div class="kpi"><div class="n">2</div><div class="l">מאגרי מסמכים-מלאים פתוחים</div></div>
+  </div>
+
+  <div class="note"><strong>זמין ≠ ברשותנו.</strong> "כיסוי זמין" = מה שניתן להגיע אליו כדין היום. "כיסוי ממומש" = מה שנאסף בפועל — כרגע 0 בכל תחום, כי טרם הופעל אף Collector. כל מספר שאינו מסומן "ממומש" הוא מפת פוטנציאל, לא קורפוס קיים.</div>
+
+  <section>
+    <h2>מפת כיסוי לפי תחום (Coverage Map)</h2>
+    <table>
+      <thead><tr><th>תחום</th><th>זמין</th><th>ממומש</th><th>ערך משפטי</th><th>ערך עסקי</th><th>קושי</th><th>ROI</th><th>ודאות</th><th>עדיפות</th></tr></thead>
+      <tbody>
+    <tr>
+      <td class="name">חקיקה — Legislation</td>
+      <td><div class="bar"><span style="width:94%;background:#1a7f45"></span></div><small>94</small></td>
+      <td class="real">0</td>
+      <td>5</td><td>4</td><td>2</td>
+      <td class="roi">68</td>
+      <td><span class="conf VERIFIED">VERIFIED</span></td>
+      <td><span class="quad" style="background:#1a7f45">DO FIRST</span></td>
+    </tr>
+    <tr>
+      <td class="name">מרשמים — Registries</td>
+      <td><div class="bar"><span style="width:85%;background:#1a7f45"></span></div><small>85</small></td>
+      <td class="real">0</td>
+      <td>3</td><td>3</td><td>1</td>
+      <td class="roi">51</td>
+      <td><span class="conf VERIFIED">VERIFIED</span></td>
+      <td><span class="quad" style="background:#2a7fb8">QUICK WIN</span></td>
+    </tr>
+    <tr>
+      <td class="name">אקדמי/משני — Academic &amp; Secondary</td>
+      <td><div class="bar"><span style="width:55%;background:#b8860b"></span></div><small>55</small></td>
+      <td class="real">0</td>
+      <td>2</td><td>3</td><td>2</td>
+      <td class="roi">22</td>
+      <td><span class="conf ESTIMATED">ESTIMATED</span></td>
+      <td><span class="quad" style="background:#2a7fb8">QUICK WIN</span></td>
+    </tr>
+    <tr>
+      <td class="name">רגולציה — Regulatory</td>
+      <td><div class="bar"><span style="width:25%;background:#c2611a"></span></div><small>25</small></td>
+      <td class="real">0</td>
+      <td>4</td><td>3</td><td>4</td>
+      <td class="roi">7</td>
+      <td><span class="conf ESTIMATED">ESTIMATED</span></td>
+      <td><span class="quad" style="background:#b8860b">STRATEGIC</span></td>
+    </tr>
+    <tr>
+      <td class="name">פסיקה — Case Law / Judiciary</td>
+      <td><div class="bar"><span style="width:31%;background:#c2611a"></span></div><small>31</small></td>
+      <td class="real">0</td>
+      <td>5</td><td>5</td><td>5</td>
+      <td class="roi">6</td>
+      <td><span class="conf VERIFIED">VERIFIED</span></td>
+      <td><span class="quad" style="background:#b8860b">STRATEGIC</span></td>
+    </tr>
+    <tr>
+      <td class="name">מנהלי — Government / Administrative</td>
+      <td><div class="bar"><span style="width:25%;background:#c2611a"></span></div><small>25</small></td>
+      <td class="real">0</td>
+      <td>3</td><td>3</td><td>4</td>
+      <td class="roi">6</td>
+      <td><span class="conf ESTIMATED">ESTIMATED</span></td>
+      <td><span class="quad" style="background:#777">DEFER</span></td>
+    </tr>
+    <tr>
+      <td class="name">בינלאומי/משווה — International &amp; Comparative</td>
+      <td><div class="bar"><span style="width:5%;background:#a12b2b"></span></div><small>5</small></td>
+      <td class="real">0</td>
+      <td>2</td><td>1</td><td>3</td>
+      <td class="roi">1</td>
+      <td><span class="conf UNKNOWN">UNKNOWN</span></td>
+      <td><span class="quad" style="background:#777">DEFER</span></td>
+    </tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>מטריצת ROI (ערך × קושי)</h2>
+    <table>
+      <thead><tr><th></th><th>קל (קושי ≤2)</th><th>קשה (קושי ≥4)</th></tr></thead>
+      <tbody>
+        <tr><td class="name">ערך גבוה</td><td><span class="quad" style="background:#1a7f45">חקיקה — DO FIRST</span> · <span class="quad" style="background:#2a7fb8">מרשמים — QUICK WIN</span></td><td><span class="quad" style="background:#b8860b">פסיקה — STRATEGIC</span> · <span class="quad" style="background:#b8860b">רגולציה — STRATEGIC</span></td></tr>
+        <tr><td class="name">ערך נמוך</td><td><span class="quad" style="background:#2a7fb8">אקדמי — QUICK WIN</span></td><td><span class="quad" style="background:#777">מנהלי / בינלאומי — DEFER</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>20 הפערים החמורים ביותר (Top Gaps)</h2>
+    <table>
+      <thead><tr><th>#</th><th>חומרה</th><th>תחום</th><th>פער</th></tr></thead>
+      <tbody><tr><td>1</td><td><span class="sev" style="background:#a12b2b">95</span></td><td>case_law</td><td>בית המשפט העליון — Supreme Court</td></tr><tr><td>2</td><td><span class="sev" style="background:#a12b2b">95</span></td><td>case_law</td><td>בתי המשפט המחוזיים — District courts</td></tr><tr><td>3</td><td><span class="sev" style="background:#a12b2b">95</span></td><td>case_law</td><td>בתי משפט השלום — Magistrate courts</td></tr><tr><td>4</td><td><span class="sev" style="background:#c2611a">75</span></td><td>case_law</td><td>בתי הדין לעבודה — Labor courts</td></tr><tr><td>5</td><td><span class="sev" style="background:#c2611a">75</span></td><td>case_law</td><td>בתי דין דתיים/צבאיים — Rabbinical/Sharia/Military</td></tr><tr><td>6</td><td><span class="sev" style="background:#c2611a">69</span></td><td>case_law</td><td>Core court full-text (Supreme/District/Magistrate/Labor) is UNREACHABLE lawfully by scraping — the single biggest value gap.</td></tr><tr><td>7</td><td><span class="sev" style="background:#c2611a">69</span></td><td>case_law</td><td>Labor-court decisions — the firm's core practice area — have NO open full-text feed.</td></tr><tr><td>8</td><td><span class="sev" style="background:#c2611a">69</span></td><td>case_law</td><td>Only 2 tribunal sets (ararim, mishmoret) provide open full documents; everything else is metadata or blocked.</td></tr><tr><td>9</td><td><span class="sev" style="background:#c2611a">69</span></td><td>case_law</td><td>No official machine-readable court data feed identified — must be pursued institutionally (FOI / data agreement).</td></tr><tr><td>10</td><td><span class="sev" style="background:#c2611a">68</span></td><td>legislation</td><td>רשומות — Official gazette</td></tr><tr><td>11</td><td><span class="sev" style="background:#c2611a">53</span></td><td>regulatory</td><td>Regulator decision endpoints are largely unaudited/estimated — needs per-regulator live audit before any build.</td></tr><tr><td>12</td><td><span class="sev" style="background:#c2611a">53</span></td><td>regulatory</td><td>Only regulation metadata (not full directives) is open today.</td></tr><tr><td>13</td><td><span class="sev" style="background:#c2611a">53</span></td><td>regulatory</td><td>רשות ניירות ערך — ISA</td></tr><tr><td>14</td><td><span class="sev" style="background:#c2611a">53</span></td><td>regulatory</td><td>בנק ישראל — Bank of Israel</td></tr><tr><td>15</td><td><span class="sev" style="background:#c2611a">53</span></td><td>regulatory</td><td>רשות שוק ההון — CMA</td></tr><tr><td>16</td><td><span class="sev" style="background:#c2611a">53</span></td><td>regulatory</td><td>החלטות מיסוי — Tax rulings</td></tr><tr><td>17</td><td><span class="sev" style="background:#b8860b">45</span></td><td>case_law</td><td>בתי דין מנהליים — Tribunals (עררים, משמורת)</td></tr><tr><td>18</td><td><span class="sev" style="background:#b8860b">45</span></td><td>government</td><td>gov.il government-resolutions corpus sits behind a WAF — no lawful bulk route without an official feed / permission.</td></tr><tr><td>19</td><td><span class="sev" style="background:#b8860b">45</span></td><td>government</td><td>Administrative decisions are scattered; only fragments are on CKAN.</td></tr><tr><td>20</td><td><span class="sev" style="background:#b8860b">45</span></td><td>government</td><td>החלטות ממשלה — Government resolutions</td></tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>הזדמנויות אסטרטגיות (Opportunities)</h2>
+    <table>
+      <thead><tr><th>#</th><th>ROI</th><th>תחום</th><th>עדיפות</th><th>מהלך מוביל</th></tr></thead>
+      <tbody><tr><td>1</td><td class="roi">68</td><td>חקיקה — Legislation</td><td><span class="quad" style="background:#1a7f45">DO FIRST</span></td><td>Build ONE Knesset OData collector (48 entity sets, open, no auth) → full legislation corpus. Highest ROI.</td></tr><tr><td>2</td><td class="roi">51</td><td>מרשמים — Registries</td><td><span class="quad" style="background:#2a7fb8">QUICK WIN</span></td><td>Point the existing CKAN adapter at the 18 ready OPEN registry datasets → immediate structured coverage.</td></tr><tr><td>3</td><td class="roi">22</td><td>אקדמי/משני — Academic &amp; Secondary</td><td><span class="quad" style="background:#2a7fb8">QUICK WIN</span></td><td>Ingest Kol Zchut (CC-BY-SA API) as the client-facing rights-reference layer; audit university OAI-PMH separately.</td></tr><tr><td>4</td><td class="roi">7</td><td>רגולציה — Regulatory</td><td><span class="quad" style="background:#b8860b">STRATEGIC</span></td><td>Run a per-regulator live audit (ISA/BoI/CMA/Tax) before building — currently estimated only.</td></tr><tr><td>5</td><td class="roi">6</td><td>פסיקה — Case Law / Judiciary</td><td><span class="quad" style="background:#b8860b">STRATEGIC</span></td><td>Ingest the 2 OPEN tribunal full-doc sets now; pursue an OFFICIAL court data feed (FOI/agreement) for the core courts.</td></tr><tr><td>6</td><td class="roi">6</td><td>מנהלי — Government / Administrative</td><td><span class="quad" style="background:#777">DEFER</span></td><td>Do NOT scrape gov.il (WAF); pursue an official government-resolutions feed / permission.</td></tr><tr><td>7</td><td class="roi">1</td><td>בינלאומי/משווה — International &amp; Comparative</td><td><span class="quad" style="background:#777">DEFER</span></td><td>Deprioritize; spin up a dedicated international-sources discovery only if the practice expands.</td></tr></tbody>
+    </table>
+    <h3 style="font-size:14px;margin:18px 0 8px;">נכסים פתוחים מוכנים לאיסוף (Collector-ready assets)</h3>
+    <table>
+      <thead><tr><th>ROI</th><th>Dataset</th><th>תחום</th><th>תוכן</th><th>רישיון</th></tr></thead>
+      <tbody><tr><td class="roi">90</td><td><code>ararim</code></td><td>case_law</td><td>full_documents</td><td>cc-by</td></tr><tr><td class="roi">90</td><td><code>mishmoret</code></td><td>case_law</td><td>full_documents</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>ica_companies</code></td><td>registries</td><td>registry_records</td><td>other-open</td></tr><tr><td class="roi">50</td><td><code>ica-changes</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>ica_partnerships</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>membership-in-liquidation</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>moj-amutot</code></td><td>registries</td><td>registry_records</td><td>other-open</td></tr><tr><td class="roi">50</td><td><code>simaneymisahr</code></td><td>registries</td><td>registry_records</td><td>other-open</td></tr><tr><td class="roi">50</td><td><code>mamtziim_patents</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>halicim_bateydin</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>yerusha</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr><tr><td class="roi">50</td><td><code>hekdeshot</code></td><td>registries</td><td>registry_records</td><td>cc-by</td></tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>מפת דרכים לפי כיסוי (Roadmap)</h2>
+    <div class="cards">
+    <div class="card">
+      <div class="sprint">Sprint 1</div>
+      <h3>Legislation — realize the open corpus</h3>
+      <p class="why">Highest ROI: VERIFIED open Knesset OData, no auth, one collector, 0% ingested today.</p>
+      <ul><li>Build the Knesset OData collector (KNS_IsraelLaw, KNS_Bill, KNS_DocumentIsraelLaw, committees).</li><li>Persist through the fail-closed pipeline (UNPUBLISHED, dedup, restriction-skip).</li></ul>
+      <p class="unblocks">↳ Primary-law grounding for every downstream legal-reasoning feature.</p>
+    </div>
+    <div class="card">
+      <div class="sprint">Sprint 2</div>
+      <h3>Case-law — open tribunals now, official feed next</h3>
+      <p class="why">Biggest value gap. Capture what is open immediately; start the institutional path for core courts.</p>
+      <ul><li>Ingest ararim + mishmoret (2 OPEN full-document tribunal sets).</li><li>Open an official-feed / FOI track for Supreme/District/Magistrate/Labor court data (NO scraping of anti-bot systems).</li></ul>
+      <p class="unblocks">↳ First real judgment corpus; groundwork for labor-court coverage (the firm's core).</p>
+    </div>
+    <div class="card">
+      <div class="sprint">Sprint 3</div>
+      <h3>Registries — cheap structured breadth</h3>
+      <p class="why">Lowest difficulty, already OPEN; one CKAN adapter serves all 18 ready datasets.</p>
+      <ul><li>Configure the CKAN collector for companies / nonprofits / IP / inheritance registries.</li><li>Honor cc-by attribution obligations on the flagged datasets.</li></ul>
+      <p class="unblocks">↳ Diligence &amp; entity-resolution layer.</p>
+    </div>
+    <div class="card">
+      <div class="sprint">Sprint 4</div>
+      <h3>Reference layer — Kol Zchut</h3>
+      <p class="why">Open CC-BY-SA API, easy, high client-facing value as a rights-reference layer.</p>
+      <ul><li>Ingest Kol Zchut via MediaWiki API with attribution.</li><li>Keep it labelled secondary/reference, never as primary law.</li></ul>
+      <p class="unblocks">↳ Client-facing rights explanations.</p>
+    </div>
+    <div class="card">
+      <div class="sprint">Sprint 5</div>
+      <h3>Regulatory &amp; Government — audit before build</h3>
+      <p class="why">Estimated only; must be audited per-regulator. gov.il stays WAF-blocked → official feed only.</p>
+      <ul><li>Per-regulator live audit (ISA/BoI/CMA/Tax/Privacy) from an unblocked network.</li><li>Pursue an official government-resolutions feed; do not scrape the WAF.</li></ul>
+      <p class="unblocks">↳ Regulatory &amp; administrative coverage once lawful routes are confirmed.</p>
+    </div></div>
+  </section>
+
+  <section style="background:#0f2038;color:#fff;">
+    <h2 style="color:#fff;">ההמלצה האסטרטגית הבאה</h2>
+    <p style="font-size:15px;margin:0;">בנה תחילה את <strong>Collector החקיקה של הכנסת (Knesset OData)</strong> — 48 ישויות, פתוח, ללא הזדהות, וכרגע 0% ממומש. זהו ה-ROI הגבוה ביותר על הלוח והוא פותח את כל שכבות ההיגיון המשפטי שמעליו. במקביל: לכוד את 2 מאגרי הטריבונלים הפתוחים, ופתח מסלול מוסדי (בקשת מידע / הסכם נתונים) לפסיקת הערכאות הליבתיות — מה שגריפה חוקית לעולם לא תשיג.</p>
+  </section>
+
+  <footer>נוצר ע"י tools/legal-source-audit/coverage-dashboard.mjs · מקורות: legal-coverage.json, legal-gap-analysis.json · 2026</footer>
+</div>
+</body>
+</html>

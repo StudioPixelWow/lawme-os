@@ -1,0 +1,518 @@
+{
+  "generated_for": "LAW ME — National Legal Knowledge Coverage Map",
+  "method": "pure synthesis of existing artifacts (no network / DB / discovery / audit / collector)",
+  "sources_used": [
+    "artifacts/national-platform-registry.json",
+    "artifacts/data-gov-legal-dataset-qualification.json",
+    "artifacts/national-discovery-catalog.json"
+  ],
+  "national": {
+    "available_coverage_score": 50,
+    "realized_coverage_score": 0,
+    "note": "AVAILABLE = lawfully reachable today. REALIZED = actually ingested. Realized is 0 because no collector has run — every domain's coverage is currently a plan, not a corpus.",
+    "domains": 7,
+    "platforms_total": 22,
+    "open_datasets_ready": 18,
+    "open_full_document_datasets": 2
+  },
+  "domains": [
+    {
+      "id": "case_law",
+      "name": "פסיקה — Case Law / Judiciary",
+      "description": "Judgments and decisions of the courts and tribunals: Supreme, District, Magistrate, Labor courts, and specialized tribunals; plus Rabbinical / Sharia / Military courts.",
+      "subdomains": [
+        {
+          "key": "supreme",
+          "name": "בית המשפט העליון — Supreme Court",
+          "available": "NONE",
+          "note": "Published-judgments search works in a real browser; server-side anti-bot (403). No lawful bulk route yet → needs an official data feed."
+        },
+        {
+          "key": "district",
+          "name": "בתי המשפט המחוזיים — District courts",
+          "available": "NONE",
+          "note": "Same net-hamishpat anti-bot posture."
+        },
+        {
+          "key": "magistrate",
+          "name": "בתי משפט השלום — Magistrate courts",
+          "available": "NONE",
+          "note": "Same; only a court-list metadata dataset exists on CKAN."
+        },
+        {
+          "key": "labor",
+          "name": "בתי הדין לעבודה — Labor courts",
+          "available": "LOW",
+          "note": "CORE for a labor-law firm. No open full-text feed; decisions reachable only via restricted/commercial DBs today."
+        },
+        {
+          "key": "tribunals",
+          "name": "בתי דין מנהליים — Tribunals (עררים, משמורת)",
+          "available": "MEDIUM",
+          "note": "2 OPEN full-document sets on data.gov.il (ararim, mishmoret) — the ONLY open full-text case-law we hold."
+        },
+        {
+          "key": "religious",
+          "name": "בתי דין דתיים/צבאיים — Rabbinical/Sharia/Military",
+          "available": "LOW",
+          "note": "Behind gov.il; estimated, unaudited."
+        }
+      ],
+      "platforms": [
+        {
+          "id": "supreme_court",
+          "name": "בית המשפט העליון — פסיקה",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "waf_blocked"
+        },
+        {
+          "id": "net_hamishpat",
+          "name": "נט המשפט — חיפוש פסיקה ציבורי",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "waf_blocked"
+        },
+        {
+          "id": "data_gov_il",
+          "name": "data.gov.il",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "open"
+        }
+      ],
+      "confidence": "VERIFIED",
+      "available_band": "LOW",
+      "available_score": 31,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 31,
+      "legal_value": 5,
+      "business_value": 5,
+      "value_score": 100,
+      "difficulty": 5,
+      "roi_score": 6,
+      "open_full_doc_datasets": [
+        "ararim",
+        "mishmoret"
+      ],
+      "open_datasets": [
+        "ararim",
+        "mishmoret",
+        "judgments",
+        "magistrate-court-list",
+        "court-lost"
+      ],
+      "open_dataset_count": 5,
+      "gaps": [
+        "Core court full-text (Supreme/District/Magistrate/Labor) is UNREACHABLE lawfully by scraping — the single biggest value gap.",
+        "Labor-court decisions — the firm's core practice area — have NO open full-text feed.",
+        "Only 2 tribunal sets (ararim, mishmoret) provide open full documents; everything else is metadata or blocked.",
+        "No official machine-readable court data feed identified — must be pursued institutionally (FOI / data agreement)."
+      ],
+      "priority_quadrant": "STRATEGIC"
+    },
+    {
+      "id": "legislation",
+      "name": "חקיקה — Legislation",
+      "description": "Primary laws, bills, secondary legislation (regulations), Knesset committee documents, and the Reshumot official gazette.",
+      "subdomains": [
+        {
+          "key": "laws",
+          "name": "חוקים — Primary laws",
+          "available": "HIGH",
+          "note": "Knesset OData KNS_IsraelLaw + KNS_DocumentIsraelLaw — full law texts, open, no auth (VERIFIED)."
+        },
+        {
+          "key": "bills",
+          "name": "הצעות חוק — Bills",
+          "available": "HIGH",
+          "note": "Knesset OData KNS_Bill (VERIFIED); CKAN my-bills/547 mirror."
+        },
+        {
+          "key": "regulations",
+          "name": "תקנות — Secondary legislation",
+          "available": "MEDIUM",
+          "note": "Partly via Knesset docs / Reshumot; machine route to Reshumot not yet verified (ESTIMATED)."
+        },
+        {
+          "key": "committees",
+          "name": "ועדות הכנסת — Committee documents",
+          "available": "HIGH",
+          "note": "Knesset OData committee/session entity sets (VERIFIED)."
+        },
+        {
+          "key": "gazette",
+          "name": "רשומות — Official gazette",
+          "available": "LOW",
+          "note": "Authoritative legislation feed; machine route ESTIMATED, needs audit."
+        }
+      ],
+      "platforms": [
+        {
+          "id": "knesset_odata",
+          "name": "הכנסת — OData ParliamentInfo",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "open"
+        },
+        {
+          "id": "data_gov_il",
+          "name": "data.gov.il",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "open"
+        }
+      ],
+      "confidence": "VERIFIED",
+      "available_band": "HIGH",
+      "available_score": 94,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 94,
+      "legal_value": 5,
+      "business_value": 4,
+      "value_score": 90,
+      "difficulty": 2,
+      "roi_score": 68,
+      "open_full_doc_datasets": [
+        "knesset:KNS_IsraelLaw",
+        "knesset:KNS_DocumentIsraelLaw",
+        "knesset:KNS_Bill"
+      ],
+      "open_datasets": [],
+      "open_dataset_count": 0,
+      "gaps": [
+        "The full open legislation corpus (Knesset OData, 48 entity sets, no auth) is reachable but 0% INGESTED — highest-ROG unrealized asset.",
+        "Reshumot gazette machine route unverified — the authoritative publication channel.",
+        "Secondary legislation (תקנות) consolidation is partial and needs mapping across Knesset + Reshumot."
+      ],
+      "priority_quadrant": "DO_FIRST"
+    },
+    {
+      "id": "registries",
+      "name": "מרשמים — Registries",
+      "description": "Statutory registers: companies, partnerships, nonprofits (amutot), patents, trademarks, inheritance & endowments.",
+      "subdomains": [
+        {
+          "key": "companies",
+          "name": "רשם החברות — Companies",
+          "available": "HIGH",
+          "note": "ica_companies / ica-changes / ica_partnerships (OPEN CKAN)."
+        },
+        {
+          "key": "nonprofits",
+          "name": "רשם העמותות — Nonprofits",
+          "available": "HIGH",
+          "note": "moj-amutot (OPEN CKAN)."
+        },
+        {
+          "key": "ip",
+          "name": "פטנטים וסימני מסחר — Patents/Trademarks",
+          "available": "HIGH",
+          "note": "mamtziim_patents / trademarks_nice / simaneymisahr (OPEN CKAN)."
+        },
+        {
+          "key": "inheritance",
+          "name": "ירושה והקדשות — Inheritance/Endowments",
+          "available": "HIGH",
+          "note": "yerusha / hekdeshot + takanot (OPEN CKAN)."
+        }
+      ],
+      "platforms": [
+        {
+          "id": "data_gov_il",
+          "name": "data.gov.il",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "open"
+        }
+      ],
+      "confidence": "VERIFIED",
+      "available_band": "HIGH",
+      "available_score": 85,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 85,
+      "legal_value": 3,
+      "business_value": 3,
+      "value_score": 60,
+      "difficulty": 1,
+      "roi_score": 51,
+      "open_full_doc_datasets": [],
+      "open_datasets": [
+        "ica_companies",
+        "ica-changes",
+        "ica_partnerships",
+        "membership-in-liquidation",
+        "moj-amutot",
+        "simaneymisahr",
+        "mamtziim_patents",
+        "halicim_bateydin",
+        "yerusha",
+        "hekdeshot",
+        "takanot_hayerusha-batei_hadin_hasharaim",
+        "takanot_hayerusha-batei_hadin_hadruzim",
+        "trademarks_nice",
+        "bakashot_cpc"
+      ],
+      "open_dataset_count": 14,
+      "gaps": [
+        "Registry records are structured data, NOT full legal documents — supports diligence, not primary-law research.",
+        "One CKAN collector serves all of these; the gap is realization (0 ingested), not access."
+      ],
+      "priority_quadrant": "QUICK_WIN"
+    },
+    {
+      "id": "regulatory",
+      "name": "רגולציה — Regulatory",
+      "description": "Decisions, directives and circulars of the regulators: ISA, Bank of Israel, CMA (Capital Market Authority), Competition Authority, Privacy Authority, Tax rulings, Regulation DB.",
+      "subdomains": [
+        {
+          "key": "regdb",
+          "name": "מאגר הרגולציה — Regulation DB",
+          "available": "MEDIUM",
+          "note": "regulationdatabase (OPEN CKAN) — regulation metadata."
+        },
+        {
+          "key": "securities",
+          "name": "רשות ניירות ערך — ISA",
+          "available": "LOW",
+          "note": "Decisions endpoint unaudited (Tier-3)."
+        },
+        {
+          "key": "banking",
+          "name": "בנק ישראל — Bank of Israel",
+          "available": "LOW",
+          "note": "Directives; machine route ESTIMATED."
+        },
+        {
+          "key": "cma",
+          "name": "רשות שוק ההון — CMA",
+          "available": "LOW",
+          "note": "ESTIMATED / unaudited."
+        },
+        {
+          "key": "tax",
+          "name": "החלטות מיסוי — Tax rulings",
+          "available": "LOW",
+          "note": "Structured rulings; route ESTIMATED."
+        }
+      ],
+      "platforms": [
+        {
+          "id": "data_gov_il",
+          "name": "data.gov.il",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "open"
+        },
+        {
+          "id": "isa",
+          "name": "רשות ניירות ערך",
+          "evidence": "VERIFIED",
+          "tier": "Tier 3",
+          "access": "open"
+        },
+        {
+          "id": "gov_il",
+          "name": "gov.il — Government Portal",
+          "evidence": "VERIFIED",
+          "tier": "Tier 2",
+          "access": "waf_blocked"
+        }
+      ],
+      "confidence": "ESTIMATED",
+      "available_band": "LOW",
+      "available_score": 25,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 25,
+      "legal_value": 4,
+      "business_value": 3,
+      "value_score": 70,
+      "difficulty": 4,
+      "roi_score": 7,
+      "open_full_doc_datasets": [],
+      "open_datasets": [
+        "regulationdatabase"
+      ],
+      "open_dataset_count": 1,
+      "gaps": [
+        "Regulator decision endpoints are largely unaudited/estimated — needs per-regulator live audit before any build.",
+        "Only regulation metadata (not full directives) is open today."
+      ],
+      "priority_quadrant": "STRATEGIC"
+    },
+    {
+      "id": "government",
+      "name": "מנהלי — Government / Administrative",
+      "description": "Government resolutions, ministry decisions, administrative orders and directives published across gov.il.",
+      "subdomains": [
+        {
+          "key": "gov_decisions",
+          "name": "החלטות ממשלה — Government resolutions",
+          "available": "LOW",
+          "note": "gov.il portal is WAF-protected (server-side 403); interface-only ToS."
+        },
+        {
+          "key": "ministry",
+          "name": "החלטות משרדים — Ministry decisions",
+          "available": "LOW",
+          "note": "~90 units on gov.il; dynamic collectors behind WAF."
+        },
+        {
+          "key": "admin_orders",
+          "name": "צווים מנהליים — Administrative orders",
+          "available": "LOW",
+          "note": "accessibilityorders / supervisionfiles (partial CKAN)."
+        }
+      ],
+      "platforms": [
+        {
+          "id": "gov_il",
+          "name": "gov.il — Government Portal",
+          "evidence": "VERIFIED",
+          "tier": "Tier 2",
+          "access": "waf_blocked"
+        },
+        {
+          "id": "data_gov_il",
+          "name": "data.gov.il",
+          "evidence": "VERIFIED",
+          "tier": "Tier 1",
+          "access": "open"
+        }
+      ],
+      "confidence": "ESTIMATED",
+      "available_band": "LOW",
+      "available_score": 25,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 25,
+      "legal_value": 3,
+      "business_value": 3,
+      "value_score": 60,
+      "difficulty": 4,
+      "roi_score": 6,
+      "open_full_doc_datasets": [],
+      "open_datasets": [],
+      "open_dataset_count": 0,
+      "gaps": [
+        "gov.il government-resolutions corpus sits behind a WAF — no lawful bulk route without an official feed / permission.",
+        "Administrative decisions are scattered; only fragments are on CKAN."
+      ],
+      "priority_quadrant": "DEFER"
+    },
+    {
+      "id": "academic",
+      "name": "אקדמי/משני — Academic & Secondary",
+      "description": "Law reviews, theses, scholarly commentary, and public legal-reference material (rights guides).",
+      "subdomains": [
+        {
+          "key": "reference",
+          "name": "מדריכי זכויות — Rights reference",
+          "available": "HIGH",
+          "note": "Kol Zchut MediaWiki API (VERIFIED): 7,347 articles, CC-BY-SA. Reference, not case law."
+        },
+        {
+          "key": "law_reviews",
+          "name": "כתבי עת משפטיים — Law reviews",
+          "available": "UNKNOWN",
+          "note": "University OAI-PMH repositories ESTIMATED / unaudited."
+        },
+        {
+          "key": "theses",
+          "name": "עבודות מחקר — Theses",
+          "available": "UNKNOWN",
+          "note": "Per-institution repositories; not audited."
+        }
+      ],
+      "platforms": [
+        {
+          "id": "kolzchut",
+          "name": "כל זכות",
+          "evidence": "VERIFIED",
+          "tier": "Tier 2",
+          "access": "open"
+        },
+        {
+          "id": "nli",
+          "name": "הספרייה הלאומית (NLI)",
+          "evidence": "ESTIMATED",
+          "tier": "Tier 2",
+          "access": "open"
+        }
+      ],
+      "confidence": "ESTIMATED",
+      "available_band": "MEDIUM",
+      "available_score": 55,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 55,
+      "legal_value": 2,
+      "business_value": 3,
+      "value_score": 50,
+      "difficulty": 2,
+      "roi_score": 22,
+      "open_full_doc_datasets": [],
+      "open_datasets": [
+        "mashkonot",
+        "britzugiyut",
+        "tovin",
+        "maale"
+      ],
+      "open_dataset_count": 4,
+      "gaps": [
+        "Kol Zchut is open and easy (client-facing rights layer) but is secondary reference, not primary law.",
+        "University law-review / thesis repositories are entirely UNAUDITED — coverage unknown."
+      ],
+      "priority_quadrant": "QUICK_WIN"
+    },
+    {
+      "id": "international",
+      "name": "בינלאומי/משווה — International & Comparative",
+      "description": "Treaties Israel is party to, foreign and comparative law, and international tribunal rulings.",
+      "subdomains": [
+        {
+          "key": "treaties",
+          "name": "אמנות — Treaties",
+          "available": "UNKNOWN",
+          "note": "No open Israeli machine source identified this program."
+        },
+        {
+          "key": "comparative",
+          "name": "משפט משווה — Comparative/foreign law",
+          "available": "UNKNOWN",
+          "note": "Out of current national scope."
+        },
+        {
+          "key": "intl_rulings",
+          "name": "פסיקה בינלאומית — International rulings",
+          "available": "UNKNOWN",
+          "note": "Not surveyed."
+        }
+      ],
+      "platforms": [],
+      "confidence": "UNKNOWN",
+      "available_band": "NONE",
+      "available_score": 5,
+      "realized_band": "NONE",
+      "realized_score": 0,
+      "unrealized_reachable_gap": 5,
+      "legal_value": 2,
+      "business_value": 1,
+      "value_score": 30,
+      "difficulty": 3,
+      "roi_score": 1,
+      "open_full_doc_datasets": [],
+      "open_datasets": [],
+      "open_dataset_count": 0,
+      "gaps": [
+        "No coverage and no discovery yet — lowest priority for an Israeli labor-law firm.",
+        "Would require a separate international-sources discovery program."
+      ],
+      "priority_quadrant": "DEFER"
+    }
+  ]
+}
