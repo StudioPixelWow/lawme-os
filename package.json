@@ -54,7 +54,9 @@
     "intelligence:test": "node --test \"src/modules/intelligence/core/__tests__/*.test.ts\" \"src/modules/intelligence/__tests__/*.test.ts\"",
     "legal:fixtures:seed:dev": "node src/modules/legal-knowledge/seed/seed-fixtures.ts",
     "sql:harness": "bash scripts/sql-harness.sh",
-    "capability1:freeze-check": "bash scripts/capability1-freeze-check.sh"
+    "capability1:freeze-check": "bash scripts/capability1-freeze-check.sh",
+    "legal:ingest:knesset": "node tools/legal-ingest/ingest-knesset.ts",
+    "legal:ingest:data-gov": "node tools/legal-ingest/ingest-data-gov.ts"
   },
   "dependencies": {
     "@fontsource-variable/assistant": "^5.2.9",
