@@ -1,23 +1,10 @@
 {
   "started": false,
-  "reason": "Overall gate is GO_WITH_FIXES (storage byte-upload not achievable from available tools); backfill runs only on a full GO.",
+  "reason": "Overall gate is GO_WITH_FIXES. Object storage is NOT_GO (0/31 physical byte uploads — requires an operator environment with network to fs.knesset.gov.il + Supabase + service-role key). Controlled backfill runs only on a full GO.",
+  "phases_planned": ["50 laws", "100 laws", "500 laws"],
+  "phase_gate_between_stages": {"validation": ">=0.98", "provenance": 1.0, "storage_verification": 1.0, "indexing": ">=0.99", "idempotency": "PASS"},
   "laws_backfilled": 0,
   "publications_backfilled": 0,
-  "guardrails_when_go": {
-    "batch_size": "10-25",
-    "concurrency": 2,
-    "checkpoint": "per (IsraelLawID, correctionNumber)",
-    "daily_cap": true,
-    "auto_stop_on": [
-      "download<98%",
-      "extraction<95%",
-      "normalization_failure>2%",
-      "high_confidence_parser_error",
-      "quarantine>5%",
-      "storage_verification_failure",
-      "403",
-      "429",
-      "schema_drift"
-    ]
-  }
+  "guardrails": {"batch_size": "10-25", "concurrency": 2, "checkpoint": "per (IsraelLawID, correctionNumber)", "daily_cap": true, "pause_resume": true},
+  "auto_stop_on": ["download_success<0.98", "checksum_failure>0", "storage_verification<1.0", "extraction_success<0.95", "normalization_failure>0.02", "quarantine>0.05", "high_confidence_parser_error", "403", "429", "schema_drift", "storage_quota_warning"]
 }

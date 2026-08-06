@@ -1,0 +1,40 @@
+{
+  "attempted_at": "2026-08-07",
+  "objective": "Physically upload the 31 registered official PDF binaries to object storage, round-trip verify, mark verified.",
+  "environment_probe": {
+    "dev_project_ref": "udispadsbxqicmawqcuk",
+    "service_role_key_present": true,
+    "service_role_key_source": ".env.local (env-loaded, never printed/committed)",
+    "target_url_confirms_dev": true,
+    "container_to_fs_knesset_gov_il": "BLOCKED (proxy: CONNECT tunnel failed, 403)",
+    "container_to_supabase_storage": "BLOCKED (proxy: CONNECT tunnel failed, 403)",
+    "browser_has_pdf_bytes": true,
+    "browser_can_authenticate_to_private_bucket": false,
+    "conclusion": "No single environment available in-session holds BOTH network paths (bytes + storage) with credentials. Container has the key but no egress to either host; the browser has the bytes but cannot authenticate to the private bucket, and injecting a service-role key into a third-party-origin page is prohibited."
+  },
+  "storage_state": {
+    "bucket": "legal-source-files",
+    "bucket_public": false,
+    "access_policy": "deny-by-default; service-role only; no permissive storage.objects policy",
+    "registered_objects": 31,
+    "pending": 31,
+    "uploaded": 0,
+    "verified": 0,
+    "quarantined": 0,
+    "checksum_mismatches": 0,
+    "duplicate_binaries": 0,
+    "distinct_sha256": 31,
+    "total_bytes": 7652966,
+    "round_trip_verification": "implemented + unit-tested (in-memory client); NOT run against live bucket (no network)"
+  },
+  "turnkey_runner": {
+    "path": "tools/legal-ingest/upload-pdfs.ts",
+    "adapter": "src/modules/legal-ai-israel/ingestion/legislation/publication/object-storage-supabase.ts",
+    "run": "node --env-file=.env.local --experimental-strip-types tools/legal-ingest/upload-pdfs.ts",
+    "requires": "an environment with network to fs.knesset.gov.il AND to the dev Supabase project + SERVICE_ROLE key",
+    "behavior": "SSRF-guarded fetch -> validate (application/pdf + %PDF- + size) -> SHA-256 vs registered (mismatch=quarantine) -> content-addressed upload (dedup, no overwrite) -> HEAD + full byte round-trip -> stored_objects=verified. No retry on 403/404/429. Idempotent."
+  },
+  "gate": "NOT_GO (upload_success 0%; the physical step must run in an operator environment)",
+  "decision": "GO_WITH_FIXES",
+  "backfill_started": false
+}

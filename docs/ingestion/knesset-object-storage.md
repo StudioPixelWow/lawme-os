@@ -58,3 +58,20 @@ exposing the service key — so the upload cannot run here.
 **Storage gate: NOT_GO** (upload success 0% < 100%). Retention/dedup rule for
 when it runs: a shared binary is kept while any publication references it
 (`ref_count > 0`); no hard delete without an explicit policy.
+
+## Running the upload (operator, one command)
+
+The physical upload is packaged turnkey — see `knesset-storage-live-run.md` for
+the environment probe proving it cannot run in the sandbox (container blocked
+from both `fs.knesset.gov.il` and Supabase; browser can't hold the key):
+
+```
+node --env-file=.env.local --experimental-strip-types tools/legal-ingest/upload-pdfs.ts
+```
+
+`tools/legal-ingest/upload-pdfs.ts` + `object-storage-supabase.ts` (the
+`@supabase/supabase-js` adapter of `StorageClient`) fetch each pending PDF under
+the SSRF policy, checksum against the registered SHA (mismatch → `quarantined`),
+upload content-addressed, round-trip verify, and flip `stored_objects` →
+`verified`. Idempotent; concurrency 2; no retry on 403/404/429; the service-role
+key is read from env only and never shipped to any browser bundle.

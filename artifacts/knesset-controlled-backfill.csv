@@ -1,0 +1,4 @@
+phase,target_laws,status,laws_processed,publications,pdfs_uploaded,pdfs_verified,gate
+phase_1,50,not_started,0,0,0,0,blocked_on_storage_go
+phase_2,100,not_started,0,0,0,0,blocked_on_storage_go
+phase_3,500,not_started,0,0,0,0,blocked_on_storage_go
