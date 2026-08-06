@@ -6,6 +6,15 @@ real: government bodies + datasets come from the **data.gov.il CKAN API**
 (`organization_list`, `package_search` — actual responses); curated institutions
 are known public bodies pending live audit. No fabricated verdicts.
 
+> **Counting correction (2026-08-05):** an entity-level qualification pass
+> (`data-gov-legal-dataset-qualification.md`) corrected the earlier over-count.
+> data.gov.il is **1 CKAN API**, not 115 — the 115 were 58 publishers + 56
+> datasets under one platform. Of the 56 OPEN-licensed datasets, only **18** are
+> genuinely legal + accessible + license-verified (25 VERIFIED_OPEN/
+> OPEN_WITH_OBLIGATIONS across tiers; 24 REJECTED as non-legal; 7 REVIEW), and
+> only **2** contain full documents. Registry `ready_to_build` corrected 56 → 18.
+> Treat the "115 API" / "56 OPEN" figures below as pre-qualification raw counts.
+
 ## Progress vs targets
 
 | Target | Goal | Now | Status |
