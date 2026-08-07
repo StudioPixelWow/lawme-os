@@ -153,12 +153,16 @@ export function reconstructPage(items: LayoutItem[]): PageReconstruction {
     if (marg.length) marginalLines.push(marg);
   }
 
-  // A genuine marginal-caption column is SPARSE (side headings on some lines),
-  // not a full second column. If the "margin" side carries as many lines as the
-  // body, the detected gap is just aligned inter-word whitespace (or a balanced
-  // two-body-column we don't reshuffle) — fall back to single-column (lossless).
+  // A genuine marginal-caption column is SPARSE (side headings on some lines) and
+  // SHORT (headings are a few words). Reject when the "margin" side is as dense as
+  // the body (aligned inter-word whitespace / balanced columns) OR carries long
+  // lines (a table/budget column, not captions) — fall back to single (lossless).
+  const marginalText = marginalLines.map(lineText).filter(Boolean);
+  const avgMarginalLen = marginalText.length ? marginalText.reduce((a, t) => a + t.length, 0) / marginalText.length : 0;
+  const maxMarginalLen = marginalText.reduce((a, t) => Math.max(a, t.length), 0);
   const marginTooDense = marginalLines.length === 0 || marginalLines.length > 0.6 * bodyLines.length;
-  if (marginTooDense) {
+  const marginTooLong = avgMarginalLen > 30 || maxMarginalLen > 45; // captions are short headings
+  if (marginTooDense || marginTooLong) {
     const bodyText = lines.map(lineText).filter(Boolean).join("\n");
     return { columnType: "single", marginalSide: null, bodyText, marginalCaptions: [], layoutConfidence: gap.clarity, fallbackUsed: true, lossless: glyphKey(bodyText) === inputKey };
   }

@@ -139,17 +139,21 @@ async function main(): Promise<void> {
       // Reading-order well-formedness: lossless AND (single OR no real-caption contamination).
       if (pg.lossless && miss === 0 && !contamThisPage) wellFormed += 1;
 
-      // Section-boundary agreement raw vs layout (proxy).
-      const rawSec = sectionMarkers(rawText), laySec = sectionMarkers(pg.bodyText);
-      const n = Math.max(rawSec.length, laySec.length);
-      if (n > 0) { secAgreeDen += n; for (let k = 0; k < Math.min(rawSec.length, laySec.length); k++) if (rawSec[k] === laySec[k]) secAgreeNum += 1; }
+      // Section reading-order signal: in a correct reading order the primary
+      // section numbers should be non-decreasing. (Comparing to raw PDF-item order
+      // is meaningless — that stream is not a reading order.)
+      const layNums = sectionMarkers(pg.bodyText).map((s) => parseInt(s, 10)).filter((v) => !Number.isNaN(v));
+      for (let k = 1; k < layNums.length; k++) { secAgreeDen += 1; if (layNums[k] >= layNums[k - 1]) secAgreeNum += 1; }
 
       const c = pg.layoutConfidence;
       if (c < 0.34) conf["lt_0.34"] += 1; else if (c < 0.6) conf["0.34_0.6"] += 1; else if (c < 0.8) conf["0.6_0.8"] += 1; else conf["0.8_1.0"] += 1;
 
-      // Capture one of each page kind (real geometry) for the regression fixture.
-      const want = pg.columnType === "two_column" ? "two_column" : pg.fallbackUsed ? "fallback" : "single";
-      if (!fixtures.some((f) => f.label === want) && pages[p].length > 0 && pages[p].length < 400) {
+      // Capture real geometry for the regression fixture: one of each page kind,
+      // AND up to 6 CONTAMINATED pages (the failure cases) for offline iteration.
+      const want = contamThisPage ? "contaminated" : pg.columnType === "two_column" ? "two_column" : pg.fallbackUsed ? "fallback" : "single";
+      const contamCount = fixtures.filter((f) => f.label === "contaminated").length;
+      const wantContam = want === "contaminated" && contamCount < 6;
+      if ((wantContam || !fixtures.some((f) => f.label === want)) && pages[p].length > 0 && pages[p].length < 500) {
         fixtures.push({ label: want, pub: r.publication_item_id as string, page: p + 1, items: pages[p] });
       }
     }
@@ -171,14 +175,14 @@ async function main(): Promise<void> {
     text_loss_rate_pct: pct(textLossPages, pagesEval),
     false_removal_glyph_count: falseRemovals,
     caption_contamination_rate_pct: pct(contamPages, twoColContamDenom),
-    section_boundary_agreement_pct: pct(secAgreeNum, secAgreeDen),
+    section_number_monotonic_pct: pct(secAgreeNum, secAgreeDen),
     fallback_pages: fallback,
     confidence_distribution: conf,
     go_gate: {
       text_loss_zero: textLossPages === 0 && falseRemovals === 0,
       caption_contamination_le_1pct: pct(contamPages, twoColContamDenom) <= 1,
       reading_order_ge_99pct: pct(wellFormed, pagesEval) >= 99,
-      section_boundary_ge_99pct: pct(secAgreeNum, secAgreeDen) >= 99,
+      section_number_monotonic_ge_99pct: pct(secAgreeNum, secAgreeDen) >= 99,
       no_high_confidence_false_removals: falseRemovals === 0,
     },
     caption_sample: captionSample,
