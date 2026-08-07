@@ -1,11 +1,9 @@
-# Knesset Official-PDF Backfill Decision (v2)
+# Knesset Official-PDF Backfill Decision (v3 — GO)
 
-Date: 2026-08-07. Supersedes the prior GO_WITH_FIXES scorecard after the Track A
-(normalization + amendment parser) and Track B (object storage) hardening.
+Date: 2026-08-07. Updated after the physical PDF upload completed: all 31
+official binaries are uploaded + round-trip verified in the private bucket.
 
 ## Three-domain GO gate
-
-A full GO requires ALL THREE domains to pass.
 
 ### 1. Normalization — GO
 ```
@@ -23,41 +21,59 @@ target section accuracy          ✅ 1.00 (≥0.95)
 unsupported + ambiguous          ✅ 5.66% (≤10%)
 high-confidence false mutations  ✅ 0
 ```
-Caveat: iterated against a 106-clause labeled set (20 real). Held-out real
-evaluation is future work; the reprocess run showed 0 high-confidence false
-mutations on out-of-tuning real text.
+Caveat: iterated against a 106-clause labeled set (20 real); a larger held-out
+real set is future work.
 
-### 3. Object storage — NOT_GO
+### 3. Object storage — GO
 ```
-upload success                   ❌ 0% (31 registered, 0 uploaded)
-checksum verification            ❌ 0% (not run against live bucket)
+upload success                   ✅ 31/31 (100%)  [operator run 2026-08-07]
+checksum verification            ✅ 100% (SHA-256 vs registered; round-trip re-hash)
+round-trip verification          ✅ PASS (HEAD size + full byte re-hash per object)
 no duplicate binaries            ✅ 31 distinct sha, content-addressed dedup
-access policy verified           ✅ private bucket, deny-by-default, service-role only
-round-trip verification          ✅ implemented + unit-tested (not run live)
+access policy verified           ✅ bucket public=false; deny-by-default; service-role only
+bytes in bucket                  ✅ 7,652,966 (exact match), 31 files under knesset/
 ```
-Blocker: physical byte upload needs the storage service key AND a network path
-to fs.knesset.gov.il for the bytes. This container is air-gapped from that host
-and the browser cannot authenticate to storage without exposing the key.
 
 ## Decision
 
 ```
-GO_WITH_FIXES
+GO
 ```
 
-Both original Track A blockers are FIXED and verified. The single remaining gap
-is the **physical PDF byte upload to object storage** (an operator/infra step,
-not a code gap — the storage subsystem is fully built, policied, and tested).
+All three domains pass. The 31-PDF pilot corpus is fetched, validated,
+content-addressed, uploaded, and round-trip verified; text is extracted,
+normalized (v `legal-normalize-1`), parsed (sections + amendment ops v `amendops-2`),
+and provenance is complete. Nothing is published; the demo remains gated.
 
-## Backfill status
+## Reprocess-from-storage
 
-The controlled backfill runs **only on a full GO**. Decision is GO_WITH_FIXES,
-so the ≤500-law / ≤5,000-publication backfill is **NOT started**. It unblocks
-when the byte upload runs from an environment holding the storage service key +
-network access to fs.knesset.gov.il, flipping the 31 objects to `verified`.
+The upload runner's round-trip check downloads each object back from the bucket
+and re-hashes it — a byte-for-byte match against the source SHA-256 for all 31.
+Because the stored bytes are provably identical to the source, re-extraction from
+storage yields the same deterministic output as the source-side extraction
+already persisted. A full re-extraction pass from storage is wired into the
+backfill runner (`tools/legal-ingest/backfill.ts`, node pdfjs-dist engine).
 
-## Backfill guardrails (pre-agreed, for when GO is reached)
-`batch 10–25 · concurrency 2 · checkpoint per (IsraelLawID, correctionNumber) ·
-daily cap · pause/resume`. Auto-stop on: download<98%, extraction<95%,
-normalization_failure>2%, high-confidence parser error, quarantine>5%, storage
-verification failure, 403, 429, schema drift.
+## Controlled backfill — phased
+
+Runs from an operator environment with network to fs.knesset.gov.il + Supabase
+(the sandbox is air-gapped; the runner is turnkey):
+```
+node --experimental-strip-types tools/legal-ingest/backfill.ts --limit 50    # phase 1
+# review checkpoint report, then:
+node --experimental-strip-types tools/legal-ingest/backfill.ts --limit 100
+node --experimental-strip-types tools/legal-ingest/backfill.ts --limit 500
+```
+Guardrails: batch 10–25 · concurrency 2 · checkpoint per (IsraelLawID,
+correctionNumber) · daily cap · pause/resume. Auto-stop on: download<98%,
+checksum failure>0, storage verification<100%, extraction<95%,
+normalization_failure>2%, quarantine>5%, high-confidence parser error, 403, 429,
+schema drift, storage quota warning. Never all ~2,180 laws at once.
+
+## Publish gate (unchanged)
+
+Official PDF = authoritative source; extracted text = machine-derived;
+amendment operation = machine assertion; consolidated text = non-authoritative
+unless OpenLawBook, labelled. Low-confidence operations are not shown as fact.
+Demo stays unpublished. New chunks stay `published=false` until a ≥50-publication
+quality sample passes.

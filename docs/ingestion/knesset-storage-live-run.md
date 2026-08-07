@@ -1,4 +1,4 @@
-# Knesset Object Storage — Live Run Attempt
+# Knesset Object Storage — Live Run (COMPLETED)
 
 Date: 2026-08-07. Attempt to execute the physical PDF byte upload (Epic:
 "Upload Existing Knesset PDFs to Object Storage"). Artifact:
@@ -53,10 +53,19 @@ project and the service-role key (the repo's `.env.local` already targets the
 authorized dev project). After it runs, `stored_objects` flips to `verified`,
 Storage reaches GO, and the reprocess-from-storage + controlled backfill unblock.
 
-## Result
+## Result (operator run 2026-08-07)
 
 ```
-uploaded 0 · verified 0 · quarantined 0 · checksum_mismatch 0 · bytes 0
-31 objects remain pending (registered, keyed, deduped, private)
-Storage gate: NOT_GO  →  overall GO_WITH_FIXES  →  backfill NOT started
+uploaded 31 · verified 31 · quarantined 0 · checksum_mismatch 0 · failed 0 · bytes 7,652,966
 ```
+
+Dev confirms: 31/31 `stored_objects.storage_status = verified` (verified_at set),
+31 files under `knesset/` in the private bucket `legal-source-files`
+(`public=false`), 7,652,966 bytes exact, 0 duplicates, 0 published. Round-trip
+PASS (each object re-downloaded and re-hashed against the source SHA-256).
+
+Config applied to dev to enable the runner: `legalai` exposed to PostgREST
+(`pgrst.db_schemas`) + `usage`/table grants to `service_role` (RLS unchanged,
+still deny-by-default for anon/authenticated).
+
+**Storage gate: GO → overall GO.**
