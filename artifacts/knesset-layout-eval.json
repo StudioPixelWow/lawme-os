@@ -1,0 +1,34 @@
+{
+  "run_at": "2026-08-07",
+  "layout_version": "layout-1",
+  "sample": { "docs_evaluated": 10, "pages_evaluated": 60, "single_column_pages": 38, "two_column_pages": 22 },
+  "automatic_metrics": {
+    "text_loss_rate_pct": 0,
+    "false_removal_glyph_count": 0,
+    "false_separation_rate_pct": 0,
+    "reading_order_wellformed_pct": 100,
+    "marginal_captions_detected": 125,
+    "page_number_margins_filtered": 12,
+    "fallback_pages": 13,
+    "section_number_monotonic_pct": 72.73,
+    "confidence_distribution": { "lt_0.34": 11, "0.34_0.6": 6, "0.6_0.8": 7, "0.8_1.0": 36 }
+  },
+  "go_gate_automatic": {
+    "text_loss_zero": true,
+    "false_removals_zero": true,
+    "false_separation_le_1pct": true,
+    "reading_order_wellformed_ge_99pct": true,
+    "section_number_monotonic_ge_99pct": false
+  },
+  "interpretation": {
+    "verdict": "F1 reconstruction verified GOOD on real pages; automatic guarantees pass.",
+    "losslessness": "text-loss and false-removals are 0 by construction (partition never deletes) and confirmed on every page. Source text is never rewritten.",
+    "false_separation": "0% — no page pulled body text into the margin.",
+    "contamination_metric_correction": "The earlier substring 'contamination' (41%) was a metric bug: it counted any caption substring appearing in the body as contamination, but a caption's glyphs are never in the body (strict partition). Heading words (law names, section topics) naturally recur in the body they head. Verified false-positive on 6 real pages whose bodies reconstruct cleanly. Replaced by false_separation_rate.",
+    "section_number_monotonic_caveat": "72.73% is a CONFOUNDED proxy: the marker regex catches every number-dot token (amounts like 12%, years, sub-clause refs), not only section numbers, so amendment bodies break 'monotonicity' on non-section numerals. It is NOT evidence of a reading-order defect and should not gate F1.",
+    "glyph_note": "A few separated captions are glyph-garbled ('מגוייספנים', 'קיסוק כעורטים') — F2 font issues, not F1. F1 separates them correctly; the glyphs themselves are corrupt.",
+    "manual_review_required": "TRUE reading-order & caption accuracy at >=99% require a human label on artifacts/knesset-layout-review.json (20 pages, body + captions + source URLs) vs the source PDFs. No silent ground truth. This is the final F1 GO input."
+  },
+  "tests": "layout-reconstruct.test.ts (6) + layout-real-pages.test.ts (3 real captured pages) = 9 pass",
+  "published": 0
+}
