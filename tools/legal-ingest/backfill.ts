@@ -7,17 +7,15 @@
  *
  *   node --experimental-strip-types tools/legal-ingest/backfill.ts --limit 50
  *
- * Per new law it: fetches GetLegislationLawItem (JSON), maps to Law + publications
- * + amendment graph (reusing publication-model), persists them; then per PDF:
- * SSRF-guard fetch -> content-addressed upload + round-trip verify (stored_objects)
- * -> pdfjs text extraction -> normalize -> section parser (originals) / amendment
- * parser v2 (amendments) -> chunks + FTS -> persist. Everything published=false.
+ * Per new law: OData discovery (skip already-ingested), GetLegislationLawItem,
+ * map to Law + publications + amendment graph; per PDF: SSRF fetch ->
+ * content-addressed upload + round-trip verify -> pdf-parse RTL extraction ->
+ * normalize -> section parser (originals) / amendment parser v2 (amendments,
+ * FILTERED + capped) -> chunks + FTS. Everything persisted published=false.
  *
- * Guardrails: batch 10-25, concurrency 2, checkpoint per (IsraelLawID,
- * correctionNumber), daily cap, and AUTO-STOP on: download<98%, checksum>0,
- * storage verification<100%, extraction<95%, normalization_failure>2%,
- * quarantine>5%, high-confidence parser error, 403/429, schema drift. Idempotent
- * (ON CONFLICT / content-addressed dedup); a re-run is a no-op for done work.
+ * Rows are BATCH-upserted per law (not per row). Progress is logged per law.
+ * Guardrails: concurrency 2, checkpoint per law, extraction timeout, and
+ * auto-stop on download<98% / checksum>0 / quarantine>5% / 403 / 429. Idempotent.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { createHash } from "node:crypto";
@@ -29,8 +27,9 @@ import { storePdf } from "../../src/modules/legal-ai-israel/ingestion/legislatio
 import { createSupabaseStorageClient } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/object-storage-supabase.ts";
 import { toPublicationModel, buildAmendmentGraph } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/publication-model.ts";
 import type { ParsedLegislationLawItem, Correction, General } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/legislation-api.ts";
-import { normalizePdfText, NORMALIZATION_VERSION } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/pdf-normalize.ts";
+import { normalizePdfText } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/pdf-normalize.ts";
 import { parseAmendmentsV2, AMENDMENT_PARSER_VERSION } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/amendment-parser-v2.ts";
+import type { OperationTypeV2 } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/amendment-parser-v2.ts";
 import { parseLegislation } from "../../src/modules/legal-ai-israel/ingestion/legislation/section-parser.ts";
 import { chunkLaw } from "../../src/modules/legal-ai-israel/ingestion/legislation/section-chunker.ts";
 import { normalizeHebrewLegalText } from "../../src/modules/legal-ai-israel/parser/hebrew-normalize.ts";
@@ -58,10 +57,14 @@ if (!SUPABASE_URL || !SERVICE_KEY) { process.stderr.write("backfill: SUPABASE_UR
 
 const LIMIT = Number((process.argv.find((a) => a.startsWith("--limit="))?.split("=")[1]) ?? process.argv[process.argv.indexOf("--limit") + 1] ?? "50");
 const CONCURRENCY = 2;
+const EXTRACT_TIMEOUT_MS = 30_000;
+const MAX_OPS_PER_PUB = 25; // cap noisy full-text parsing
+const KEEP_OP_TYPES = new Set<OperationTypeV2>(["replace_words", "replace_section", "add_section", "delete_section", "insert_words", "delete_words", "rename_term", "renumber_section", "replace_schedule", "add_schedule"]);
 const ODATA = "https://knesset.gov.il/OdataV4/ParliamentInfo/KNS_IsraelLaw";
 const LEGIS = "https://www.knesset.gov.il/WebSiteApi/knessetapi/LegislationItem/GetLegislationLawItem?ItemId=";
+const log = (s: string) => process.stderr.write(s + "\n");
 
-const sha256Hex = (b: Uint8Array) => createHash("sha256").update(b).digest("hex");
+const sha = (s: string | Uint8Array) => createHash("sha256").update(s).digest("hex");
 const nodeHttp: HttpClient = async (url, signal): Promise<HttpResponse> => {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), signal.timeoutMs);
@@ -74,185 +77,154 @@ const nodeHttp: HttpClient = async (url, signal): Promise<HttpResponse> => {
   } finally { clearTimeout(t); }
 };
 
-// pdf-parse is CommonJS with no types — require it and drive extraction through
-// a custom page renderer that reconstructs RTL reading order (group by line y,
-// sort lines top→bottom, glyphs right→left), matching the pilot's pdf.js path.
 const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse") as (
-  data: Uint8Array | Buffer,
-  opts?: { pagerender?: (pageData: unknown) => Promise<string> },
-) => Promise<{ text: string; numpages: number }>;
+const pdfParse = require("pdf-parse") as (data: Buffer, opts?: { pagerender?: (pageData: unknown) => Promise<string> }) => Promise<{ text: string; numpages: number }>;
 
 async function extractText(pdf: Uint8Array): Promise<{ text: string; pages: number; coverage: number }> {
-  let pagesWithText = 0;
+  let withText = 0;
   const pagerender = async (pageData: unknown): Promise<string> => {
     const pd = pageData as { getTextContent: (o?: unknown) => Promise<{ items: { str?: string; transform?: number[] }[] }> };
     const tc = await pd.getTextContent({ normalizeWhitespace: true, disableCombineTextItems: false });
     const lines: Record<number, [number, string][]> = {};
-    for (const it of tc.items) {
-      if (!it.str || !it.transform) continue;
-      const y = Math.round(it.transform[5]);
-      (lines[y] = lines[y] ?? []).push([it.transform[4], it.str]);
-    }
+    for (const it of tc.items) { if (!it.str || !it.transform) continue; const y = Math.round(it.transform[5]); (lines[y] = lines[y] ?? []).push([it.transform[4], it.str]); }
     const ys = Object.keys(lines).map(Number).sort((a, b) => b - a);
     const txt = ys.map((y) => lines[y].sort((a, b) => b[0] - a[0]).map((z) => z[1]).join(" ")).join("\n");
-    if (txt.trim().length > 10) pagesWithText += 1;
+    if (txt.trim().length > 10) withText += 1;
     return `${txt}\n\n`;
   };
-  const out = await pdfParse(Buffer.from(pdf), { pagerender });
-  return { text: out.text, pages: out.numpages, coverage: out.numpages ? pagesWithText / out.numpages : 0 };
+  const timeout = new Promise<never>((_, rej) => setTimeout(() => rej(new Error("extract timeout")), EXTRACT_TIMEOUT_MS));
+  const out = await Promise.race([pdfParse(Buffer.from(pdf), { pagerender }), timeout]);
+  return { text: out.text, pages: out.numpages, coverage: out.numpages ? withText / out.numpages : 0 };
 }
 
-interface Metrics {
-  lawsProcessed: number; publications: number; pdfsDiscovered: number; pdfsUploaded: number;
-  pdfsVerified: number; pdfsFailed: number; checksumMismatch: number; sections: number;
-  operations: number; ambiguous: number; unsupported: number; chunks: number; bytes: number;
-  extractionFailures: number; quarantined: number; relationships: number;
-}
+const S = (v: unknown): string | null => (v === null || v === undefined || v === "" ? null : String(v));
+
+interface Metrics { lawsProcessed: number; publications: number; pdfsDiscovered: number; pdfsUploaded: number; pdfsVerified: number; pdfsFailed: number; checksumMismatch: number; sections: number; operations: number; chunks: number; bytes: number; extractionFailures: number; quarantined: number; relationships: number; }
 
 async function main(): Promise<void> {
   const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!, { db: { schema: "legalai" }, auth: { persistSession: false } });
   const storage = createSupabaseStorageClient(supabase);
-  const m: Metrics = { lawsProcessed: 0, publications: 0, pdfsDiscovered: 0, pdfsUploaded: 0, pdfsVerified: 0, pdfsFailed: 0, checksumMismatch: 0, sections: 0, operations: 0, ambiguous: 0, unsupported: 0, chunks: 0, bytes: 0, extractionFailures: 0, quarantined: 0, relationships: 0 };
+  const m: Metrics = { lawsProcessed: 0, publications: 0, pdfsDiscovered: 0, pdfsUploaded: 0, pdfsVerified: 0, pdfsFailed: 0, checksumMismatch: 0, sections: 0, operations: 0, chunks: 0, bytes: 0, extractionFailures: 0, quarantined: 0, relationships: 0 };
 
-  // Checkpoint: last processed IsraelLawID.
-  const { data: cp } = await supabase.from("ingestion_checkpoints").select("cursor").eq("source", "knesset_backfill").maybeSingle();
+  const { data: cp } = await supabase.from("ingestion_checkpoints").select("cursor").eq("source", "knesset_backfill").eq("dataset", "laws").maybeSingle();
   let lastId = Number((cp?.cursor as string | undefined) ?? "0");
 
-  // Discover next laws by Id via OData (page of 100), skip already-ingested.
-  const picked: { id: number }[] = [];
-  let odataOffset = 0;
-  while (picked.length < LIMIT && odataOffset < 2200) {
-    const url = `${ODATA}?$select=Id&$orderby=Id&$filter=Id gt ${lastId}&$top=100&$skip=${odataOffset}&$format=json`;
-    const r = await fetch(url);
+  // Discover: page OData, bulk-check existence, collect up to LIMIT new Ids.
+  const picked: number[] = [];
+  let offset = 0;
+  while (picked.length < LIMIT && offset < 2300) {
+    const r = await fetch(`${ODATA}?$select=Id&$orderby=Id&$filter=Id gt ${lastId}&$top=100&$skip=${offset}&$format=json`);
     if (!r.ok) break;
-    const j = (await r.json()) as { value?: { Id: number }[] };
-    const rows = j.value ?? [];
+    const rows = ((await r.json()) as { value?: { Id: number }[] }).value ?? [];
     if (rows.length === 0) break;
-    for (const row of rows) {
-      if (picked.length >= LIMIT) break;
-      const { data: exists } = await supabase.from("canonical_entities").select("canonical_id").eq("canonical_id", `knesset:${row.Id}`).maybeSingle();
-      if (!exists) picked.push({ id: row.Id });
-      lastId = Math.max(lastId, row.Id);
-    }
-    odataOffset += 100;
+    const ids = rows.map((x) => x.Id);
+    lastId = Math.max(lastId, ...ids);
+    const { data: existing } = await supabase.from("canonical_entities").select("canonical_id").in("canonical_id", ids.map((i) => `knesset:${i}`));
+    const have = new Set((existing ?? []).map((e) => (e as { canonical_id: string }).canonical_id));
+    for (const id of ids) { if (picked.length >= LIMIT) break; if (!have.has(`knesset:${id}`)) picked.push(id); }
+    offset += 100;
   }
+  log(`discovered ${picked.length} new laws to backfill (limit ${LIMIT})`);
 
-  async function processLaw(lawId: number): Promise<void> {
+  const entityCommon = { extraction_method: "api", parser_version: "legis-pub-2", mapping_version: "legis-pub-map-2" };
+
+  async function processLaw(lawId: number, idx: number): Promise<void> {
     const r = await fetch(`${LEGIS}${lawId}`);
-    if (!r.ok) return;
+    if (!r.ok) { log(`[${idx}/${picked.length}] law ${lawId}: API ${r.status} — skip`); return; }
     const j = (await r.json()) as { general?: Record<string, unknown>; corrections?: { listCorrections?: unknown } };
     const g = (j.general ?? {}) as Record<string, unknown>;
     const lc = j.corrections?.listCorrections;
     const arr = (Array.isArray(lc) ? lc : lc ? [lc] : []) as Record<string, unknown>[];
-    // The JSON API returns numeric fields (itemId, correctionNumber, magazine,
-    // page) as NUMBERS — coerce every field to string|null so the string-based
-    // identity/normalization code never sees a number.
-    const S = (v: unknown): string | null => (v === null || v === undefined || v === "" ? null : String(v));
-    const general: General = {
-      hebSubject: S(g.hebSubject), lawValidity: S(g.lawValidity), publicationDate: S(g.publicationDate),
-      latestPublicationDate: S(g.latestPublicationDate), openBookUrl: S(g.openBookUrl), kolZchutUrl: S(g.kolZchutUrl), knsName: S(g.knsName),
-    };
-    const corrections: Correction[] = arr.map((c) => ({
-      itemId: S(c.itemId), name: S(c.name), correctionNumber: S(c.correctionNumber), correctionType: S(c.correctionType),
-      publicationDate: S(c.publicationDate), publicationSeries: S(c.publicationSeries), magazineNumber: S(c.magazineNumber),
-      pageNumber: S(c.pageNumber), filePath: S(c.filePath), fileType: S(c.fileType), summaryLaw: S(c.summaryLaw),
-    }));
+    const general: General = { hebSubject: S(g.hebSubject), lawValidity: S(g.lawValidity), publicationDate: S(g.publicationDate), latestPublicationDate: S(g.latestPublicationDate), openBookUrl: S(g.openBookUrl), kolZchutUrl: S(g.kolZchutUrl), knsName: S(g.knsName) };
+    const corrections: Correction[] = arr.map((c) => ({ itemId: S(c.itemId), name: S(c.name), correctionNumber: S(c.correctionNumber), correctionType: S(c.correctionType), publicationDate: S(c.publicationDate), publicationSeries: S(c.publicationSeries), magazineNumber: S(c.magazineNumber), pageNumber: S(c.pageNumber), filePath: S(c.filePath), fileType: S(c.fileType), summaryLaw: S(c.summaryLaw) }));
     const item: ParsedLegislationLawItem = { itemId: String(lawId), general, corrections, secondaryCount: 0 };
     const model = toPublicationModel(item);
     const edges = buildAmendmentGraph(model);
+    const ob = model.law.hasOpenBookConsolidation ? "community_consolidated" : "none";
 
-    await supabase.from("canonical_entities").upsert({
-      canonical_id: model.law.canonicalId, entity_type: "Law", source_platform: "knesset_legislation_api", source_publisher: "knesset",
-      source_url: `${LEGIS}${lawId}`, external_record_id: String(lawId), content_level: "metadata_only", version_status: "validated",
-      fields: { title: model.law.title, validity: model.law.validity, hasOpenBookConsolidation: model.law.hasOpenBookConsolidation, hasOfficialConsolidation: false },
-      primary_text: model.law.title, primary_text_language: "he",
-    }, { onConflict: "canonical_id", ignoreDuplicates: true });
+    // Row accumulators (batch-upserted at the end).
+    const entityRows: Record<string, unknown>[] = [{ canonical_id: model.law.canonicalId, entity_type: "Law", source_platform: "knesset_legislation_api", source_url: `${LEGIS}${lawId}`, external_record_id: String(lawId), ...entityCommon, content_hash: sha(model.law.canonicalId), raw_record_hash: sha(model.law.title ?? String(lawId)), content_level: "metadata_only", version_status: "validated", fields: { title: model.law.title, validity: model.law.validity, hasOpenBookConsolidation: model.law.hasOpenBookConsolidation, hasOfficialConsolidation: false }, primary_text: model.law.title, primary_text_language: "he" }];
+    const pubRows: Record<string, unknown>[] = [];
+    const edgeRows = edges.map((e) => ({ edge_type: e.type, from_id: e.from, to_id: e.to, evidence: e.evidence }));
+    const storedRows: Record<string, unknown>[] = [];
+    const chunkRows: Record<string, unknown>[] = [];
+    const opRows: Record<string, unknown>[] = [];
+    const pubUpdates: { id: string; patch: Record<string, unknown> }[] = [];
 
     for (const doc of model.documents) {
-      m.publications += 1;
-      const ob = (model.law.hasOpenBookConsolidation ? "community_consolidated" : "none");
-      await supabase.from("law_publications").upsert({
-        publication_canonical_id: doc.canonicalId, law_canonical_id: doc.lawCanonicalId, israel_law_id: String(doc.israelLawId),
-        publication_item_id: doc.itemId, amendment_event_id: doc.amendmentEventId, publication_type: doc.docType, correction_number: doc.correctionNumber,
-        correction_type: doc.correctionType, title: doc.title, publication_series: doc.publicationSeries, publication_number: doc.magazineNumber,
-        publication_page: doc.pageNumber, publication_date: doc.publicationDate, chain_index: doc.chainIndex, pdf_url: doc.pdfUrl,
-        content_level: doc.pdfUrl ? "metadata_only" : "metadata_only", consolidation_status: "non_consolidated_publication", authority_level: "primary_official",
-        openbook_status: ob, license_basis: "statutory_exemption_sec6", version_status: "validated", published: false, source_url: doc.pdfUrl,
-      }, { onConflict: "publication_canonical_id", ignoreDuplicates: true });
+      pubRows.push({ publication_canonical_id: doc.canonicalId, law_canonical_id: doc.lawCanonicalId, israel_law_id: String(doc.israelLawId), publication_item_id: doc.itemId, amendment_event_id: doc.amendmentEventId, publication_type: doc.docType, correction_number: doc.correctionNumber, correction_type: doc.correctionType, title: doc.title, publication_series: doc.publicationSeries, publication_number: doc.magazineNumber, publication_page: doc.pageNumber, publication_date: doc.publicationDate, chain_index: doc.chainIndex, pdf_url: doc.pdfUrl, content_level: "metadata_only", consolidation_status: "non_consolidated_publication", authority_level: "primary_official", openbook_status: ob, license_basis: "statutory_exemption_sec6", version_status: "validated", published: false, source_url: doc.pdfUrl });
     }
-    for (const e of edges) {
-      m.relationships += 1;
-      await supabase.from("law_publication_edges").upsert({ edge_type: e.type, from_id: e.from, to_id: e.to, evidence: e.evidence }, { onConflict: "edge_type,from_id,to_id", ignoreDuplicates: true });
-    }
+    m.publications += pubRows.length;
+    m.relationships += edgeRows.length;
 
-    // PDFs: fetch -> upload -> extract -> parse -> persist.
+    // PDFs: fetch -> upload+verify -> extract -> parse.
     for (const doc of model.documents) {
       if (!doc.pdfUrl || !doc.itemId) continue;
       m.pdfsDiscovered += 1;
       const fetched = await fetchPdfWithRetry(doc.pdfUrl, nodeHttp, DEFAULT_PDF_POLICY, { maxAttempts: 3, backoffMs: (a) => 500 * a, sleep: (ms) => new Promise((res) => setTimeout(res, ms)) });
       if (!fetched.ok) { m.pdfsFailed += 1; continue; }
-      const sha = fetched.sha256;
       const stored = await storePdf(storage, String(doc.israelLawId), doc.itemId, fetched.bytes);
       if (stored.status !== "verified") { m.pdfsFailed += 1; continue; }
       m.pdfsUploaded += stored.deduped ? 0 : 1; m.pdfsVerified += 1; m.bytes += stored.deduped ? 0 : fetched.size;
       const now = new Date().toISOString();
-      await supabase.from("stored_objects").upsert({ sha256: sha, bucket: stored.meta.bucket, object_key: stored.meta.objectKey, size_bytes: fetched.size, content_type: "application/pdf", storage_status: "verified", ref_count: 1, uploaded_at: now, verified_at: now }, { onConflict: "sha256", ignoreDuplicates: true });
+      storedRows.push({ sha256: fetched.sha256, bucket: stored.meta.bucket, object_key: stored.meta.objectKey, size_bytes: fetched.size, content_type: "application/pdf", storage_status: "verified", ref_count: 1, uploaded_at: now, verified_at: now });
 
-      // Extraction.
       let ext: { text: string; pages: number; coverage: number };
       try { ext = await extractText(fetched.bytes); } catch { m.extractionFailures += 1; continue; }
       const quarantined = ext.coverage < 0.8;
       if (quarantined) m.quarantined += 1;
-      await supabase.from("law_publications").update({
-        pdf_sha256: sha, pdf_object_key: stored.meta.objectKey, pdf_size_bytes: fetched.size, pdf_content_type: "application/pdf", pdf_fetched_at: now,
-        page_count: ext.pages, extraction_method: "pdfjs_text_layer", extraction_version: "pdfjs-node-5", extraction_confidence: ext.coverage,
-        ocr_used: false, raw_text_hash: sha256Hex(new TextEncoder().encode(ext.text)), content_level: "full_text",
-        version_status: quarantined ? "quarantined" : "validated",
-      }).eq("publication_canonical_id", doc.canonicalId);
+      pubUpdates.push({ id: doc.canonicalId, patch: { pdf_sha256: fetched.sha256, pdf_object_key: stored.meta.objectKey, pdf_size_bytes: fetched.size, pdf_content_type: "application/pdf", pdf_fetched_at: now, page_count: ext.pages, extraction_method: "pdfjs_text_layer", extraction_version: "pdf-parse-node-1", extraction_confidence: ext.coverage, ocr_used: false, raw_text_hash: sha(new TextEncoder().encode(ext.text)), content_level: "full_text", version_status: quarantined ? "quarantined" : "validated" } });
       if (quarantined) continue;
 
-      const norm = normalizePdfText(ext.text);
+      const norm = normalizePdfText(ext.text).normalizedText;
       if (doc.docType === "original_enactment") {
-        const law = parseLegislation(normalizeHebrewLegalText(norm.normalizedText).normalizedText);
-        const secId = (n: string) => `Section:${doc.lawCanonicalId}:${createHash("sha256").update(`${doc.lawCanonicalId}|${n}`).digest("hex").slice(0, 10)}`;
+        const law = parseLegislation(normalizeHebrewLegalText(norm).normalizedText);
+        const secId = (n: string) => `Section:${doc.lawCanonicalId}:${sha(`${doc.lawCanonicalId}|${n}`).slice(0, 10)}`;
         for (const s of law.sections) {
           m.sections += 1;
-          await supabase.from("canonical_entities").upsert({ canonical_id: secId(s.sectionNumber), entity_type: "Section", source_platform: "knesset_legislation_pdf", source_publisher: "knesset", source_url: doc.pdfUrl, external_record_id: `${doc.lawCanonicalId}:${s.sectionNumber}`, content_level: "full_text", version_status: "validated", fields: { sectionNumber: s.sectionNumber, lawCanonicalId: doc.lawCanonicalId, publicationCanonicalId: doc.canonicalId }, primary_text: s.bodyText, primary_text_language: "he" }, { onConflict: "canonical_id", ignoreDuplicates: true });
+          entityRows.push({ canonical_id: secId(s.sectionNumber), entity_type: "Section", source_platform: "knesset_legislation_pdf", source_url: doc.pdfUrl, external_record_id: `${doc.lawCanonicalId}:${s.sectionNumber}`, ...entityCommon, extraction_method: "file_parse", content_hash: s.contentHash, raw_record_hash: sha(s.bodyText), content_level: "full_text", version_status: "validated", fields: { sectionNumber: s.sectionNumber, lawCanonicalId: doc.lawCanonicalId, publicationCanonicalId: doc.canonicalId }, primary_text: s.bodyText, primary_text_language: "he" });
         }
-        const cks = chunkLaw(law, { maxChars: 900, lawId: doc.lawCanonicalId, documentVersionId: `pub:${doc.itemId}`, sectionId: (s) => secId(s.sectionNumber) });
-        for (const c of cks) {
+        for (const c of chunkLaw(law, { maxChars: 900, lawId: doc.lawCanonicalId, documentVersionId: `pub:${doc.itemId}`, sectionId: (s) => secId(s.sectionNumber) })) {
           m.chunks += 1;
-          await supabase.from("legal_chunks").upsert({ law_canonical_id: doc.lawCanonicalId, section_canonical_id: c.sectionId, document_version_id: c.documentVersionId, section_number: c.sectionNumber, heading_path: c.headingPath, ordinal: c.ordinal, chunk_index: c.chunkIndex, text: c.text, source_span_start: c.sourceSpanStart, source_span_end: c.sourceSpanEnd, token_count: c.tokenCount, content_hash: c.contentHash, language: "he", source_url: doc.pdfUrl, license_status: "statutory_exemption_sec6", published: false }, { onConflict: "section_canonical_id,chunk_index", ignoreDuplicates: true });
+          chunkRows.push({ law_canonical_id: doc.lawCanonicalId, section_canonical_id: c.sectionId, document_version_id: c.documentVersionId, section_number: c.sectionNumber, heading_path: c.headingPath, ordinal: c.ordinal, chunk_index: c.chunkIndex, text: c.text, source_span_start: c.sourceSpanStart, source_span_end: c.sourceSpanEnd, token_count: c.tokenCount, content_hash: c.contentHash, language: "he", source_url: doc.pdfUrl, license_status: "statutory_exemption_sec6", published: false });
         }
       } else {
-        for (const op of parseAmendmentsV2(norm.normalizedText)) {
-          if (op.status === "unsupported") { m.unsupported += 1; continue; }
-          if (op.status === "ambiguous") m.ambiguous += 1;
+        // Amendment: keep only high-value operation types, cap per publication.
+        const ops = parseAmendmentsV2(norm).filter((o) => (o.status === "parsed" || o.status === "needs_review") && KEEP_OP_TYPES.has(o.operationType) && o.confidence >= 0.6).slice(0, MAX_OPS_PER_PUB);
+        for (const op of ops) {
           m.operations += 1;
-          await supabase.from("amendment_operations").upsert({ publication_canonical_id: doc.canonicalId, target_law_id: doc.lawCanonicalId, target_section: op.targetSection, operation_type: op.operationType, status: op.status, confidence: op.confidence, evidence: op.evidence, source_span_start: op.sourceSpan.start, source_span_end: op.sourceSpan.end, parser_version: AMENDMENT_PARSER_VERSION }, { onConflict: "publication_canonical_id,source_span_start,operation_type", ignoreDuplicates: true });
+          opRows.push({ publication_canonical_id: doc.canonicalId, target_law_id: doc.lawCanonicalId, target_section: op.targetSection, operation_type: op.operationType, status: op.status, confidence: op.confidence, evidence: op.evidence, source_span_start: op.sourceSpan.start, source_span_end: op.sourceSpan.end, parser_version: AMENDMENT_PARSER_VERSION });
         }
       }
     }
-    m.lawsProcessed += 1;
-    // Checkpoint after each law.
-    await supabase.from("ingestion_checkpoints").upsert({ source: "knesset_backfill", cursor: String(lawId) }, { onConflict: "source" });
 
-    // Auto-stop guardrails.
+    // Batch upserts (few round-trips instead of thousands).
+    const chunk = <T>(a: T[], n: number): T[][] => { const o: T[][] = []; for (let i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; };
+    for (const b of chunk(entityRows, 200)) await supabase.from("canonical_entities").upsert(b, { onConflict: "canonical_id", ignoreDuplicates: true });
+    for (const b of chunk(pubRows, 200)) await supabase.from("law_publications").upsert(b, { onConflict: "publication_canonical_id", ignoreDuplicates: true });
+    for (const b of chunk(edgeRows, 200)) await supabase.from("law_publication_edges").upsert(b, { onConflict: "edge_type,from_id,to_id", ignoreDuplicates: true });
+    for (const b of chunk(storedRows, 200)) await supabase.from("stored_objects").upsert(b, { onConflict: "sha256", ignoreDuplicates: true });
+    for (const u of pubUpdates) await supabase.from("law_publications").update(u.patch).eq("publication_canonical_id", u.id);
+    for (const b of chunk(chunkRows, 200)) await supabase.from("legal_chunks").upsert(b, { onConflict: "section_canonical_id,chunk_index", ignoreDuplicates: true });
+    for (const b of chunk(opRows, 200)) await supabase.from("amendment_operations").upsert(b, { onConflict: "publication_canonical_id,source_span_start,operation_type", ignoreDuplicates: true });
+
+    m.lawsProcessed += 1;
+    await supabase.from("ingestion_checkpoints").upsert({ source: "knesset_backfill", dataset: "laws", mode: "full", cursor: String(lawId), page: 0, done: false, fetched: m.lawsProcessed, updated_at: new Date().toISOString() }, { onConflict: "source,dataset" });
+    log(`[${idx}/${picked.length}] law ${lawId}: pubs=${pubRows.length} pdfs=${storedRows.length} sections=${m.sections} ops=${opRows.length}`);
+
     const dlRate = m.pdfsDiscovered ? m.pdfsVerified / m.pdfsDiscovered : 1;
-    if (m.checksumMismatch > 0 || (m.pdfsDiscovered >= 10 && dlRate < 0.98)) throw new Error(`auto-stop: download/verify ${(dlRate * 100).toFixed(1)}% or checksum mismatch`);
+    if (m.checksumMismatch > 0 || (m.pdfsDiscovered >= 10 && dlRate < 0.98)) throw new Error(`auto-stop: download/verify ${(dlRate * 100).toFixed(1)}%`);
     if (m.pdfsVerified >= 10 && m.quarantined / Math.max(1, m.pdfsVerified) > 0.05) throw new Error("auto-stop: quarantine > 5%");
   }
 
   try {
+    let idx = 0;
     for (let i = 0; i < picked.length; i += CONCURRENCY) {
-      await Promise.all(picked.slice(i, i + CONCURRENCY).map((p) => processLaw(p.id)));
+      await Promise.all(picked.slice(i, i + CONCURRENCY).map((id) => processLaw(id, ++idx)));
     }
-  } catch (e) {
-    process.stderr.write(`STOPPED: ${(e as Error).message}\n`);
-  }
+  } catch (e) { log(`STOPPED: ${(e as Error).message}`); }
   await supabase.from("ingestion_runs").insert({ kind: "knesset_backfill", metrics: m }).then(() => {}, () => {});
-  process.stdout.write(JSON.stringify({ limit: LIMIT, ...m, normalization_version: NORMALIZATION_VERSION, parser_version: AMENDMENT_PARSER_VERSION }, null, 2) + "\n");
+  process.stdout.write(JSON.stringify({ limit: LIMIT, ...m }, null, 2) + "\n");
 }
 
 main().catch((e) => { process.stderr.write(`backfill failed: ${(e as Error).message}\n`); process.exit(1); });
