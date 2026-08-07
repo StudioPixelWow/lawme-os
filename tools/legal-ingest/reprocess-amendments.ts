@@ -48,7 +48,9 @@ const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABAS
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY ?? process.env.SERVICE_ROLE_KEY;
 if (!SUPABASE_URL || !SERVICE_KEY) { process.stderr.write("reprocess-amendments: SUPABASE_URL + secret/service-role key required\n"); process.exit(2); }
 const BUCKET = "legal-source-files";
-const LIMIT = Number((process.argv.find((a) => a.startsWith("--limit="))?.split("=")[1]) ?? process.argv[process.argv.indexOf("--limit") + 1] ?? "100000");
+const limitEq = process.argv.find((a) => a.startsWith("--limit="))?.split("=")[1];
+const limitIdx = process.argv.indexOf("--limit");
+const LIMIT = Number(limitEq ?? (limitIdx >= 0 ? process.argv[limitIdx + 1] : undefined) ?? "100000");
 
 const CONTENT_PAGE_MIN_CHARS = 120;
 const MAX_OPS_PER_PUB = 25;
