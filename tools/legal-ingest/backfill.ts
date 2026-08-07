@@ -29,6 +29,7 @@ import { toPublicationModel, buildAmendmentGraph } from "../../src/modules/legal
 import type { ParsedLegislationLawItem, Correction, General } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/legislation-api.ts";
 import { normalizePdfText } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/pdf-normalize.ts";
 import { parseAmendmentsV2, AMENDMENT_PARSER_VERSION } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/amendment-parser-v2.ts";
+import { amendmentFingerprint } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/amendment-fingerprint.ts";
 import type { OperationTypeV2 } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/amendment-parser-v2.ts";
 import { parseLegislation } from "../../src/modules/legal-ai-israel/ingestion/legislation/section-parser.ts";
 import { chunkLaw } from "../../src/modules/legal-ai-israel/ingestion/legislation/section-chunker.ts";
@@ -203,7 +204,7 @@ async function main(): Promise<void> {
         const ops = parseAmendmentsV2(norm).filter((o) => (o.status === "parsed" || o.status === "needs_review") && KEEP_OP_TYPES.has(o.operationType) && o.confidence >= 0.6).slice(0, MAX_OPS_PER_PUB);
         for (const op of ops) {
           m.operations += 1;
-          opRows.push({ publication_canonical_id: doc.canonicalId, target_law_id: doc.lawCanonicalId, target_section: op.targetSection, operation_type: op.operationType, status: op.status, confidence: op.confidence, evidence: op.evidence, source_span_start: op.sourceSpan.start, source_span_end: op.sourceSpan.end, parser_version: AMENDMENT_PARSER_VERSION });
+          opRows.push({ publication_canonical_id: doc.canonicalId, target_law_id: doc.lawCanonicalId, target_section: op.targetSection, operation_type: op.operationType, status: op.status, confidence: op.confidence, evidence: op.evidence, old_text: op.oldText, new_text: op.newText, source_span_start: op.sourceSpan.start, source_span_end: op.sourceSpan.end, parser_version: AMENDMENT_PARSER_VERSION, op_fingerprint: amendmentFingerprint({ targetLawId: doc.lawCanonicalId, targetSection: op.targetSection, operationType: op.operationType, oldText: op.oldText, newText: op.newText, evidence: op.evidence, spanStart: op.sourceSpan.start, spanEnd: op.sourceSpan.end }) });
         }
       }
     }
@@ -216,10 +217,12 @@ async function main(): Promise<void> {
     for (const b of chunk(storedRows, 200)) await supabase.from("stored_objects").upsert(b, { onConflict: "sha256", ignoreDuplicates: true });
     for (const u of pubUpdates) await supabase.from("law_publications").update(u.patch).eq("publication_canonical_id", u.id);
     for (const b of chunk(chunkRows, 200)) await supabase.from("legal_chunks").upsert(b, { onConflict: "section_canonical_id,chunk_index", ignoreDuplicates: true });
-    for (const b of chunk(opRows, 200)) await supabase.from("amendment_operations").upsert(b, { onConflict: "publication_canonical_id,source_span_start,operation_type", ignoreDuplicates: true });
+    for (const b of chunk(opRows, 200)) await supabase.from("amendment_operations").upsert(b, { onConflict: "publication_canonical_id,op_fingerprint", ignoreDuplicates: true });
 
     m.lawsProcessed += 1;
-    await supabase.from("ingestion_checkpoints").upsert({ source: "knesset_backfill", dataset: "laws", mode: "full", cursor: String(lawId), page: 0, done: false, fetched: m.lawsProcessed, updated_at: new Date().toISOString() }, { onConflict: "source,dataset" });
+    // C1: mode must satisfy CHECK (mode IN ('backfill','incremental')); "full" silently failed the upsert.
+    { const { error: cpErr } = await supabase.from("ingestion_checkpoints").upsert({ source: "knesset_backfill", dataset: "laws", mode: "backfill", cursor: String(lawId), page: 0, done: false, fetched: m.lawsProcessed, updated_at: new Date().toISOString() }, { onConflict: "source,dataset" });
+      if (cpErr) log(`checkpoint upsert failed: ${cpErr.message}`); }
     log(`[${idx}/${picked.length}] law ${lawId}: pubs=${pubRows.length} pdfs=${storedRows.length} sections=${m.sections} ops=${opRows.length}`);
 
     // Gates evaluate over a meaningful sample so a noisy early window can't false-halt
