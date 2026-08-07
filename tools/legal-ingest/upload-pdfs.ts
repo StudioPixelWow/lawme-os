@@ -97,7 +97,9 @@ interface PendingRow {
 }
 
 async function main(): Promise<void> {
-  const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!, { auth: { persistSession: false } });
+  // The publication tables live in the `legalai` schema (exposed to PostgREST),
+  // matching the existing ingestion stores.
+  const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!, { db: { schema: "legalai" }, auth: { persistSession: false } });
   const storage = createSupabaseStorageClient(supabase);
 
   // Pending objects (one per distinct sha256).
