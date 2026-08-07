@@ -97,7 +97,7 @@ async function main(): Promise<void> {
   const conf = { "lt_0.34": 0, "0.34_0.6": 0, "0.6_0.8": 0, "0.8_1.0": 0 };
   let pagesEval = 0, single = 0, twoCol = 0, fallback = 0, textLossPages = 0, falseRemovals = 0;
   let contamPages = 0, twoColContamDenom = 0, wellFormed = 0, secAgreeNum = 0, secAgreeDen = 0, captionsTotal = 0, docsEval = 0, pageNumberMargins = 0;
-  const review: { pub: string; page: number; url: string | null; captions: string[]; body_head: string }[] = [];
+  const review: { kind: string; pub: string; page: number; url: string | null; columnType: string; captions: string[]; body: string }[] = [];
   const captionSample: { pub: string; page: number; caption: string }[] = [];
 
   for (const r of interleaved) {
@@ -142,7 +142,14 @@ async function main(): Promise<void> {
         captionsTotal += realCaps.length;
         pageNumberMargins += noiseCaps;
         for (const c of realCaps.slice(0, 1)) if (captionSample.length < 25) captionSample.push({ pub: r.publication_item_id as string, page: p + 1, caption: c.text });
-        if (review.length < 20) review.push({ pub: r.publication_item_id as string, page: p + 1, url: (r as { source_url?: string }).source_url ?? null, captions: realCaps.map((c) => c.text), body_head: pg.bodyText.slice(0, 700) });
+      }
+
+      // Manual-review set with VARIETY: quotas per page kind so a human sees
+      // two-column, single-column, and fallback (table/schedule) reconstructions.
+      const kind = pg.columnType === "two_column" ? "two_column" : pg.fallbackUsed ? "fallback" : "single";
+      const quota = kind === "two_column" ? 10 : 5;
+      if (review.filter((v) => v.kind === kind).length < quota) {
+        review.push({ kind, pub: r.publication_item_id as string, page: p + 1, url: (r as { source_url?: string }).source_url ?? null, columnType: pg.columnType, captions: realCaps.map((c) => c.text), body: pg.bodyText.slice(0, 1600) });
       }
 
       // Reading-order well-formedness: lossless AND (single OR no false separation).
