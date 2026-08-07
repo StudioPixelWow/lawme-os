@@ -85,7 +85,7 @@ async function main(): Promise<void> {
   // of single-page corrections, multi-page laws, and long omnibus documents.
   const { data: cand } = await supabase
     .from("law_publications")
-    .select("publication_canonical_id, publication_item_id, publication_type, page_count, pdf_object_key")
+    .select("publication_canonical_id, publication_item_id, publication_type, page_count, pdf_object_key, source_url")
     .eq("content_level", "full_text").not("pdf_object_key", "is", null)
     .order("page_count", { ascending: false }).limit(400);
   const rows = (cand ?? []).filter((r) => r.pdf_object_key);
@@ -97,6 +97,7 @@ async function main(): Promise<void> {
   const conf = { "lt_0.34": 0, "0.34_0.6": 0, "0.6_0.8": 0, "0.8_1.0": 0 };
   let pagesEval = 0, single = 0, twoCol = 0, fallback = 0, textLossPages = 0, falseRemovals = 0;
   let contamPages = 0, twoColContamDenom = 0, wellFormed = 0, secAgreeNum = 0, secAgreeDen = 0, captionsTotal = 0, docsEval = 0, pageNumberMargins = 0;
+  const review: { pub: string; page: number; url: string | null; captions: string[]; body_head: string }[] = [];
   const captionSample: { pub: string; page: number; caption: string }[] = [];
 
   for (const r of interleaved) {
@@ -124,20 +125,28 @@ async function main(): Promise<void> {
       if (!pg.lossless || miss > 0) { textLossPages += 1; falseRemovals += miss; }
 
       // Separate REAL section captions (contain Hebrew) from margin noise (running
-      // page numbers / footnote refs). Contamination + caption accuracy use real ones.
+      // page numbers / footnote refs).
       const realCaps = pg.marginalCaptions.filter((c) => /[֐-׿]/.test(c.text) && c.text.replace(/\s/g, "").length >= 4);
       const noiseCaps = pg.marginalCaptions.length - realCaps.length;
-      const contamThisPage = pg.columnType === "two_column" && realCaps.some((c) => pg.bodyText.includes(c.text));
+      // REAL failure mode = false separation: body text wrongly pulled into the
+      // margin, i.e. a "caption" that is sentence-like (long / many words). A caption
+      // whose WORDS also occur in the body is NOT contamination — the partition
+      // guarantees a caption's glyphs are not in the body; heading words naturally
+      // recur in the body they head (law names, section topics). (Verified on real
+      // pages: substring-overlap flagged clean reconstructions as false positives.)
+      const bodyLike = (t: string) => t.replace(/\s/g, "").length > 40 || t.split(/\s+/).filter(Boolean).length > 8;
+      const falseSepThisPage = pg.columnType === "two_column" && realCaps.some((c) => bodyLike(c.text));
       if (pg.columnType === "two_column") {
         twoColContamDenom += 1;
-        if (contamThisPage) contamPages += 1;
+        if (falseSepThisPage) contamPages += 1;
         captionsTotal += realCaps.length;
         pageNumberMargins += noiseCaps;
         for (const c of realCaps.slice(0, 1)) if (captionSample.length < 25) captionSample.push({ pub: r.publication_item_id as string, page: p + 1, caption: c.text });
+        if (review.length < 20) review.push({ pub: r.publication_item_id as string, page: p + 1, url: (r as { source_url?: string }).source_url ?? null, captions: realCaps.map((c) => c.text), body_head: pg.bodyText.slice(0, 700) });
       }
 
-      // Reading-order well-formedness: lossless AND (single OR no real-caption contamination).
-      if (pg.lossless && miss === 0 && !contamThisPage) wellFormed += 1;
+      // Reading-order well-formedness: lossless AND (single OR no false separation).
+      if (pg.lossless && miss === 0 && !falseSepThisPage) wellFormed += 1;
 
       // Section reading-order signal: in a correct reading order the primary
       // section numbers should be non-decreasing. (Comparing to raw PDF-item order
@@ -149,11 +158,11 @@ async function main(): Promise<void> {
       if (c < 0.34) conf["lt_0.34"] += 1; else if (c < 0.6) conf["0.34_0.6"] += 1; else if (c < 0.8) conf["0.6_0.8"] += 1; else conf["0.8_1.0"] += 1;
 
       // Capture real geometry for the regression fixture: one of each page kind,
-      // AND up to 6 CONTAMINATED pages (the failure cases) for offline iteration.
-      const want = contamThisPage ? "contaminated" : pg.columnType === "two_column" ? "two_column" : pg.fallbackUsed ? "fallback" : "single";
-      const contamCount = fixtures.filter((f) => f.label === "contaminated").length;
-      const wantContam = want === "contaminated" && contamCount < 6;
-      if ((wantContam || !fixtures.some((f) => f.label === want)) && pages[p].length > 0 && pages[p].length < 500) {
+      // AND up to 6 false-separation pages (real failure cases) for offline iteration.
+      const want = falseSepThisPage ? "false_separation" : pg.columnType === "two_column" ? "two_column" : pg.fallbackUsed ? "fallback" : "single";
+      const wantCount = fixtures.filter((f) => f.label === "false_separation").length;
+      const wantMore = want === "false_separation" && wantCount < 6;
+      if ((wantMore || !fixtures.some((f) => f.label === want)) && pages[p].length > 0 && pages[p].length < 500) {
         fixtures.push({ label: want, pub: r.publication_item_id as string, page: p + 1, items: pages[p] });
       }
     }
@@ -174,20 +183,23 @@ async function main(): Promise<void> {
     reading_order_wellformed_pct: pct(wellFormed, pagesEval),
     text_loss_rate_pct: pct(textLossPages, pagesEval),
     false_removal_glyph_count: falseRemovals,
-    caption_contamination_rate_pct: pct(contamPages, twoColContamDenom),
+    false_separation_rate_pct: pct(contamPages, twoColContamDenom),
+    false_separation_note: "body text wrongly pulled into the margin (sentence-like caption). Replaces the earlier substring 'contamination' metric, which false-positived on coincidental heading/body word overlap (verified on real pages).",
     section_number_monotonic_pct: pct(secAgreeNum, secAgreeDen),
     fallback_pages: fallback,
     confidence_distribution: conf,
     go_gate: {
       text_loss_zero: textLossPages === 0 && falseRemovals === 0,
-      caption_contamination_le_1pct: pct(contamPages, twoColContamDenom) <= 1,
+      false_separation_le_1pct: pct(contamPages, twoColContamDenom) <= 1,
       reading_order_ge_99pct: pct(wellFormed, pagesEval) >= 99,
       section_number_monotonic_ge_99pct: pct(secAgreeNum, secAgreeDen) >= 99,
       no_high_confidence_false_removals: falseRemovals === 0,
     },
+    manual_review_required: "reading-order & caption accuracy at >=99% require a human label on knesset-layout-review.json vs the source PDFs — no silent ground truth.",
     caption_sample: captionSample,
   };
   writeFileSync("artifacts/knesset-layout-eval.json", JSON.stringify(result, null, 2));
+  writeFileSync("artifacts/knesset-layout-review.json", JSON.stringify(review, null, 2));
   if (fixtures.length) writeFileSync("artifacts/knesset-layout-fixtures.json", JSON.stringify(fixtures, null, 2));
   process.stdout.write(JSON.stringify(result, null, 2) + "\n");
   process.stderr.write(`\nwrote artifacts/knesset-layout-eval.json` + (fixtures.length ? ` + artifacts/knesset-layout-fixtures.json (${fixtures.length} real pages)\n` : `\n`));
