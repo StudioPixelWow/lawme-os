@@ -1,0 +1,51 @@
+{
+  "run_at": "2026-08-07",
+  "scope": "A1 amendment reprocess from Object Storage (correction + amendment_law, validated, has-bytes). No Knesset re-fetch.",
+  "reprocess_run": {
+    "amendment_pubs_processed": 2573,
+    "attempted_ops": 9975,
+    "persisted_ops": 9975,
+    "within_run_duplicate_ops": 0,
+    "ambiguous": 2441,
+    "needs_review": 5891,
+    "unsupported": 53991,
+    "skipped_no_text": 0,
+    "failed": 0,
+    "fingerprint_collisions": 0
+  },
+  "db_end_state": {
+    "total_ops": 10125,
+    "null_fingerprint": 0,
+    "fingerprint_collisions": 0,
+    "non_canonical_types": 0,
+    "confidence_ge_0_6": 10125,
+    "ops_with_old_or_new_text": 4181,
+    "pubs_with_ops": 1811,
+    "by_pub_type": {
+      "amendment_law": {"pubs": 560, "ops": 5348},
+      "correction": {"pubs": 1219, "ops": 4627},
+      "original_enactment_legacy": {"pubs": 22, "ops": 116},
+      "repeal_publication_legacy": {"pubs": 10, "ops": 34}
+    }
+  },
+  "amendment_eval": {
+    "entries": 106,
+    "precision": 1.0,
+    "recall": 1.0,
+    "operationTypeAccuracy": 1.0,
+    "targetSectionAccuracy": 1.0,
+    "unsupportedRate": 0.0,
+    "ambiguousRate": 0.0566,
+    "highConfidenceFalseMutations": 0
+  },
+  "go_gate": {
+    "fingerprint_collisions_zero": true,
+    "persisted_vs_attempted_explained": "persisted == attempted (9975); within-run duplicates 0. Total ops stayed ~flat (10,153 -> 10,125), confirming the prior backfill 'attempted 29k -> 10k' gap was overwhelmingly TRUE DUPLICATES (parser emitting the same op repeatedly), not distinct ops collapsed by the old key. A1's value is correctness (the key can no longer collapse genuinely-distinct ops) and idempotency, not mass recovery.",
+    "high_confidence_false_mutations_zero": true,
+    "verdict": "GO"
+  },
+  "findings": [
+    {"id": "AR1", "severity": "medium", "issue": "150 legacy ops sit on 22 original_enactment + 10 repeal_publication pubs (pilot-derived), outside the reprocess scope (correction/amendment_law). They are valid (fingerprinted, canonical, conf>=0.6) but not re-derived by the current parser.",
+     "note": "Original enactments and repeals often carry INDIRECT amendments (תיקונים עקיפים) to other laws. The backfill op logic only parsed non-original docs, so indirect amendments across all 420 original enactments were never derived. Completing that is a graph-completeness improvement but needs its own eval (parsing full original-enactment text risks false-positive ops), so it is deliberately NOT folded into A1."}
+  ]
+}
