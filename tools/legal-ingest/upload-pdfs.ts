@@ -21,16 +21,44 @@
  * NOTE: this session's sandbox is air-gapped from both hosts, so this file is
  * shipped to be RUN BY THE OPERATOR — it is not executed in-session.
  */
+import { readFileSync, existsSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { fetchPdfWithRetry, DEFAULT_PDF_POLICY } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/pdf-fetch.ts";
 import type { HttpClient, HttpResponse } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/pdf-fetch.ts";
 import { storePdf } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/object-storage.ts";
 import { createSupabaseStorageClient } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/object-storage-supabase.ts";
 
+/**
+ * Self-load env from .env.local / .env (so `--env-file` quirks don't matter).
+ * Only fills keys not already set; handles KEY=VALUE with optional quotes.
+ * Never prints values.
+ */
+function loadDotEnv(): void {
+  for (const file of [".env.local", ".env"]) {
+    if (!existsSync(file)) continue;
+    for (const raw of readFileSync(file, "utf8").split("\n")) {
+      const line = raw.trim();
+      if (!line || line.startsWith("#")) continue;
+      const eq = line.indexOf("=");
+      if (eq === -1) continue;
+      const key = line.slice(0, eq).trim().replace(/^export\s+/, "");
+      let val = line.slice(eq + 1).trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) val = val.slice(1, -1);
+      if (key && process.env[key] === undefined) process.env[key] = val;
+    }
+  }
+}
+loadDotEnv();
+
 const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SERVICE_ROLE_KEY;
 if (!SUPABASE_URL || !SERVICE_KEY) {
-  process.stderr.write("upload-pdfs: SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY required in env\n");
+  const seen = (n: string) => `${n}=${process.env[n] ? "present" : "absent"}`;
+  process.stderr.write(
+    "upload-pdfs: need a Supabase URL + service-role key. Checked (values hidden):\n  " +
+      [seen("SUPABASE_URL"), seen("NEXT_PUBLIC_SUPABASE_URL"), seen("SUPABASE_SERVICE_ROLE_KEY"), seen("SERVICE_ROLE_KEY")].join("\n  ") +
+      "\nEnsure .env.local (in the repo root you run from) contains NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, or export them, then re-run.\n",
+  );
   process.exit(2);
 }
 
