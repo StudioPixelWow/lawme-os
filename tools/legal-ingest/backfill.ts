@@ -224,8 +224,13 @@ async function main(): Promise<void> {
 
     // Gates evaluate over a meaningful sample so a noisy early window can't false-halt
     // (checksum mismatch still trips immediately — it is never acceptable).
-    const dlRate = m.pdfsDiscovered ? m.pdfsVerified / m.pdfsDiscovered : 1;
-    if (m.checksumMismatch > 0 || (m.pdfsDiscovered >= 20 && dlRate < 0.98)) throw new Error(`auto-stop: download/verify ${(dlRate * 100).toFixed(1)}%`);
+    // Download rate is measured over RESOLVED PDFs (verified + failed), NOT discovered:
+    // under concurrency, discovered leads verified by the number of in-flight fetches,
+    // which would transiently depress the ratio and false-halt. A genuine failure
+    // increments pdfsFailed and correctly lowers this rate.
+    const resolved = m.pdfsVerified + m.pdfsFailed;
+    const dlRate = resolved ? m.pdfsVerified / resolved : 1;
+    if (m.checksumMismatch > 0 || (resolved >= 20 && dlRate < 0.98)) throw new Error(`auto-stop: download/verify ${(dlRate * 100).toFixed(1)}%`);
     if (m.pdfsVerified >= 50 && m.quarantined / Math.max(1, m.pdfsVerified) > 0.05) throw new Error("auto-stop: quarantine > 5%");
   }
 
