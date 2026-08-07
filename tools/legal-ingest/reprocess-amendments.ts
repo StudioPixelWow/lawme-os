@@ -77,15 +77,25 @@ async function main(): Promise<void> {
   const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!, { db: { schema: "legalai" }, auth: { persistSession: false } });
   const storage = createSupabaseStorageClient(supabase);
 
-  const { data: rows, error } = await supabase
-    .from("law_publications")
-    .select("publication_canonical_id, law_canonical_id, israel_law_id, publication_item_id, publication_type, pdf_object_key")
-    .in("publication_type", ["correction", "amendment_law"])
-    .eq("version_status", "validated")
-    .not("pdf_object_key", "is", null)
-    .limit(LIMIT);
-  if (error) { process.stderr.write(`query failed: ${error.message}\n`); process.exit(1); }
-  const pubs = rows ?? [];
+  // PostgREST caps each response at 1000 rows regardless of .limit(); page through
+  // with .range() (law_publications is not mutated here, so offset paging is stable).
+  const pubs: Record<string, unknown>[] = [];
+  const PAGE = 1000;
+  for (let from = 0; pubs.length < LIMIT; from += PAGE) {
+    const { data, error } = await supabase
+      .from("law_publications")
+      .select("publication_canonical_id, law_canonical_id, israel_law_id, publication_item_id, publication_type, pdf_object_key")
+      .in("publication_type", ["correction", "amendment_law"])
+      .eq("version_status", "validated")
+      .not("pdf_object_key", "is", null)
+      .order("publication_canonical_id", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) { process.stderr.write(`query failed: ${error.message}\n`); process.exit(1); }
+    if (!data || data.length === 0) break;
+    pubs.push(...data);
+    if (data.length < PAGE) break;
+  }
+  if (pubs.length > LIMIT) pubs.length = LIMIT;
   process.stdout.write(`amendment pubs to reprocess: ${pubs.length}\n`);
 
   const m = { pubs: 0, attempted: 0, persisted: 0, withinRunDuplicates: 0, ambiguous: 0, needsReview: 0, unsupported: 0, skippedNoText: 0, failed: 0 };
