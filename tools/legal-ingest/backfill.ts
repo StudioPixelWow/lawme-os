@@ -142,17 +142,21 @@ async function main(): Promise<void> {
     const r = await fetch(`${LEGIS}${lawId}`);
     if (!r.ok) return;
     const j = (await r.json()) as { general?: Record<string, unknown>; corrections?: { listCorrections?: unknown } };
-    const g = (j.general ?? {}) as Record<string, string | null>;
+    const g = (j.general ?? {}) as Record<string, unknown>;
     const lc = j.corrections?.listCorrections;
-    const arr = (Array.isArray(lc) ? lc : lc ? [lc] : []) as Record<string, string | null>[];
+    const arr = (Array.isArray(lc) ? lc : lc ? [lc] : []) as Record<string, unknown>[];
+    // The JSON API returns numeric fields (itemId, correctionNumber, magazine,
+    // page) as NUMBERS — coerce every field to string|null so the string-based
+    // identity/normalization code never sees a number.
+    const S = (v: unknown): string | null => (v === null || v === undefined || v === "" ? null : String(v));
     const general: General = {
-      hebSubject: g.hebSubject ?? null, lawValidity: g.lawValidity ?? null, publicationDate: g.publicationDate ?? null,
-      latestPublicationDate: g.latestPublicationDate ?? null, openBookUrl: g.openBookUrl ?? null, kolZchutUrl: g.kolZchutUrl ?? null, knsName: g.knsName ?? null,
+      hebSubject: S(g.hebSubject), lawValidity: S(g.lawValidity), publicationDate: S(g.publicationDate),
+      latestPublicationDate: S(g.latestPublicationDate), openBookUrl: S(g.openBookUrl), kolZchutUrl: S(g.kolZchutUrl), knsName: S(g.knsName),
     };
     const corrections: Correction[] = arr.map((c) => ({
-      itemId: c.itemId ?? null, name: c.name ?? null, correctionNumber: c.correctionNumber ?? null, correctionType: c.correctionType ?? null,
-      publicationDate: c.publicationDate ?? null, publicationSeries: c.publicationSeries ?? null, magazineNumber: c.magazineNumber ?? null,
-      pageNumber: c.pageNumber ?? null, filePath: c.filePath ?? null, fileType: c.fileType ?? null, summaryLaw: c.summaryLaw ?? null,
+      itemId: S(c.itemId), name: S(c.name), correctionNumber: S(c.correctionNumber), correctionType: S(c.correctionType),
+      publicationDate: S(c.publicationDate), publicationSeries: S(c.publicationSeries), magazineNumber: S(c.magazineNumber),
+      pageNumber: S(c.pageNumber), filePath: S(c.filePath), fileType: S(c.fileType), summaryLaw: S(c.summaryLaw),
     }));
     const item: ParsedLegislationLawItem = { itemId: String(lawId), general, corrections, secondaryCount: 0 };
     const model = toPublicationModel(item);
