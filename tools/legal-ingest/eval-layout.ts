@@ -38,6 +38,9 @@ const BUCKET = "legal-source-files";
 const pagesEq = process.argv.find((a) => a.startsWith("--pages="))?.split("=")[1];
 const pagesIdx = process.argv.indexOf("--pages");
 const TARGET_PAGES = Number(pagesEq ?? (pagesIdx >= 0 ? process.argv[pagesIdx + 1] : undefined) ?? "60");
+// Cap pages taken per document so the sample spans MANY documents (variety:
+// single/two-column, short corrections, long omnibus) rather than one big doc.
+const MAX_PAGES_PER_DOC = 6;
 
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse") as (data: Buffer, opts?: { pagerender?: (p: unknown) => Promise<string> }) => Promise<{ numpages: number }>;
@@ -93,7 +96,7 @@ async function main(): Promise<void> {
   const fixtures: { label: string; pub: string; page: number; items: LayoutItem[] }[] = [];
   const conf = { "lt_0.34": 0, "0.34_0.6": 0, "0.6_0.8": 0, "0.8_1.0": 0 };
   let pagesEval = 0, single = 0, twoCol = 0, fallback = 0, textLossPages = 0, falseRemovals = 0;
-  let contamPages = 0, twoColContamDenom = 0, wellFormed = 0, secAgreeNum = 0, secAgreeDen = 0, captionsTotal = 0, docsEval = 0;
+  let contamPages = 0, twoColContamDenom = 0, wellFormed = 0, secAgreeNum = 0, secAgreeDen = 0, captionsTotal = 0, docsEval = 0, pageNumberMargins = 0;
   const captionSample: { pub: string; page: number; caption: string }[] = [];
 
   for (const r of interleaved) {
@@ -106,9 +109,11 @@ async function main(): Promise<void> {
     docsEval += 1;
 
     const doc = reconstructDocument(pages);
+    let perDoc = 0;
     for (let p = 0; p < doc.pages.length; p++) {
+      if (pagesEval >= TARGET_PAGES || perDoc >= MAX_PAGES_PER_DOC) break;
       const pg = doc.pages[p];
-      pagesEval += 1;
+      pagesEval += 1; perDoc += 1;
       if (pg.columnType === "two_column") twoCol += 1; else single += 1;
       if (pg.fallbackUsed) fallback += 1;
 
@@ -118,17 +123,20 @@ async function main(): Promise<void> {
       const miss = missingGlyphs(rawText, outText);
       if (!pg.lossless || miss > 0) { textLossPages += 1; falseRemovals += miss; }
 
-      // Caption contamination: a detected caption (len>=4) still inside the body.
+      // Separate REAL section captions (contain Hebrew) from margin noise (running
+      // page numbers / footnote refs). Contamination + caption accuracy use real ones.
+      const realCaps = pg.marginalCaptions.filter((c) => /[֐-׿]/.test(c.text) && c.text.replace(/\s/g, "").length >= 4);
+      const noiseCaps = pg.marginalCaptions.length - realCaps.length;
+      const contamThisPage = pg.columnType === "two_column" && realCaps.some((c) => pg.bodyText.includes(c.text));
       if (pg.columnType === "two_column") {
         twoColContamDenom += 1;
-        const contam = pg.marginalCaptions.some((c) => c.text.length >= 4 && pg.bodyText.includes(c.text));
-        if (contam) contamPages += 1;
-        captionsTotal += pg.marginalCaptions.length;
-        for (const c of pg.marginalCaptions.slice(0, 1)) if (captionSample.length < 25) captionSample.push({ pub: r.publication_item_id as string, page: p + 1, caption: c.text });
+        if (contamThisPage) contamPages += 1;
+        captionsTotal += realCaps.length;
+        pageNumberMargins += noiseCaps;
+        for (const c of realCaps.slice(0, 1)) if (captionSample.length < 25) captionSample.push({ pub: r.publication_item_id as string, page: p + 1, caption: c.text });
       }
 
-      // Reading-order well-formedness: lossless AND (single OR no contamination).
-      const contamThisPage = pg.columnType === "two_column" && pg.marginalCaptions.some((c) => c.text.length >= 4 && pg.bodyText.includes(c.text));
+      // Reading-order well-formedness: lossless AND (single OR no real-caption contamination).
       if (pg.lossless && miss === 0 && !contamThisPage) wellFormed += 1;
 
       // Section-boundary agreement raw vs layout (proxy).
@@ -157,7 +165,8 @@ async function main(): Promise<void> {
     single_column_pages: single,
     two_column_pages: twoCol,
     marginal_captions_detected: captionsTotal,
-    marginal_caption_detection: "count + sample below; TRUE accuracy requires manual label of the sample (no silent ground truth)",
+    page_number_margins_filtered: pageNumberMargins,
+    marginal_caption_detection: "real captions (Hebrew) only; page-number/running-header margins counted separately. TRUE accuracy requires manual label of the sample (no silent ground truth)",
     reading_order_wellformed_pct: pct(wellFormed, pagesEval),
     text_loss_rate_pct: pct(textLossPages, pagesEval),
     false_removal_glyph_count: falseRemovals,
