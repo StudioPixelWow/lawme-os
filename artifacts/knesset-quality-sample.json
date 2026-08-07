@@ -1,0 +1,67 @@
+{
+  "run_at": "2026-08-07",
+  "scope": "Post-backfill quality sample (phases 1+2+3 complete). Read-only assessment via dev DB.",
+  "corpus": {
+    "laws": 527,
+    "sections": 1330,
+    "publications_total": 4287,
+    "publications_validated": 4286,
+    "publications_quarantined": 1,
+    "full_text_pubs": 3003,
+    "metadata_only_pubs": 1283,
+    "chunks": 3804,
+    "amendment_operations_stored": 10188,
+    "stored_objects": 2967,
+    "stored_objects_verified": 2967,
+    "bucket_mb": 533.9,
+    "published_publications": 0,
+    "published_chunks": 0
+  },
+  "gates_pass": {
+    "authority_labeling": "100% primary_official + non_consolidated_publication + statutory_exemption_sec6 (4286/4286)",
+    "provenance_chain": "full_text pubs all carry pdf_object_key + pdf_sha256 (3003/3003); 2967 objects 100% verified",
+    "quarantine": "1/4287 quarantined = 0.02% (genuine image-only PDF, correctly held)",
+    "chunk_integrity": "0 empty chunks, 0 tiny (<20 char) chunks, avg 994 chars",
+    "section_number_format": "0 malformed section numbers (100% match ^[0-9]+[Hebrew]{0,3}$)",
+    "amendment_op_confidence": "avg confidence >=0.70 per type; only 1 needs_review + 1 ambiguous of 10188",
+    "publish_gate": "0 published (publications and chunks) — invariant intact",
+    "text_coherence": "sampled section text is coherent, complete Hebrew legal prose (has_hebrew=100% on sample)"
+  },
+  "findings_text_fidelity": [
+    {"id": "F1", "severity": "medium", "publish_safety": false,
+     "issue": "Two-column gazette marginal section-captions (side headings) are interleaved into section body text by the flat pdf-parse text layer.",
+     "impact": "Text is complete but not display-clean; extracted text is not yet presentable AS clean statutory text.",
+     "fix": "Layout-aware extraction (column/x-band separation) or pdf.js text-layer geometry to isolate the marginal-note column."},
+    {"id": "F2", "severity": "low", "publish_safety": false,
+     "issue": "Glyph confusions on older font-encoded PDFs (e.g. daled/resh, nun/gimel; the 'TT: undefined function: 32' fonts).",
+     "impact": "Occasional character errors in extracted text (e.g. 'meridat' for 'medidat', 'pagkas' for 'pinkas').",
+     "fix": "Font-aware glyph remap / ToUnicode CMap handling; flag affected pubs for review."},
+    {"id": "F3", "severity": "low", "publish_safety": false,
+     "issue": "Section-number glitches from footnote digits gluing onto the section number (e.g. '1424' where section 142 has footnote 4).",
+     "impact": "A small number of section canonical ids carry an incorrect numeric suffix.",
+     "fix": "Strip trailing footnote-reference digits in the section-number parser using footnote-marker context."},
+    {"id": "F4", "severity": "low", "publish_safety": false,
+     "issue": "10 Section entities have empty primary_text (0.75% of 1330).",
+     "impact": "Minor — a few sections parsed to empty bodies.",
+     "fix": "Filter/flag empty-body sections in the section parser."},
+    {"id": "F5", "severity": "low", "publish_safety": false,
+     "issue": "81 full-text publications have stored bytes + SHA but a null source_url.",
+     "impact": "Provenance display gap; the object is present and verified, but the origin URL was not recorded.",
+     "fix": "Backfill source_url from law_publications.pdf_url / stored_objects.object_key where present."}
+  ],
+  "findings_amendment_graph": [
+    {"id": "A1", "severity": "medium", "publish_safety": false,
+     "issue": "The amendment_operations unique key (publication_canonical_id, source_span_start, operation_type) collapses genuinely-distinct operations that share a clause start-offset and type. Across phases ~29k parsed ops persisted as 10188 (~60% dropped on ON CONFLICT DO NOTHING). Confirmed on high-volume laws (2000944: 2861 attempted -> 848 stored; 2000907: 1083 -> 328).",
+     "impact": "Amendment graph is under-populated. Does NOT affect the PDF/text corpus or publish safety (ops are gated machine assertions).",
+     "fix": "Add an additive deterministic op_fingerprint column = sha256(target_section|operation_type|old_text|new_text|source_span_start|source_span_end); make the unique key (publication_canonical_id, op_fingerprint); reprocess amendments from stored bytes to backfill dropped ops."}
+  ],
+  "findings_cosmetic": [
+    {"id": "C1", "issue": "ingestion_checkpoints table has 0 rows — per-law checkpoint upsert silently no-ops. Resume works correctly via the 'laws already ingested' existence check, so non-blocking.", "fix": "Diagnose the checkpoint upsert payload/constraint mismatch."},
+    {"id": "C2", "issue": "7 legacy-type ops (commencement/amend_phrase/replaced_section/modified_section/change_effective_date) predate the KEEP_OP_TYPES filter.", "fix": "One-off delete of non-KEEP legacy op types."}
+  ],
+  "verdict": {
+    "as_source_and_provenance_layer": "PASS — official PDFs stored + 100% verified, text extracted and clearly labeled machine-derived, 100% labeled non-consolidated primary-official, fully gated unpublished.",
+    "as_display_ready_statutory_text": "NOT YET — marginal-caption interleaving (F1) + glyph fidelity (F2) mean extracted text is not clean enough to present as authoritative law text.",
+    "publish_recommendation": "KEEP unpublished. The source PDFs are authoritative and may be surfaced as source documents with machine-derived text labeled as such. Do NOT flip extracted text to published until F1+F2 are addressed and the amendment dedup key (A1) is fixed and reprocessed."
+  }
+}
