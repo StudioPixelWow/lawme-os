@@ -11,7 +11,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { StorageClient } from "./object-storage.ts";
 
-export function createSupabaseStorageClient(supabase: SupabaseClient): StorageClient {
+/** Only the `.storage` accessor is used, so accept any DB-schema-typed client. */
+type StorageOnly = Pick<SupabaseClient, "storage">;
+
+export function createSupabaseStorageClient(supabase: StorageOnly): StorageClient {
   return {
     async exists(bucket, key) {
       const slash = key.lastIndexOf("/");
