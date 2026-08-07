@@ -80,8 +80,14 @@ const nodeHttp: HttpClient = async (url, signal): Promise<HttpResponse> => {
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse") as (data: Buffer, opts?: { pagerender?: (pageData: unknown) => Promise<string> }) => Promise<{ text: string; numpages: number }>;
 
-async function extractText(pdf: Uint8Array): Promise<{ text: string; pages: number; coverage: number }> {
-  let withText = 0;
+// A page counts as "content" only if it yields a substantial amount of text.
+// Born-digital Knesset gazette PDFs interleave blank back-pages (≈0 chars) that
+// must NOT be treated as extraction failures — quarantine keys off whether ANY
+// real legal text was extracted, not the blank/total page fraction (which
+// systematically false-quarantined short 2–4 page laws, incl. Basic-Law errata).
+const CONTENT_PAGE_MIN_CHARS = 120;
+async function extractText(pdf: Uint8Array): Promise<{ text: string; pages: number; contentPages: number; coverage: number }> {
+  const perPage: number[] = [];
   const pagerender = async (pageData: unknown): Promise<string> => {
     const pd = pageData as { getTextContent: (o?: unknown) => Promise<{ items: { str?: string; transform?: number[] }[] }> };
     const tc = await pd.getTextContent({ normalizeWhitespace: true, disableCombineTextItems: false });
@@ -89,12 +95,14 @@ async function extractText(pdf: Uint8Array): Promise<{ text: string; pages: numb
     for (const it of tc.items) { if (!it.str || !it.transform) continue; const y = Math.round(it.transform[5]); (lines[y] = lines[y] ?? []).push([it.transform[4], it.str]); }
     const ys = Object.keys(lines).map(Number).sort((a, b) => b - a);
     const txt = ys.map((y) => lines[y].sort((a, b) => b[0] - a[0]).map((z) => z[1]).join(" ")).join("\n");
-    if (txt.trim().length > 10) withText += 1;
+    perPage.push(txt.replace(/\s/g, "").length);
     return `${txt}\n\n`;
   };
   const timeout = new Promise<never>((_, rej) => setTimeout(() => rej(new Error("extract timeout")), EXTRACT_TIMEOUT_MS));
   const out = await Promise.race([pdfParse(Buffer.from(pdf), { pagerender }), timeout]);
-  return { text: out.text, pages: out.numpages, coverage: out.numpages ? withText / out.numpages : 0 };
+  const contentPages = perPage.filter((c) => c >= CONTENT_PAGE_MIN_CHARS).length;
+  // extraction_confidence = fraction of pages carrying real text (informative provenance only).
+  return { text: out.text, pages: out.numpages, contentPages, coverage: out.numpages ? contentPages / out.numpages : 0 };
 }
 
 const S = (v: unknown): string | null => (v === null || v === undefined || v === "" ? null : String(v));
@@ -169,9 +177,11 @@ async function main(): Promise<void> {
       const now = new Date().toISOString();
       storedRows.push({ sha256: fetched.sha256, bucket: stored.meta.bucket, object_key: stored.meta.objectKey, size_bytes: fetched.size, content_type: "application/pdf", storage_status: "verified", ref_count: 1, uploaded_at: now, verified_at: now });
 
-      let ext: { text: string; pages: number; coverage: number };
+      let ext: { text: string; pages: number; contentPages: number; coverage: number };
       try { ext = await extractText(fetched.bytes); } catch { m.extractionFailures += 1; continue; }
-      const quarantined = ext.coverage < 0.8;
+      // Quarantine ONLY when no page yielded real text (image-only/failed extraction),
+      // not when a document simply has blank back-pages.
+      const quarantined = ext.contentPages === 0;
       if (quarantined) m.quarantined += 1;
       pubUpdates.push({ id: doc.canonicalId, patch: { pdf_sha256: fetched.sha256, pdf_object_key: stored.meta.objectKey, pdf_size_bytes: fetched.size, pdf_content_type: "application/pdf", pdf_fetched_at: now, page_count: ext.pages, extraction_method: "pdfjs_text_layer", extraction_version: "pdf-parse-node-1", extraction_confidence: ext.coverage, ocr_used: false, raw_text_hash: sha(new TextEncoder().encode(ext.text)), content_level: "full_text", version_status: quarantined ? "quarantined" : "validated" } });
       if (quarantined) continue;
@@ -212,9 +222,11 @@ async function main(): Promise<void> {
     await supabase.from("ingestion_checkpoints").upsert({ source: "knesset_backfill", dataset: "laws", mode: "full", cursor: String(lawId), page: 0, done: false, fetched: m.lawsProcessed, updated_at: new Date().toISOString() }, { onConflict: "source,dataset" });
     log(`[${idx}/${picked.length}] law ${lawId}: pubs=${pubRows.length} pdfs=${storedRows.length} sections=${m.sections} ops=${opRows.length}`);
 
+    // Gates evaluate over a meaningful sample so a noisy early window can't false-halt
+    // (checksum mismatch still trips immediately — it is never acceptable).
     const dlRate = m.pdfsDiscovered ? m.pdfsVerified / m.pdfsDiscovered : 1;
-    if (m.checksumMismatch > 0 || (m.pdfsDiscovered >= 10 && dlRate < 0.98)) throw new Error(`auto-stop: download/verify ${(dlRate * 100).toFixed(1)}%`);
-    if (m.pdfsVerified >= 10 && m.quarantined / Math.max(1, m.pdfsVerified) > 0.05) throw new Error("auto-stop: quarantine > 5%");
+    if (m.checksumMismatch > 0 || (m.pdfsDiscovered >= 20 && dlRate < 0.98)) throw new Error(`auto-stop: download/verify ${(dlRate * 100).toFixed(1)}%`);
+    if (m.pdfsVerified >= 50 && m.quarantined / Math.max(1, m.pdfsVerified) > 0.05) throw new Error("auto-stop: quarantine > 5%");
   }
 
   try {
