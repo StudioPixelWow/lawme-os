@@ -51,13 +51,22 @@ function loadDotEnv(): void {
 loadDotEnv();
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SERVICE_ROLE_KEY;
+// Accept both the legacy service_role name and Supabase's newer "secret key"
+// naming (SUPABASE_SECRET_KEY / sb_secret_...), which grants the same full,
+// RLS-bypassing server access needed for private-bucket uploads.
+const SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ??
+  process.env.SUPABASE_SECRET_KEY ??
+  process.env.SERVICE_ROLE_KEY ??
+  process.env.SUPABASE_SERVICE_KEY;
 if (!SUPABASE_URL || !SERVICE_KEY) {
   const seen = (n: string) => `${n}=${process.env[n] ? "present" : "absent"}`;
   process.stderr.write(
-    "upload-pdfs: need a Supabase URL + service-role key. Checked (values hidden):\n  " +
-      [seen("SUPABASE_URL"), seen("NEXT_PUBLIC_SUPABASE_URL"), seen("SUPABASE_SERVICE_ROLE_KEY"), seen("SERVICE_ROLE_KEY")].join("\n  ") +
-      "\nEnsure .env.local (in the repo root you run from) contains NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, or export them, then re-run.\n",
+    "upload-pdfs: need a Supabase URL + a secret/service-role key. Checked (values hidden):\n  " +
+      [seen("SUPABASE_URL"), seen("NEXT_PUBLIC_SUPABASE_URL"),
+       seen("SUPABASE_SERVICE_ROLE_KEY"), seen("SUPABASE_SECRET_KEY"),
+       seen("SERVICE_ROLE_KEY"), seen("SUPABASE_SERVICE_KEY")].join("\n  ") +
+      "\nAdd the dev project's secret key to .env.local as SUPABASE_SECRET_KEY (or SUPABASE_SERVICE_ROLE_KEY), or export it, then re-run.\n",
   );
   process.exit(2);
 }
