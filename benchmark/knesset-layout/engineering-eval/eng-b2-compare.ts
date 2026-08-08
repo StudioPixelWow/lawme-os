@@ -35,7 +35,7 @@ const providers = existsSync(`${EVAL}/outputs`) ? readdirSync(`${EVAL}/outputs`)
 const sectionCount = (t: string) => (t.match(/(?:^|\n|\s)\d{1,3}\s*\./g) ?? []).length;
 
 function tablesFor(rec: any): CanonicalTable[] {
-  if (rec?.layout && Array.isArray(rec.layout.pages) && rec.layout.pages.length) return extractTables(rec.layout as DocaiDocument, { allowGeometryFallback: ALLOW_GEOMETRY });
+  if (rec?.layout && Array.isArray(rec.layout.pages) && rec.layout.pages.length) return extractTables(rec.layout as DocaiDocument, { allowGeometryFallback: ALLOW_GEOMETRY, pageNumericRatio: numericRatio(rec?.text ?? "") });
   if (Array.isArray(rec?.tables)) return rec.tables as CanonicalTable[];
   return [];
 }

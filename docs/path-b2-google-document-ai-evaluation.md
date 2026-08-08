@@ -107,6 +107,26 @@ To obtain native table cells for budget tables (and let them reach `accepted`), 
 Form Parser / Layout Parser processor. Until then, budget tables correctly land in
 `needs_review` rather than being published with a possibly-broken amount↔label mapping.
 
+## 5b. Live retest result (enriched run) + geometry-gate fix
+
+The enriched Google run confirmed the processor emits **no native `pages[].tables`**
+(Enterprise Document OCR), so table structure comes from the geometry fallback
+(token bounding boxes). Live outcome after the geometry-gate fix:
+
+- accepted (5): bench-022, bench-023, bench-102, bench-105, bench-108
+- needs_review (5): bench-060, bench-061 (budget tables), bench-101 (sparse), bench-104, bench-107 (blank)
+- failed: 0 · `all_match_expected: true` · decision `GOOGLE_APPROVED`
+
+The first live run exposed a false-positive: the geometry fallback treated the
+two-column bilingual page (bench-022) and the colophon line (bench-102) as tables
+and over-quarantined them. Fix (generic, not overfit): geometry reconstruction now
+only fires on **numeric-heavy** pages (`pageNumericRatio ≥ 0.3`), so prose/colophons
+stay clean prose while budget tables (bench-060/061) still reconstruct. On the live
+060/061 the reconstructed grid keeps label↔value together (e.g. 061:
+`78 תיירות → 410,509 / 100,862 / 360,803`; `01 03 החברה להגנות ים המלח → 73,500 / 85,862`),
+mean cell confidence 0.95–0.97, and is routed to `needs_review` because it is
+geometry-derived, not native Document AI cells.
+
 ## 6. Scope / integrity
 
 `published=0` for every record. This evaluation and its code do not modify FROZEN

@@ -44,7 +44,7 @@ interface RetestRow {
 
 function tablesFor(rec: any): CanonicalTable[] {
   if (rec?.layout && Array.isArray(rec.layout.pages) && rec.layout.pages.length) {
-    return extractTables(rec.layout as DocaiDocument, { allowGeometryFallback: ALLOW_GEOMETRY });
+    return extractTables(rec.layout as DocaiDocument, { allowGeometryFallback: ALLOW_GEOMETRY, pageNumericRatio: numericRatio(rec?.text ?? "") });
   }
   if (Array.isArray(rec?.tables)) return rec.tables as CanonicalTable[]; // pre-computed
   return [];

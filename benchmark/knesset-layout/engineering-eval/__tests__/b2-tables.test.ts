@@ -90,6 +90,21 @@ test("no native tables + no fallback ⇒ empty; fallback flag enables geometry",
   assert.equal(extractTables(doc, { allowGeometryFallback: true }).length, 0); // no tokens ⇒ nothing to reconstruct
 });
 
+test("geometry fallback is gated by page numeric ratio (no spurious tables on prose)", () => {
+  const mkTok = (t: string, x: number, y: number) => ({ layout: { textAnchor: { content: t }, confidence: 0.9, boundingPoly: { vertices: [{ x, y }, { x: x + 40, y }, { x: x + 40, y: y + 10 }, { x, y: y + 10 }] } } });
+  const doc: DocaiDocument = {
+    text: "",
+    pages: [{
+      pageNumber: 1, dimension: { width: 600, height: 800 }, tables: [],
+      tokens: [mkTok("א", 500, 100), mkTok("ב", 200, 100), mkTok("ג", 500, 130), mkTok("ד", 200, 130), mkTok("ה", 500, 70), mkTok("ו", 200, 70)],
+    }],
+  };
+  // numeric-poor page (prose/colophon) ⇒ NO geometry table
+  assert.equal(extractTables(doc, { allowGeometryFallback: true, pageNumericRatio: 0.1 }).length, 0);
+  // numeric-heavy page (budget table) ⇒ geometry table allowed
+  assert.equal(extractTables(doc, { allowGeometryFallback: true, pageNumericRatio: 0.5 }).length, 1);
+});
+
 test("geometry fallback reconstructs a grid from token bboxes (uncertain)", () => {
   // Two rows × two columns of tokens by coordinates (RTL: higher x = col 0).
   const mkTok = (t: string, x: number, y: number) => ({ layout: { textAnchor: { content: t }, confidence: 0.8, boundingPoly: { vertices: [{ x, y }, { x: x + 40, y }, { x: x + 40, y: y + 10 }, { x, y: y + 10 }] } } });

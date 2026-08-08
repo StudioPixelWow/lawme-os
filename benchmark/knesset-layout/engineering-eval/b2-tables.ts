@@ -247,13 +247,27 @@ export function reconstructTablesFromTokens(doc: DocaiDocument): CanonicalTable[
   return out;
 }
 
-export interface ExtractOptions { allowGeometryFallback?: boolean }
+export interface ExtractOptions {
+  allowGeometryFallback?: boolean;
+  /** Page-level numeric-token ratio (0..1). Geometry reconstruction only fires
+   *  on numeric-heavy pages (budget tables), so two-column prose and colophons
+   *  are not mistaken for tables. Undefined ⇒ treated as 1 (no gate). */
+  pageNumericRatio?: number;
+  minNumericRatioForGeometry?: number; // default 0.3
+}
 
-/** Prefer native DocAI tables; optionally fall back to geometry reconstruction. */
+/** Prefer native DocAI tables; optionally fall back to geometry reconstruction.
+ *  Geometry is GATED on the page being numeric-heavy — a generic rule (not
+ *  overfit to any page): budget tables are numeric-dense, prose/colophons are
+ *  not, so the latter stay clean prose instead of spurious geometry tables. */
 export function extractTables(doc: DocaiDocument, opts: ExtractOptions = {}): CanonicalTable[] {
   const native = extractDocaiTables(doc);
   if (native.length) return native;
-  if (opts.allowGeometryFallback) return reconstructTablesFromTokens(doc);
+  if (opts.allowGeometryFallback) {
+    const nr = opts.pageNumericRatio ?? 1;
+    const min = opts.minNumericRatioForGeometry ?? 0.3;
+    if (nr >= min) return reconstructTablesFromTokens(doc);
+  }
   return [];
 }
 

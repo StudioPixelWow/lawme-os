@@ -81,7 +81,8 @@ function trimLayout(document: any): DocaiDocument {
 function buildRecord(e: { id: string; publication_item_id: string; page_number: number; source_url: string }, document: any, meanConf: number, latency: number) {
   const text: string = document?.text ?? "";
   const layout = trimLayout(document);
-  const tables = extractTables(layout, { allowGeometryFallback: ALLOW_GEOMETRY });
+  const nr = numericRatio(text);
+  const tables = extractTables(layout, { allowGeometryFallback: ALLOW_GEOMETRY, pageNumericRatio: nr });
   const det = tableDetection(tables);
   const tokenCount = (document?.pages ?? []).reduce((a: number, p: any) => a + (p.tokens?.length ?? 0), 0);
   const lineCount = (document?.pages ?? []).reduce((a: number, p: any) => a + (p.lines?.length ?? 0), 0);
@@ -91,7 +92,7 @@ function buildRecord(e: { id: string; publication_item_id: string; page_number: 
     mean_confidence: meanConf, ocr_error: false, image_decoded: true,
   };
   const cls = classifyPage(sig);
-  const tbl = assessTables(tables, { numeric_ratio: numericRatio(text), has_flattened_text: stripSpace(text).length > 0 });
+  const tbl = assessTables(tables, { numeric_ratio: nr, has_flattened_text: stripSpace(text).length > 0 });
   const verdict = decideB2(cls, tbl);
   const normalized = [text, ...tables.map(tableToText)].filter(Boolean).join("\n\n");
   return {
