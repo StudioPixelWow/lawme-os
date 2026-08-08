@@ -1,0 +1,45 @@
+{
+  "run_at": "2026-08-07",
+  "reviewer": "assistant (human-style manual read of reconstructed body vs criteria)",
+  "layout_version": "layout-1",
+  "criteria": ["body reading order correct", "no legal text lost", "captions separated from body", "no body paragraph misclassified as caption", "no caption interleaved in body", "section boundaries intact", "glyph corruption from font encoding NOT counted (F2)"],
+  "pages": [
+    {"n": 1, "pub": "2161820", "page": 1, "kind": "single", "verdict": "FAIL", "issue": "reading-order: multi-column index of amended laws interleaved"},
+    {"n": 2, "pub": "2161820", "page": 2, "kind": "fallback", "verdict": "FAIL", "issue": "reading-order: modern justified two-column body words interleaved across logical lines"},
+    {"n": 3, "pub": "2161820", "page": 3, "kind": "fallback", "verdict": "FAIL", "issue": "reading-order: two-column body interleaved"},
+    {"n": 4, "pub": "2161820", "page": 4, "kind": "fallback", "verdict": "FAIL", "issue": "reading-order: two-column body interleaved"},
+    {"n": 5, "pub": "2161820", "page": 5, "kind": "single", "verdict": "FAIL", "issue": "reading-order: two-column body interleaved"},
+    {"n": 6, "pub": "2161820", "page": 6, "kind": "two_column", "verdict": "FAIL", "issue": "reading-order: two-column body interleaved/doubled"},
+    {"n": 7, "pub": "544591", "page": 1, "kind": "single", "verdict": "PASS", "issue": null},
+    {"n": 8, "pub": "544591", "page": 2, "kind": "fallback", "verdict": "PASS", "issue": null},
+    {"n": 9, "pub": "544591", "page": 3, "kind": "single", "verdict": "FAIL", "issue": "reading-order: partial two-column duplication"},
+    {"n": 10, "pub": "544591", "page": 4, "kind": "single", "verdict": "PASS", "issue": null},
+    {"n": 11, "pub": "544591", "page": 6, "kind": "two_column", "verdict": "PASS", "issue": null},
+    {"n": 12, "pub": "2203821", "page": 4, "kind": "fallback", "verdict": "PASS", "issue": null},
+    {"n": 13, "pub": "2203821", "page": 6, "kind": "two_column", "verdict": "PASS", "issue": "definitions section, reads cleanly"},
+    {"n": 14, "pub": "151413", "page": 1, "kind": "two_column", "verdict": "PASS", "issue": "caption 'החלטת סעיף 7' glyph typo = F2 only"},
+    {"n": 15, "pub": "151413", "page": 2, "kind": "two_column", "verdict": "PASS", "issue": "minor caption footnote/glyph artifacts = F2/F3 only"},
+    {"n": 16, "pub": "151413", "page": 3, "kind": "two_column", "verdict": "PASS", "issue": null},
+    {"n": 17, "pub": "151413", "page": 4, "kind": "two_column", "verdict": "PASS", "issue": null},
+    {"n": 18, "pub": "151413", "page": 5, "kind": "two_column", "verdict": "PASS", "issue": null},
+    {"n": 19, "pub": "151413", "page": 6, "kind": "two_column", "verdict": "PASS", "issue": "caption 'שוגים'='שונים' glyph = F2 only"},
+    {"n": 20, "pub": "148830", "page": 2, "kind": "two_column", "verdict": "PASS", "issue": "heavy glyph corruption (1959 font) = F2; reading order + separation correct"}
+  ],
+  "tally": {
+    "total": 20, "pass": 14, "fail": 6, "pass_pct": 70,
+    "by_layout_class": {
+      "classic_marginal_caption (151413/148830/2203821/544591 clean pages)": "13/14 PASS",
+      "modern_multi_column_justified (2161820 + 544591 p3)": "0/6 PASS"
+    }
+  },
+  "go_gate": {
+    "text_loss_zero": true,
+    "false_removals_zero": true,
+    "reading_order_ge_99pct": false,
+    "caption_classification_ge_99pct": "captions correct on all pages that had them; failures are body reading-order, not caption misclassification",
+    "verdict": "NOT GO"
+  },
+  "root_cause": "layout-1 groups items into visual lines by y then sorts RTL by x. This is correct for classic single-body-column gazette pages with a narrow marginal-caption column, but INTERLEAVES columns on modern justified two-body-column typesetting (pub 2161820, 2021). Needs a balanced-two-body-column handler: detect ~equal columns and read the right column fully (RTL first) then the left, instead of merging across the gap per line.",
+  "proxy_limitation": "The automatic reading_order_wellformed metric (lossless && no false-separation) read 100% but MISSED column-interleaving (which is lossless and has no caption). The manual gate is required, exactly as specified.",
+  "published": 0
+}

@@ -71,5 +71,28 @@ reading-order accuracy >= 99%
 section-boundary accuracy >= 99%
 ```
 
+### `section_number_monotonic` REJECTED as a gating metric
+
+Per founder decision (2026-08-07), `section_number_monotonic` is a **non-gating
+diagnostic only**. It is NOT a valid proxy for section-order correctness because
+legal publications contain years, percentages, cross-references, monetary
+amounts and sub-clause numbering, all of which the marker regex captures as
+"section numbers", confounding monotonicity. It must not appear in the F1 GO gate.
+
+### Manual validation gate (F1 GO input)
+
+Automatic metrics can guarantee only losslessness (text-loss / false-removals);
+true reading-order and caption accuracy require a human label on the review
+sample vs the source PDFs (`artifacts/knesset-layout-manual-review.json`).
+
+**First manual review (20 pages): NOT GO — 14/20 PASS (70%).** Classic
+marginal-caption gazette pages pass cleanly (pub 151413: 6/6; older laws good);
+modern two-body-column typesetting (pub 2161820, 2021) fails — columns interleave
+because layout-1 groups by y across the full width. The automatic
+`reading_order_wellformed` proxy read 100% and MISSED this (column-interleaving is
+lossless with no caption to false-separate) — which is exactly why the human gate
+is mandatory. Next iteration: a balanced two-body-column reader (read right column
+fully, then left, for RTL) before F1 can clear the gate.
+
 Nothing is published on the basis of F1 alone; the publish decision waits for the
 post-fix 100-publication quality sample. `published = 0` throughout.
