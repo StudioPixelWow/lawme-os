@@ -49,7 +49,10 @@ function onePage(src: string, page: number): Buffer {
 
 async function main(): Promise<void> {
   const { DocumentProcessorServiceClient } = require("@google-cloud/documentai").v1;
-  const client = new DocumentProcessorServiceClient();
+  // Regional endpoint is required for non-US locations (e.g. eu) — the default
+  // global endpoint cannot see an eu processor.
+  const apiEndpoint = GCP_LOCATION && GCP_LOCATION !== "us" ? `${GCP_LOCATION}-documentai.googleapis.com` : undefined;
+  const client = new DocumentProcessorServiceClient(apiEndpoint ? { apiEndpoint } : {});
   const name = `projects/${GCP_PROJECT}/locations/${GCP_LOCATION}/processors/${GCP_DOCAI_PROCESSOR}`;
   mkdirSync(`${EVAL}/outputs/google-docai`, { recursive: true });
   let done = 0, fail = 0;

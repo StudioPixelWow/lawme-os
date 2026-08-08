@@ -34,6 +34,7 @@ concurrency:
 
 permissions:
   contents: read
+  id-token: write   # required for keyless Google auth via OIDC / Workload Identity
 
 jobs:
   phase3:
@@ -42,12 +43,13 @@ jobs:
     env:
       # Non-secret routing inputs
       B2_IDS: bench-022,bench-023,bench-060,bench-061,bench-101,bench-102,bench-104,bench-105,bench-107,bench-108
+      # Non-secret GCP identifiers → repo/environment VARIABLES (not secrets).
+      GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+      GCP_LOCATION: ${{ vars.GCP_LOCATION }}
+      GCP_DOCAI_PROCESSOR: ${{ vars.GCP_DOCAI_PROCESSOR }}
       # Secrets (never printed). Configure in the repo/environment secret store.
       AZURE_DI_ENDPOINT: ${{ secrets.AZURE_DI_ENDPOINT }}
       AZURE_DI_KEY: ${{ secrets.AZURE_DI_KEY }}
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_LOCATION: ${{ secrets.GCP_LOCATION }}
-      GCP_DOCAI_PROCESSOR: ${{ secrets.GCP_DOCAI_PROCESSOR }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
     steps:
@@ -71,13 +73,14 @@ jobs:
           npm ci
           npm i --no-save @google-cloud/documentai   # cloud adapter dep (CI-only)
 
-      - name: Write Google service-account key from secret (not logged)
-        run: |
-          install -m 600 /dev/null "$RUNNER_TEMP/gcp-sa.json"
-          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp-sa.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp-sa.json" >> "$GITHUB_ENV"
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      - name: Authenticate to Google Cloud (OIDC / Workload Identity — keyless)
+        if: ${{ github.event.inputs.run_b2_eval == 'true' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+        # Exports short-lived ADC (GOOGLE_APPLICATION_CREDENTIALS) that the
+        # @google-cloud/documentai client picks up automatically. No stored key.
 
       - name: B2 — fetch residual PDFs from Object Storage
         if: ${{ github.event.inputs.run_b2_eval == 'true' }}
