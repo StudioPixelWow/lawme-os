@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Standalone operator / benchmark / CI Node scripts (run via `node
+  // --experimental-strip-types`), not part of the Next.js app. They interface
+  // with untyped external JSON (Azure/Google Document AI, pdf-parse), so
+  // `no-explicit-any` at those boundaries is expected and non-actionable.
+  {
+    files: ["benchmark/**/*.ts", "tools/legal-ingest/**/*.ts"],
+    rules: { "@typescript-eslint/no-explicit-any": "off" },
+  },
 ]);
 
 export default eslintConfig;

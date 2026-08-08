@@ -52,7 +52,7 @@ function onePage(src: string, page: number): Buffer {
 
 async function analyze(pdf: Buffer): Promise<{ text: string; conf: number }> {
   const url = `${ENDPOINT!.replace(/\/$/, "")}/documentintelligence/documentModels/${MODEL}:analyze?api-version=${API}`;
-  const post = await fetch(url, { method: "POST", headers: { "Ocp-Apim-Subscription-Key": KEY!, "Content-Type": "application/pdf" }, body: pdf });
+  const post = await fetch(url, { method: "POST", headers: { "Ocp-Apim-Subscription-Key": KEY!, "Content-Type": "application/pdf" }, body: new Uint8Array(pdf) });
   if (post.status !== 202) throw new Error(`analyze HTTP ${post.status}: ${await post.text()}`);
   const op = post.headers.get("operation-location");
   if (!op) throw new Error("no operation-location header");

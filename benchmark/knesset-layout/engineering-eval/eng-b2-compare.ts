@@ -55,7 +55,7 @@ for (const provider of providers) {
 
 // cross-provider reading-order stability (agreement) among cloud providers
 const cloudPresent = perProvider.filter((p) => CLOUD.has(p.provider)).map((p) => p.provider);
-let agreement: Record<string, number> = {};
+const agreement: Record<string, number> = {};
 for (let i = 0; i < cloudPresent.length; i++) for (let j = i + 1; j < cloudPresent.length; j++) {
   const a = cloudPresent[i], b = cloudPresent[j]; const vals: number[] = [];
   for (const id of RESIDUAL) { const ra = readJson(`${EVAL}/outputs/${a}/${id}.json`), rb = readJson(`${EVAL}/outputs/${b}/${id}.json`); if (ra && rb) vals.push(jaccard(ra.text ?? "", rb.text ?? "")); }

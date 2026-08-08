@@ -65,7 +65,8 @@ async function main(): Promise<void> {
   const cache = new Map<string, Uint8Array>();
   const tally = { A: 0, B1: 0, B2: 0, needs_review: 0 };
   const pubs = new Set<string>();
-  let physicalOk = 0, provenanceOk = 0, extractionFailures = 0, rawTouched = 0;
+  let physicalOk = 0, provenanceOk = 0, extractionFailures = 0;
+  const rawTouched = 0;
   const lossAB1: number[] = [], dupAB1: number[] = [], hebAll: number[] = [];
   for (const w of list) {
     pubs.add(w.publication_item_id);

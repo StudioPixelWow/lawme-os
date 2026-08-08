@@ -63,7 +63,7 @@ function handleSave(id: string, incoming: GroundTruth): { code: number; body: un
   const e = entryOf.get(id);
   if (!e) return { code: 404, body: { error: "unknown benchmark id" } };
   const prev = loadGroundTruth(DIR, id);
-  let rec = withProvenance({ ...(prev ?? {}), ...incoming }, e);
+  const rec = withProvenance({ ...(prev ?? {}), ...incoming }, e);
   const changed = changedFields(prev, rec);
 
   // Review invalidation: editing a reviewed page drops it back to READY_FOR_REVIEW.
@@ -107,7 +107,7 @@ function handleReview(id: string, body: { action: string; reviewer?: string; not
   const corrected = withProvenance({ ...prev, ...(body.correction ?? {}) }, e);
   const action = body.action;
   const note = String(body.note ?? "").trim();
-  let rec: GroundTruth = corrected;
+  const rec: GroundTruth = corrected;
 
   if (action === "APPROVE") {
     rec.state = "APPROVED";
