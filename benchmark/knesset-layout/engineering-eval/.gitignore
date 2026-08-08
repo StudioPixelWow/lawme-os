@@ -1,0 +1,5 @@
+# Regenerable from the authoritative PDFs (not committed):
+reference/
+outputs/
+artifacts/
+# The evidence record IS committed: report/*.json, report/*.md

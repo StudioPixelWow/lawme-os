@@ -1,0 +1,309 @@
+{
+  "path": "Founder-Approved Engineering Evaluation (SEPARATE from the strict human-ground-truth benchmark)",
+  "disclaimer": "AUTOMATIC / PROXY engineering metrics measured against the PDF's OWN embedded text layer (order-independent glyph oracle) plus intrinsic signals. These are NOT human-ground-truth accuracy and NOT certification of correctness. The strict 108-page benchmark is preserved unchanged for future independent human annotation. published=0.",
+  "engines": [
+    "layout-2",
+    "tesseract-heb"
+  ],
+  "reference_summary": {
+    "pages": 108,
+    "no_text_layer_pages": 8,
+    "garbled_text_layer_pages": 2,
+    "note": "no_text_layer ⇒ scanned/image page, OCR-only, NO objective text reference (needs human certification). garbled_text_layer ⇒ embedded text is corrupt (F2 glyph); glyph-loss vs it is not meaningful and OCR may legitimately differ."
+  },
+  "per_engine": {
+    "layout-2": {
+      "overall": {
+        "pages": 108,
+        "pages_with_reliable_reference": 98,
+        "pages_no_text_layer": 8,
+        "pages_garbled_reference": 2,
+        "mean_text_loss_pct": 0.03,
+        "mean_duplication_pct": 0,
+        "mean_hebrew_share": 90.16,
+        "mean_section_monotonic_diag_pct": 100,
+        "mean_false_separation_pct": 0.23,
+        "folio_detected_rate_pct": 66.67,
+        "unresolved_rate_pct": 5.56,
+        "failure_rate_pct": 13.89
+      },
+      "by_stratum": {
+        "budget_table": {
+          "pages": 4,
+          "pages_with_reliable_reference": 4,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0.09,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 75,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 0
+        },
+        "classic_marginal_caption": {
+          "pages": 19,
+          "pages_with_reliable_reference": 17,
+          "pages_no_text_layer": 2,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 89.47,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 47.37,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 10.53
+        },
+        "complex_modern": {
+          "pages": 21,
+          "pages_with_reliable_reference": 19,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 2,
+          "mean_text_loss_pct": 0.11,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 88.17,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 1.19,
+          "folio_detected_rate_pct": 85.71,
+          "unresolved_rate_pct": 9.52,
+          "failure_rate_pct": 14.29
+        },
+        "doubled_text_layer": {
+          "pages": 1,
+          "pages_with_reliable_reference": 1,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 100,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 0
+        },
+        "front_or_index": {
+          "pages": 25,
+          "pages_with_reliable_reference": 25,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 99.95,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 88,
+          "unresolved_rate_pct": 12,
+          "failure_rate_pct": 12
+        },
+        "image_partial": {
+          "pages": 9,
+          "pages_with_reliable_reference": 3,
+          "pages_no_text_layer": 6,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 33.33,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 33.33,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 66.67
+        },
+        "modern_two_column": {
+          "pages": 6,
+          "pages_with_reliable_reference": 6,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0.03,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 99.95,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 83.33,
+          "unresolved_rate_pct": 16.67,
+          "failure_rate_pct": 16.67
+        },
+        "old_font": {
+          "pages": 23,
+          "pages_with_reliable_reference": 23,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 0,
+          "mean_duplication_pct": 0,
+          "mean_hebrew_share": 99.45,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 47.83,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 0
+        }
+      }
+    },
+    "tesseract-heb": {
+      "overall": {
+        "pages": 108,
+        "pages_with_reliable_reference": 98,
+        "pages_no_text_layer": 8,
+        "pages_garbled_reference": 2,
+        "mean_text_loss_pct": 10.62,
+        "mean_duplication_pct": 12.17,
+        "mean_hebrew_share": 97.22,
+        "mean_section_monotonic_diag_pct": 100,
+        "mean_false_separation_pct": 0,
+        "folio_detected_rate_pct": 67.59,
+        "unresolved_rate_pct": 2.78,
+        "failure_rate_pct": 71.3
+      },
+      "by_stratum": {
+        "budget_table": {
+          "pages": 4,
+          "pages_with_reliable_reference": 4,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 25.78,
+          "mean_duplication_pct": 10.03,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 50,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 100
+        },
+        "classic_marginal_caption": {
+          "pages": 19,
+          "pages_with_reliable_reference": 17,
+          "pages_no_text_layer": 2,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 4.49,
+          "mean_duplication_pct": 3.48,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 89.47,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 42.11
+        },
+        "complex_modern": {
+          "pages": 21,
+          "pages_with_reliable_reference": 19,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 2,
+          "mean_text_loss_pct": 26.39,
+          "mean_duplication_pct": 1.92,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 76.19,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 71.43
+        },
+        "doubled_text_layer": {
+          "pages": 1,
+          "pages_with_reliable_reference": 1,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 49.53,
+          "mean_duplication_pct": 0.63,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 100,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 100
+        },
+        "front_or_index": {
+          "pages": 25,
+          "pages_with_reliable_reference": 25,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 3.49,
+          "mean_duplication_pct": 23.08,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 64,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 76
+        },
+        "image_partial": {
+          "pages": 9,
+          "pages_with_reliable_reference": 3,
+          "pages_no_text_layer": 6,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 2.61,
+          "mean_duplication_pct": 91.44,
+          "mean_hebrew_share": 66.67,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 33.33,
+          "unresolved_rate_pct": 33.33,
+          "failure_rate_pct": 100
+        },
+        "modern_two_column": {
+          "pages": 6,
+          "pages_with_reliable_reference": 6,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 18.2,
+          "mean_duplication_pct": 1.81,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 83.33,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 66.67
+        },
+        "old_font": {
+          "pages": 23,
+          "pages_with_reliable_reference": 23,
+          "pages_no_text_layer": 0,
+          "pages_garbled_reference": 0,
+          "mean_text_loss_pct": 4.6,
+          "mean_duplication_pct": 8.45,
+          "mean_hebrew_share": 100,
+          "mean_section_monotonic_diag_pct": 100,
+          "mean_false_separation_pct": 0,
+          "folio_detected_rate_pct": 56.52,
+          "unresolved_rate_pct": 0,
+          "failure_rate_pct": 73.91
+        }
+      }
+    }
+  },
+  "cross_engine": {
+    "layout2_vs_tesseract_glyph_jaccard_pct": 82.37,
+    "note": "agreement on clean text-layer pages; high ⇒ both engines converge (triangulation), low ⇒ investigate. Neither engine is ground truth."
+  },
+  "failure_classes": {
+    "no_text_layer_scanned": [
+      "bench-022",
+      "bench-023",
+      "bench-101",
+      "bench-102",
+      "bench-104",
+      "bench-105",
+      "bench-107",
+      "bench-108"
+    ],
+    "garbled_embedded_text_F2": [
+      "bench-060",
+      "bench-061"
+    ],
+    "layout2_unresolved_reading_order_F1": [
+      "bench-044",
+      "bench-058",
+      "bench-061",
+      "bench-068",
+      "bench-073",
+      "bench-088"
+    ],
+    "layout2_low_hebrew_share_F2": [
+      "bench-060",
+      "bench-061"
+    ]
+  },
+  "published": 0
+}
