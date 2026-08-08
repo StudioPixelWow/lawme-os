@@ -1,0 +1,19 @@
+{
+  "_schema": "LAW ME layout benchmark ground-truth (per page). Fill from the OFFICIAL PDF, not from any extractor output.",
+  "id": "bench-000",
+  "_source_pdf": "<source_url from manifest>",
+  "_page_number": 0,
+  "confirmed_stratum": "one of: classic_marginal_caption | modern_two_column | complex_modern | old_font | doubled_text_layer | budget_table | image_partial | front_or_index",
+  "reading_order_text": "Full correct RTL reading-order transcription of the page body (captions excluded).",
+  "regions": [
+    { "role": "body", "column": 0, "bbox_or_desc": "e.g. right body column" },
+    { "role": "caption", "column": -1, "bbox_or_desc": "e.g. marginal section heading, right margin" }
+  ],
+  "marginal_captions": ["section headings as printed in the margin"],
+  "section_boundaries": ["section numbers in reading order, e.g. 1, 2, 3, 9א"],
+  "page_alignment": { "printed_page_label": "as printed on the page", "gazette_page": "ספר החוקים page if shown" },
+  "hebrew_fidelity_notes": "glyph corruption / ambiguous characters observed on the page",
+  "annotator": "",
+  "reviewed_by": "",
+  "confidence": "high | medium | low"
+}
