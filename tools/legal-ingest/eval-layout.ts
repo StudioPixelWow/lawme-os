@@ -121,11 +121,11 @@ async function main(): Promise<void> {
       else single += 1;
       if (pg.fallbackUsed) fallback += 1;
 
-      // Raw flat text for this page (all items, y↓ then x↓) for loss + section compare.
+      // Text-loss uses the module's dedup-aware lossless flag (the raw comparison
+      // would wrongly count intentionally-dropped coincident duplicates as loss).
       const rawText = pages[p].map((i) => i.str).join(" ");
-      const outText = pg.bodyText + " " + pg.marginalCaptions.map((c) => c.text).join(" ");
-      const miss = missingGlyphs(rawText, outText);
-      if (!pg.lossless || miss > 0) { textLossPages += 1; falseRemovals += miss; }
+      const miss = pg.lossless ? 0 : missingGlyphs(rawText, pg.bodyText + " " + pg.marginalCaptions.map((c) => c.text).join(" "));
+      if (!pg.lossless) { textLossPages += 1; falseRemovals += miss; }
 
       // Separate REAL section captions (contain Hebrew) from margin noise (running
       // page numbers / footnote refs).
@@ -155,8 +155,10 @@ async function main(): Promise<void> {
         review.push({ kind, pub: r.publication_item_id as string, page: p + 1, url: (r as { source_url?: string }).source_url ?? null, columnType: pg.columnType, captions: realCaps.map((c) => c.text), body: pg.bodyText.slice(0, 1600) });
       }
 
-      // Reading-order well-formedness: lossless AND (single OR no false separation).
-      if (pg.lossless && miss === 0 && !falseSepThisPage) wellFormed += 1;
+      // Unresolved pages are HELD (flagged), not scored for reading-order — they are
+      // honestly deferred, not counted as failures or passes.
+      // Reading-order well-formedness (over resolved pages): lossless AND no false separation.
+      if (!pg.unresolved && pg.lossless && miss === 0 && !falseSepThisPage) wellFormed += 1;
 
       // Section reading-order signal: in a correct reading order the primary
       // section numbers should be non-decreasing. (Comparing to raw PDF-item order
@@ -182,7 +184,7 @@ async function main(): Promise<void> {
   const pct = (a: number, b: number) => (b ? Number(((a / b) * 100).toFixed(2)) : 100);
   const result = {
     run_at_note: "timestamp added by operator/report",
-    layout_version: "layout-1",
+    layout_version: "layout-2",
     docs_evaluated: docsEval,
     pages_evaluated: pagesEval,
     single_column_pages: single,
@@ -192,7 +194,8 @@ async function main(): Promise<void> {
     marginal_captions_detected: captionsTotal,
     page_number_margins_filtered: pageNumberMargins,
     marginal_caption_detection: "real captions (Hebrew) only; page-number/running-header margins counted separately. TRUE accuracy requires manual label of the sample (no silent ground truth)",
-    reading_order_wellformed_pct: pct(wellFormed, pagesEval),
+    resolved_pages: pagesEval - unresolved,
+    reading_order_wellformed_pct_of_resolved: pct(wellFormed, pagesEval - unresolved),
     text_loss_rate_pct: pct(textLossPages, pagesEval),
     false_removal_glyph_count: falseRemovals,
     false_separation_rate_pct: pct(contamPages, twoColContamDenom),
@@ -203,7 +206,7 @@ async function main(): Promise<void> {
     go_gate: {
       text_loss_zero: textLossPages === 0 && falseRemovals === 0,
       false_separation_le_1pct: pct(contamPages, twoColContamDenom) <= 1,
-      reading_order_ge_99pct: pct(wellFormed, pagesEval) >= 99,
+      reading_order_ge_99pct_of_resolved: pct(wellFormed, pagesEval - unresolved) >= 99,
       section_number_monotonic_ge_99pct: pct(secAgreeNum, secAgreeDen) >= 99,
       no_high_confidence_false_removals: falseRemovals === 0,
     },

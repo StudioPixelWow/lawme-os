@@ -235,14 +235,20 @@ export function reconstructPage(rawItems: LayoutItem[]): PageReconstruction {
 
   const bodyText = bodyChunks.join("\n");
 
-  // Doubled text layer with OFFSET duplicates (coincident-dedup can't catch these):
-  // detect abnormal adjacent word repetition and FLAG rather than emit corrupt text.
+  // FLAG-not-guess signals that segmentation is unreliable → mark UNRESOLVED and
+  // emit raw reading order (still lossless), never a confident-but-wrong result:
+  //  (a) a "caption" that is sentence-like (long / many words) means body text was
+  //      pulled into a margin band → the page was mis-segmented.
+  //  (b) OFFSET doubled glyphs (coincident-dedup can't catch these) show up as
+  //      abnormal adjacent word repetition after reconstruction.
+  const bodyLikeCaption = marginalCaptions.some((c) => c.text.replace(/\s/g, "").length > 40 || c.text.split(/\s+/).filter(Boolean).length > 8);
   const words = bodyText.split(/\s+/).filter(Boolean);
   let adjDup = 0; for (let k = 1; k < words.length; k++) if (words[k] === words[k - 1] && words[k].length >= 2) adjDup++;
   const dupWordRatio = words.length ? adjDup / words.length : 0;
-  if (dupWordRatio > 0.08) {
+  if (bodyLikeCaption || dupWordRatio > 0.05) {
     const r = raw();
-    return { columnType: "unresolved", bodyColumns: bodyBands.length, marginalSide: null, bodyText: r.text, marginalCaptions: [], segments: [{ role: "body", column: 0, text: r.text, sourceSpan: r.span }], layoutConfidence: 0.2, unresolved: true, fallbackUsed: true, lossless: glyphKey(r.text) === dedupKey };
+    const reason = bodyLikeCaption ? "body-like caption (mis-segmentation)" : "offset duplicate glyphs";
+    return { columnType: "unresolved", bodyColumns: bodyBands.length, marginalSide: null, bodyText: r.text, marginalCaptions: [], segments: [{ role: "body", column: 0, text: `[unresolved: ${reason}] ` + r.text, sourceSpan: r.span }], layoutConfidence: 0.15, unresolved: true, fallbackUsed: true, lossless: glyphKey(r.text) === dedupKey };
   }
   const lossless = glyphKey(bodyText + marginalCaptions.map((c) => c.text).join("")) === dedupKey;
 
