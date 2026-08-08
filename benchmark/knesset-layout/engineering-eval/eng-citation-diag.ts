@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import type { LayoutItem } from "../../../src/modules/legal-ai-israel/ingestion/legislation/publication/layout-reconstruct.ts";
+import { detectPrintedFolio } from "../../../src/modules/legal-ai-israel/ingestion/legislation/publication/citation-folio.ts";
 
 const DIR = process.env.BENCH_DIR ?? "benchmark/knesset-layout";
 const EVAL = `${DIR}/engineering-eval`;
@@ -80,8 +81,9 @@ async function main(): Promise<void> {
     // (1) physical page alignment: the physical page we extracted exists and is the one cited.
     const physical_ok = e.page_number >= 1 && e.page_number <= numpages;
     physicalTotal += 1; if (physical_ok) physicalOk += 1;
-    // (2) folio
-    const folio = detectFolio(items);
+    // (2) folio — production detector (digits + gershayim gematria + header-merged, confidence-gated)
+    const pf = detectPrintedFolio(items);
+    const folio = { label: pf.printed_page_label, kind: pf.kind };
     const isFrontIndex = e.stratum_tentative === "front_or_index";
     let clazz: string;
     if (folio.label) clazz = "printed_folio_found";
