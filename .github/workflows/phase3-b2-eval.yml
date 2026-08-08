@@ -82,7 +82,7 @@ jobs:
           npm i --no-save @google-cloud/documentai   # cloud adapter dep (CI-only)
 
       - name: Authenticate to Google Cloud (OIDC / Workload Identity — keyless)
-        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
+        if: ${{ (github.event.inputs.run_b2_eval == 'true' || github.event.inputs.run_reprocess == 'true') && github.event.inputs.run_google == 'true' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -117,8 +117,13 @@ jobs:
           B2_IDS: ''   # unset ⇒ cohort mode
         run: node --experimental-strip-types tools/legal-ingest/fetch-cohort-from-storage.ts
 
-      - name: Reprocess — hybrid dry-run over the cohort (routing + gate metrics)
+      - name: Reprocess — hybrid dry-run over the cohort (A/B1 local + live B2 Google OCR)
         if: ${{ github.event.inputs.run_reprocess == 'true' }}
+        env:
+          # Live Path-B2 provider. With run_google=true the OIDC auth above exports
+          # GOOGLE_APPLICATION_CREDENTIALS, so B2 pages are OCR'd live; otherwise
+          # B2 pages are safely quarantined (needs_review), never fabricated.
+          B2_PROVIDER: google-docai
         run: |
           PDFS_DIR=tools/legal-ingest/.cohort-pdfs \
           WORKLIST=tools/legal-ingest/.cohort-worklist.json \

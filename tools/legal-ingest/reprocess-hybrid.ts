@@ -22,6 +22,9 @@ import { createRequire } from "node:module";
 import { reconstructPage, type LayoutItem } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/layout-reconstruct.ts";
 import { recoverReadingOrder } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/layout-order-v3.ts";
 import { routePage, ROUTER_VERSION, DEFAULT_ROUTE_CONFIG, type RouteSignals } from "../../src/modules/legal-ai-israel/ingestion/legislation/publication/extraction-router.ts";
+import { assembleB2Page, type B2PageAssembly } from "../../benchmark/knesset-layout/engineering-eval/b2-page.ts";
+import { ocrPageWithGoogle, googleOcrAvailable, googleOcrConfigFromEnv } from "../../benchmark/knesset-layout/engineering-eval/b2-ocr.ts";
+import { computeReprocessMetrics, type ReprocessPageRecord } from "./reprocess-metrics.ts";
 
 const COMMIT = process.argv.includes("--commit");
 const B2_PROVIDER = process.env.B2_PROVIDER ?? "pending";
@@ -57,82 +60,92 @@ function worklist(): { publication_item_id: string; page_number: number }[] {
   return m.entries.map((e: any) => ({ publication_item_id: e.publication_item_id, page_number: e.page_number }));
 }
 
+const ALLOW_GEOMETRY = (process.env.B2_TABLE_GEOMETRY_FALLBACK ?? "true") !== "false";
+const OCR_CFG = googleOcrConfigFromEnv();
+
 async function main(): Promise<void> {
   if (COMMIT && B2_PROVIDER === "pending") { process.stderr.write("REFUSING --commit: no Path-B2 provider selected (set B2_PROVIDER after eng-b2-compare.ts). DB write + extraction-layer migration are approval-gated.\n"); process.exit(1); }
   if (COMMIT) { process.stderr.write("REFUSING --commit in this build: DB write + migration are approval-gated. Run dry-run, get founder approval + apply the extraction-layer migration, then wire the persist step.\n"); process.exit(1); }
   mkdirSync(OUT, { recursive: true });
   const list = worklist();
   const cache = new Map<string, Uint8Array>();
-  const tally = { A: 0, B1: 0, B2: 0, needs_review: 0 };
   const pubs = new Set<string>();
-  let physicalOk = 0, provenanceOk = 0, extractionFailures = 0;
-  const rawTouched = 0;
-  const lossAB1: number[] = [], dupAB1: number[] = [], hebAll: number[] = [];
+  const records: ReprocessPageRecord[] = [];
+  const b2Live = B2_PROVIDER === "google-docai" && googleOcrAvailable(OCR_CFG);
+  if (B2_PROVIDER === "google-docai" && !b2Live) process.stderr.write("[b2] google-docai selected but OCR credentials absent — B2 pages will be quarantined (needs_review), not OCR'd. Run in CI (OIDC) for live B2.\n");
+
   for (const w of list) {
     pubs.add(w.publication_item_id);
     const p = `${PDFS}/${w.publication_item_id}.pdf`;
-    if (!existsSync(p)) { process.stderr.write(`  [no-pdf-in-object-storage-cache] ${w.publication_item_id}\n`); extractionFailures += 1; continue; }
+    if (!existsSync(p)) {
+      process.stderr.write(`  [no-pdf-in-object-storage-cache] ${w.publication_item_id}\n`);
+      records.push({ publication_item_id: w.publication_item_id, page_number: w.page_number, route: "B2", needs_review: true, physical_page_alignment: false, provenance_complete: false, published: 0, raw_overwritten: false, extraction_failure: true, google_call: false, b2: null });
+      continue;
+    }
     let pdf = cache.get(w.publication_item_id); if (!pdf) { pdf = new Uint8Array(readFileSync(p)); cache.set(w.publication_item_id, pdf); }
     const { items, numpages } = await pageItems(pdf, w.page_number);
     const rawText = items.map((i) => i.str).join(" ");
     const has = rawText.replace(/\s+/g, "").length > 0;
     const l2 = reconstructPage(items);
     const sig: RouteSignals = { has_text_layer: has, hebrew_share: hebrewShare(rawText), layout2_unresolved: l2.unresolved };
-    const pre = routePage(sig, { ...DEFAULT_ROUTE_CONFIG, b2_provider: B2_PROVIDER });
     let extracted = "", orderVersion = "layout-2", b1Resolved: boolean | undefined;
+    const pre = routePage(sig, { ...DEFAULT_ROUTE_CONFIG, b2_provider: B2_PROVIDER });
     if (pre.route === "A") { extracted = l2.bodyText + (l2.marginalCaptions.length ? "\n" + l2.marginalCaptions.map((c) => c.text).join("\n") : ""); }
     else if (pre.route === "B1") { const r = recoverReadingOrder(items); extracted = r.reading_order_text; orderVersion = r.order_version; b1Resolved = r.resolved && r.lossless; }
-    else { extracted = ""; /* B2: OCR performed by the selected cloud provider step; raw stays authoritative */ }
     const decision = routePage({ ...sig, b1_resolved: b1Resolved }, { ...DEFAULT_ROUTE_CONFIG, b2_provider: B2_PROVIDER });
-    tally[decision.route] += 1; if (decision.needs_review) tally.needs_review += 1;
 
-    // ---- gate metrics (proxy; NOT human accuracy) ----
-    const physical_ok = w.page_number >= 1 && w.page_number <= numpages; if (physical_ok) physicalOk += 1;
-    const provenance_present = !!w.publication_item_id && w.page_number >= 1; if (provenance_present) provenanceOk += 1;
-    if (has) hebAll.push(hebrewShare(extracted));
-    if ((decision.route === "A" || decision.route === "B1")) {
-      lossAB1.push(glyphLoss(rawText, extracted)); dupAB1.push(glyphDup(rawText, extracted));
-      if (extracted.replace(/\s+/g, "").length === 0 && has) extractionFailures += 1;
+    const physical_ok = w.page_number >= 1 && w.page_number <= numpages;
+    const provenance_complete = !!w.publication_item_id && w.page_number >= 1 && physical_ok;
+    const glyph = (decision.route === "A" || decision.route === "B1") ? glyphLoss(rawText, extracted) : null;
+    const dupAb1 = (decision.route === "A" || decision.route === "B1") ? glyphDup(rawText, extracted) : null;
+    const hebAb1 = (decision.route === "A" || decision.route === "B1") ? hebrewShare(extracted) : null;
+    const extractionFailure = (decision.route === "A" || decision.route === "B1") && has && extracted.replace(/\s+/g, "").length === 0;
+
+    // ---- Path B2: live Google Document AI OCR + shared B2 assembly ----
+    let b2: B2PageAssembly | null = null; let googleCall = false; let b2Latency: number | null = null;
+    if (decision.route === "B2") {
+      if (b2Live) {
+        try { const ocr = await ocrPageWithGoogle(p, w.page_number, OCR_CFG); googleCall = true; b2Latency = ocr.latency_ms; b2 = assembleB2Page({ text: ocr.text, layout: ocr.layout, mean_confidence: ocr.mean_confidence, token_count: ocr.token_count, line_count: ocr.line_count, block_count: ocr.block_count, allowGeometryFallback: ALLOW_GEOMETRY }); }
+        catch (err) { process.stderr.write(`  [b2-ocr-fail] ${w.publication_item_id} p${w.page_number}: ${(err as Error).message}\n`); b2 = assembleB2Page({ text: "", layout: { text: "", pages: [] }, mean_confidence: 0, ocr_error: true, allowGeometryFallback: ALLOW_GEOMETRY }); }
+      } else {
+        // No OCR credentials in this environment: quarantine, never fabricate OCR text.
+        b2 = assembleB2Page({ text: "", layout: { text: "", pages: [] }, mean_confidence: 0, ocr_error: true, allowGeometryFallback: ALLOW_GEOMETRY });
+      }
     }
+
+    const needsReview = decision.route === "B2" ? (b2?.verdict.decision === "needs_review" || b2?.verdict.decision === "failed") : decision.needs_review;
+    records.push({
+      publication_item_id: w.publication_item_id, page_number: w.page_number, route: decision.route,
+      needs_review: needsReview, physical_page_alignment: physical_ok, provenance_complete, published: 0,
+      raw_overwritten: false, extraction_failure: extractionFailure, google_call: googleCall, latency_ms: b2Latency,
+      glyph_loss: glyph, duplication_ab1: dupAb1, hebrew_share_ab1: hebAb1,
+      b2: b2 ? { decision: b2.verdict.decision, state: b2.classification.state, ocr_state: b2.ocr_state, chars: b2.chars, hebrew_share: b2.hebrew_share, duplication: b2.duplication, numeric_ratio: b2.numeric_ratio, table_count: b2.table_count, table_source: b2.table_source, reason_codes: b2.verdict.reason_codes } : null,
+    });
 
     const record = {
       publication_item_id: w.publication_item_id, page_number: w.page_number,
       pdf_page_index: w.page_number, physical_page_alignment: physical_ok,
-      // raw is NEVER overwritten — this is a separate machine-derived layer:
-      layer: "structured_reading_order",
-      route: decision.route, engine: decision.engine, engine_version: decision.engine_version,
+      layer: "structured_reading_order",  // raw is NEVER overwritten — separate machine-derived layer
+      route: decision.route, engine: decision.route === "B2" ? (b2Live ? "google-docai" : "cloud-ocr:pending") : decision.engine,
+      engine_version: decision.engine_version, processor_id: decision.route === "B2" && b2Live ? OCR_CFG.processor : undefined,
       order_version: decision.route === "B1" ? orderVersion : (decision.route === "A" ? "layout-2" : B2_PROVIDER),
       route_reason: decision.route_reason, confidence: decision.confidence,
-      machine_derived: true, needs_review: decision.needs_review, published: 0,
-      router_version: ROUTER_VERSION,
-      provenance: { publication_item_id: w.publication_item_id, page_number: w.page_number, source: "object_storage_pdf", machine_derived: true },
-      reading_order_text: extracted, // for B2 this is filled by the cloud OCR step
+      machine_derived: true, needs_review: needsReview, published: 0, router_version: ROUTER_VERSION,
+      provenance: { publication_item_id: w.publication_item_id, page_number: w.page_number, source_url: (w as { source_url?: string }).source_url, source: "object_storage_pdf", machine_derived: true },
+      reading_order_text: decision.route === "B2" ? (b2?.text ?? "") : extracted,
+      b2: decision.route === "B2" ? { ocr_state: b2?.ocr_state, chars: b2?.chars, hebrew_share: b2?.hebrew_share, duplication: b2?.duplication, table_count: b2?.table_count, table_source: b2?.table_source, decision: b2?.verdict.decision, reason_codes: b2?.verdict.reason_codes, tables: b2?.tables } : undefined,
     };
     writeFileSync(`${OUT}/${w.publication_item_id}_p${w.page_number}.extraction.json`, JSON.stringify(record, null, 2));
   }
-  // raw is never written by this tool, by construction.
-  const processed = tally.A + tally.B1 + tally.B2;
-  const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
-  const pct = (x: number | null) => x == null ? null : +(x * 100).toFixed(2);
-  const metrics = {
-    kind: "HYBRID-REPROCESS-METRICS (dry-run, proxy — NOT human accuracy)",
-    publications: pubs.size, pages_processed: processed,
-    routing: { path_A_pct: pct(tally.A / Math.max(1, processed)), path_B1_pct: pct(tally.B1 / Math.max(1, processed)), path_B2_pct: pct(tally.B2 / Math.max(1, processed)) },
-    needs_review: tally.needs_review, needs_review_pct: pct(tally.needs_review / Math.max(1, processed)),
-    unresolved: 0, // a B1 page that can't be resolved is routed to needs_review (quarantined), never left silently unresolved
-    physical_page_alignment_pct: pct(physicalOk / Math.max(1, processed)),
-    provenance_coverage_pct: pct(provenanceOk / Math.max(1, processed)),
-    glyph_loss_proxy_pct_A_B1: pct(mean(lossAB1)), duplication_pct_A_B1: pct(mean(dupAB1)), hebrew_share_pct: pct(mean(hebAll)),
-    extraction_failures: extractionFailures,
-    raw_overwritten: rawTouched > 0, // always false — this tool never writes raw
-    published: 0,
-  };
+
+  const metrics = computeReprocessMetrics(records, pubs.size);
   writeFileSync(`${OUT}/_reprocess-metrics.json`, JSON.stringify(metrics, null, 2));
   process.stdout.write(
-    `DRY-RUN hybrid reprocess — ${pubs.size} publications, ${processed} pages (staging → ${OUT}/)\n` +
-    `Path A ${metrics.routing.path_A_pct}% · B1 ${metrics.routing.path_B1_pct}% · B2 ${metrics.routing.path_B2_pct}% · needs_review ${tally.needs_review} (${metrics.needs_review_pct}%)\n` +
-    `physical-page alignment ${metrics.physical_page_alignment_pct}% · provenance ${metrics.provenance_coverage_pct}% · glyph-loss(A+B1) ${metrics.glyph_loss_proxy_pct_A_B1}% · dup ${metrics.duplication_pct_A_B1}% · heb ${metrics.hebrew_share_pct}% · failures ${extractionFailures}\n` +
-    `raw untouched (this tool never writes raw) · published=0 · from Object-Storage PDFs.\n` +
+    `DRY-RUN hybrid reprocess — ${metrics.publications_completed}/${metrics.publications_attempted} publications, ${metrics.total_pages} pages (staging → ${OUT}/)\n` +
+    `Path A ${metrics.path_A_pct}% · B1 ${metrics.path_B1_pct}% · B2 ${metrics.path_B2_pct}% · accepted ${metrics.accepted_pages} · needs_review ${metrics.needs_review_pages} · ocr_fail ${metrics.ocr_failures}\n` +
+    `tables ${metrics.table_pages} (geom ${metrics.geometry_table_pages}, native ${metrics.native_table_pages}; accepted ${metrics.table_pages_accepted}, review ${metrics.table_pages_needs_review}) · sparse ${metrics.sparse_pages} · blank ${metrics.likely_blank_pages}\n` +
+    `physical-align ${metrics.physical_page_alignment_pct}% · provenance ${metrics.provenance_complete_pct}% · raw_overwrite ${metrics.raw_overwrite_count} · published ${metrics.published_count} · dup ${metrics.duplicate_extractions} · google_calls ${metrics.google_b2_call_count}\n` +
+    `failure_classes: ${metrics.newly_discovered_failure_classes.join(", ") || "none"} · from Object-Storage PDFs.\n` +
     `metrics → ${OUT}/_reprocess-metrics.json\n`,
   );
 }
