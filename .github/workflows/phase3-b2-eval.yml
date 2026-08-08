@@ -22,7 +22,7 @@ on:
       run_azure:
         description: 'Include Azure Document Intelligence (needs AZURE_DI_* secrets)'
         type: boolean
-        default: true
+        default: false   # OFF by default — Azure is OPTIONAL_BENCHMARK; leaving it on made runs fail with no Azure creds
       run_google:
         description: 'Include Google Document AI (needs the WIF binding)'
         type: boolean
