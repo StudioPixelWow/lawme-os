@@ -46,13 +46,36 @@ extractor output (to avoid circularity). Each `ground-truth/<id>.json`:
 }
 ```
 
-## Workflow (Phase 1)
+## Workflow (Phase 1) — local annotation workspace
 
-1. For each manifest entry, open `source_url` at `page_number` in the official PDF.
-2. Transcribe the correct reading order and fill `ground-truth/<id>.json` per the schema.
-3. A second reviewer verifies each annotation (`reviewed_by`).
-4. Freeze: run `freeze-benchmark.ts` → writes `FROZEN-v1.json` (sha-256 of the
-   manifest + every ground-truth file). After freeze, the set is immutable.
+```
+# 1. PREPARE (operator, networked): pull each page's PDF from Object Storage and
+#    generate a layout-2 DRAFT per page (accelerator only, marked _draft:true).
+node --experimental-strip-types benchmark/knesset-layout/prepare-annotation.ts
+
+# 2. ANNOTATE (operator, local): open the workspace in a browser.
+node --experimental-strip-types benchmark/knesset-layout/annotate-server.ts
+#    → http://localhost:8787  — PDF page beside the editable draft.
+
+# 3. FREEZE (only when 108/108 are second-reviewed & APPROVED/UNRESOLVED):
+node --experimental-strip-types benchmark/knesset-layout/freeze-benchmark.ts --freeze --stamp 2026-08-08
+```
+
+In the workspace each page shows the **official PDF at the exact page** next to a
+**clearly-marked DRAFT** (from `layout-2` only — never a candidate OCR/layout
+engine). The annotator edits the reading-order text, marks body / caption / table
+/ header-footer regions, confirms section boundaries, page/citation alignment and
+the stratum, records Hebrew/glyph issues, and sets a state:
+`APPROVED` / `NEEDS_CORRECTION` / `UNRESOLVED`. Everything is editable; the draft
+is never accepted automatically. Saves are incremental (per edit, atomic) to
+`ground-truth/<id>.json`. A second reviewer sets `reviewed_by`. A progress
+dashboard shows counts per stratum; keyboard shortcuts (J/K nav, A/N/U state,
+Ctrl+S save, R reset-to-draft) keep review fast.
+
+Freeze validates every required field and requires **108/108 second-reviewed**
+(state APPROVED or UNRESOLVED — `NEEDS_CORRECTION`/pending blocks freeze), then
+writes the immutable `FROZEN-v1.json` (sha-256 of the manifest + every ground
+truth). After freeze the set is immutable; changes require a new version.
 
 ## Evaluation protocol (Phase 2 — only after freeze)
 
