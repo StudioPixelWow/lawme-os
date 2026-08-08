@@ -1,0 +1,153 @@
+{
+  "kind": "ROUTER-REGRESSION (engineering, proxy metrics — NOT human accuracy)",
+  "router_version": "hybrid-router-1",
+  "route_config": {
+    "hebrew_min": 0.6,
+    "b2_provider": "pending"
+  },
+  "overall": {
+    "pages": 108,
+    "pct_path_A": 86.11,
+    "pct_path_B1_layout_only": 4.63,
+    "pct_path_B2_ocr": 9.26,
+    "unresolved_pct": 0,
+    "needs_review_pct": 9.26,
+    "glyph_loss_proxy_pct_A_B1": 0.03,
+    "duplication_pct_A_B1": 0,
+    "hebrew_share_pct": 99.4,
+    "citation_alignment_pct": 66.67
+  },
+  "by_stratum": {
+    "budget_table": {
+      "pages": 4,
+      "pct_path_A": 100,
+      "pct_path_B1_layout_only": 0,
+      "pct_path_B2_ocr": 0,
+      "unresolved_pct": 0,
+      "needs_review_pct": 0,
+      "glyph_loss_proxy_pct_A_B1": 0.09,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 100,
+      "citation_alignment_pct": 75
+    },
+    "classic_marginal_caption": {
+      "pages": 19,
+      "pct_path_A": 89.47,
+      "pct_path_B1_layout_only": 0,
+      "pct_path_B2_ocr": 10.53,
+      "unresolved_pct": 0,
+      "needs_review_pct": 10.53,
+      "glyph_loss_proxy_pct_A_B1": 0,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 100,
+      "citation_alignment_pct": 57.89
+    },
+    "complex_modern": {
+      "pages": 21,
+      "pct_path_A": 85.71,
+      "pct_path_B1_layout_only": 4.76,
+      "pct_path_B2_ocr": 9.52,
+      "unresolved_pct": 0,
+      "needs_review_pct": 9.52,
+      "glyph_loss_proxy_pct_A_B1": 0.11,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 97.7,
+      "citation_alignment_pct": 76.19
+    },
+    "doubled_text_layer": {
+      "pages": 1,
+      "pct_path_A": 100,
+      "pct_path_B1_layout_only": 0,
+      "pct_path_B2_ocr": 0,
+      "unresolved_pct": 0,
+      "needs_review_pct": 0,
+      "glyph_loss_proxy_pct_A_B1": 0,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 100,
+      "citation_alignment_pct": 100
+    },
+    "front_or_index": {
+      "pages": 25,
+      "pct_path_A": 88,
+      "pct_path_B1_layout_only": 12,
+      "pct_path_B2_ocr": 0,
+      "unresolved_pct": 0,
+      "needs_review_pct": 0,
+      "glyph_loss_proxy_pct_A_B1": 0,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 99.95,
+      "citation_alignment_pct": 88
+    },
+    "image_partial": {
+      "pages": 9,
+      "pct_path_A": 33.33,
+      "pct_path_B1_layout_only": 0,
+      "pct_path_B2_ocr": 66.67,
+      "unresolved_pct": 0,
+      "needs_review_pct": 66.67,
+      "glyph_loss_proxy_pct_A_B1": 0,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 100,
+      "citation_alignment_pct": 33.33
+    },
+    "modern_two_column": {
+      "pages": 6,
+      "pct_path_A": 83.33,
+      "pct_path_B1_layout_only": 16.67,
+      "pct_path_B2_ocr": 0,
+      "unresolved_pct": 0,
+      "needs_review_pct": 0,
+      "glyph_loss_proxy_pct_A_B1": 0.03,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 99.95,
+      "citation_alignment_pct": 83.33
+    },
+    "old_font": {
+      "pages": 23,
+      "pct_path_A": 100,
+      "pct_path_B1_layout_only": 0,
+      "pct_path_B2_ocr": 0,
+      "unresolved_pct": 0,
+      "needs_review_pct": 0,
+      "glyph_loss_proxy_pct_A_B1": 0,
+      "duplication_pct_A_B1": 0,
+      "hebrew_share_pct": 99.45,
+      "citation_alignment_pct": 47.83
+    }
+  },
+  "b1_pages": [
+    {
+      "id": "bench-044",
+      "resolved": true
+    },
+    {
+      "id": "bench-058",
+      "resolved": true
+    },
+    {
+      "id": "bench-068",
+      "resolved": true
+    },
+    {
+      "id": "bench-073",
+      "resolved": true
+    },
+    {
+      "id": "bench-088",
+      "resolved": true
+    }
+  ],
+  "b2_pages": [
+    "bench-022",
+    "bench-023",
+    "bench-060",
+    "bench-061",
+    "bench-101",
+    "bench-102",
+    "bench-104",
+    "bench-105",
+    "bench-107",
+    "bench-108"
+  ],
+  "note": "Path A = layout-2 (unchanged → no regression on clean classes). Path B1 = layout-order-v3 re-orders the SAME glyphs (glyph-loss stays ~0). Path B2 = cloud OCR PENDING operator run; tesseract shown as placeholder only. published=0."
+}

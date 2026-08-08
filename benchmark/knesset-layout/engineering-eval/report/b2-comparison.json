@@ -1,0 +1,47 @@
+{
+  "kind": "B2-RESIDUAL-COMPARISON (engineering / proxy — not human accuracy)",
+  "residual_pages": [
+    "bench-022",
+    "bench-023",
+    "bench-101",
+    "bench-102",
+    "bench-104",
+    "bench-105",
+    "bench-107",
+    "bench-108",
+    "bench-060",
+    "bench-061"
+  ],
+  "providers_present": [
+    "layout-2",
+    "tesseract-heb"
+  ],
+  "per_provider": [
+    {
+      "provider": "layout-2",
+      "pages": 10,
+      "hebrew_share": 0,
+      "duplication": 10.79,
+      "section_markers": 0.5,
+      "folio_rate": 20,
+      "mean_latency_ms": null,
+      "cost_per_1k": -1,
+      "produced_text_rate": 20
+    },
+    {
+      "provider": "tesseract-heb",
+      "pages": 10,
+      "hebrew_share": 70,
+      "duplication": 9.63,
+      "section_markers": 3.3,
+      "folio_rate": 20,
+      "mean_latency_ms": null,
+      "cost_per_1k": 0,
+      "produced_text_rate": 70
+    }
+  ],
+  "cross_provider_reading_order_agreement_pct": {},
+  "cost_note": "cost_per_1k is published list pricing, not a quote; override with COST_JSON.",
+  "recommended_b2_provider": "PENDING — need ≥2 cloud providers run on the residual set. Present: layout-2, tesseract-heb. Tesseract is fallback-only and excluded from selection. Run eng-azure.ts and eng-google.ts on operator infra (B2_IDS=bench-022,bench-023,bench-101,bench-102,bench-104,bench-105,bench-107,bench-108,bench-060,bench-061), then re-run this.",
+  "published": 0
+}

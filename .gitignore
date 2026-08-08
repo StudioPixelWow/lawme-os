@@ -63,3 +63,6 @@ supabase/.branches/
 # LEGAL AI ISRAEL pilot outputs (runtime corpus artifacts, not source)
 pilot-out/
 pilot-live/
+
+# hybrid reprocess dry-run staging (regenerable)
+tools/legal-ingest/.staging-hybrid/
