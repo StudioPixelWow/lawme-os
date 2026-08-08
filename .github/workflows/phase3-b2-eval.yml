@@ -16,7 +16,15 @@ on:
         required: true
         default: ''
       run_b2_eval:
-        description: 'Run Azure + Google + compare on the 10 residual pages'
+        description: 'Run the B2 residual eval (fetch + providers + compare)'
+        type: boolean
+        default: true
+      run_azure:
+        description: 'Include Azure Document Intelligence (needs AZURE_DI_* secrets)'
+        type: boolean
+        default: true
+      run_google:
+        description: 'Include Google Document AI (needs the WIF binding)'
         type: boolean
         default: true
       run_reprocess:
@@ -74,7 +82,7 @@ jobs:
           npm i --no-save @google-cloud/documentai   # cloud adapter dep (CI-only)
 
       - name: Authenticate to Google Cloud (OIDC / Workload Identity — keyless)
-        if: ${{ github.event.inputs.run_b2_eval == 'true' }}
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -87,11 +95,11 @@ jobs:
         run: node --experimental-strip-types tools/legal-ingest/fetch-cohort-from-storage.ts
 
       - name: B2 — Azure Document Intelligence (10 pages)
-        if: ${{ github.event.inputs.run_b2_eval == 'true' }}
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_azure == 'true' }}
         run: PDFS_DIR=benchmark/knesset-layout/pdfs node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-azure.ts
 
       - name: B2 — Google Document AI (10 pages)
-        if: ${{ github.event.inputs.run_b2_eval == 'true' }}
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
         run: PDFS_DIR=benchmark/knesset-layout/pdfs node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-google.ts
 
       - name: B2 — compare + select provider
