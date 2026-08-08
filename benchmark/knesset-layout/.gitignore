@@ -5,3 +5,5 @@ drafts/
 checkpoints/
 # Human ground truth IS committed (the benchmark's value): ground-truth/*.json
 # Append-only per-page audit trail IS committed: ground-truth/history/*.jsonl
+# Deterministic workload triage report (regenerable): triage/
+triage/
