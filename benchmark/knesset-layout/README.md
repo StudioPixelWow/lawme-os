@@ -46,20 +46,45 @@ extractor output (to avoid circularity). Each `ground-truth/<id>.json`:
 }
 ```
 
-## Workflow (Phase 1) — local annotation workspace
+## Workflow (Phase 1) — local annotation workspace v2
+
+Full operating manuals live in `docs/benchmark/`:
+`ANNOTATION_WORKFLOW.md`, `REVIEWER_GUIDE.md`, `FREEZE_PROTOCOL.md`,
+`ANNOTATION_INDEPENDENCE.md`. The short version:
 
 ```
 # 1. PREPARE (operator, networked): pull each page's PDF from Object Storage and
 #    generate a layout-2 DRAFT per page (accelerator only, marked _draft:true).
 node --experimental-strip-types benchmark/knesset-layout/prepare-annotation.ts
 
-# 2. ANNOTATE (operator, local): open the workspace in a browser.
+# 2. ANNOTATE + REVIEW (operator, local): open the workspace in a browser.
 node --experimental-strip-types benchmark/knesset-layout/annotate-server.ts
-#    → http://localhost:8787  — PDF page beside the editable draft.
+#    → http://localhost:8787  — PDF page beside the editable draft; live dashboard,
+#      required-field validation, second-reviewer mode (R), disagreement workflow,
+#      append-only history, queues, keyboard-first review, atomic autosave.
 
-# 3. FREEZE (only when 108/108 are second-reviewed & APPROVED/UNRESOLVED):
+# 3. CHECKPOINT (any time): safety backup of progress (hashes + counts). NOT a freeze.
+node --experimental-strip-types benchmark/knesset-layout/checkpoint-annotations.ts --stamp 2026-08-08T1030
+
+# 4. PRE-FLIGHT: is the set ready to freeze? Reports remaining reasons; writes nothing.
+node --experimental-strip-types benchmark/knesset-layout/preflight-freeze.ts
+
+# 5. FREEZE (only when pre-flight says READY — 108/108 final + second-reviewed):
 node --experimental-strip-types benchmark/knesset-layout/freeze-benchmark.ts --freeze --stamp 2026-08-08
 ```
+
+The page lifecycle, required fields, freeze gate, dashboard counts, and conflict
+rules are all defined once in `annotation-core.ts` and shared by the server,
+checkpoint, pre-flight, and freeze, so they can never disagree. Editing a
+reviewed page automatically invalidates its review (no silent stale approvals),
+and the freeze gate rejects any page whose reviewer equals its annotator.
+Deterministic tests: `__tests__/annotation-workflow.test.ts`
+(`node --experimental-strip-types --test benchmark/knesset-layout/__tests__/annotation-workflow.test.ts`).
+
+Keyboard: `J/K` nav · `Shift+J/K` next/prev awaiting review · `A` ready/approve ·
+`N` needs-correction/return · `U` unresolved · `R` review mode · `S` save ·
+`Ctrl/Cmd+Enter` save & next · `G` go to page · `F` fit page/width · `D` diff ·
+`1–9` pick stratum.
 
 In the workspace each page shows the **official PDF at the exact page** next to a
 **clearly-marked DRAFT** (from `layout-2` only — never a candidate OCR/layout

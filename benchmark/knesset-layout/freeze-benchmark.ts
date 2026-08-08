@@ -1,23 +1,29 @@
 /**
  * LAW ME layout benchmark — scaffold + freeze tool.
  *
- *   node --experimental-strip-types benchmark/knesset-layout/freeze-benchmark.ts --scaffold
- *     Creates one empty ground-truth/<id>.json per manifest entry (for the human
- *     annotator to fill). Never overwrites an existing (filled) file.
+ *   freeze-benchmark.ts --scaffold
+ *     Creates one empty ground-truth/<id>.json per manifest entry (annotator
+ *     fills it). Never overwrites an existing (filled) file.
  *
- *   node --experimental-strip-types benchmark/knesset-layout/freeze-benchmark.ts --freeze --stamp <ISO-DATE>
- *     Verifies every ground-truth file is present and non-empty, then writes the
- *     immutable FROZEN-v1.json = sha-256 of the manifest + each ground-truth file.
- *     After freeze, the benchmark must not change; new pages go into a new version.
+ *   freeze-benchmark.ts --freeze --stamp <ISO-DATE>
+ *     Verifies EVERY page is freeze-eligible via the shared annotation-core gate
+ *     (final state, second-reviewed by a distinct person, no conflicts, fully
+ *     valid), then writes the immutable FROZEN-v1.json (sha-256 of the manifest
+ *     + each ground-truth file, counts, per-stratum, reviewer stats).
+ *
+ * Freeze strictness is defined ONCE, in annotation-core.freezeIssues(). This
+ * file never relaxes it. BENCH_DIR overrides the benchmark directory for
+ * isolated tests only; production uses the default path.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
-import { createHash } from "node:crypto";
+import {
+  sha, loadManifest, loadGroundTruth, freezeIssues, FINAL_STATES,
+  effectiveStratum, type ManifestEntry, type GroundTruth,
+} from "./annotation-core.ts";
 
-const DIR = "benchmark/knesset-layout";
+const DIR = process.env.BENCH_DIR ?? "benchmark/knesset-layout";
 const GT = `${DIR}/ground-truth`;
-const manifest = JSON.parse(readFileSync(`${DIR}/manifest-v1.json`, "utf8")) as { entries: { id: string; stratum_tentative: string; publication_item_id: string; page_number: number; source_url: string }[] };
-
-const sha = (s: string) => createHash("sha256").update(s).digest("hex");
+const manifest = loadManifest(DIR);
 const mode = process.argv.includes("--freeze") ? "freeze" : process.argv.includes("--scaffold") ? "scaffold" : "help";
 
 if (mode === "scaffold") {
@@ -26,10 +32,11 @@ if (mode === "scaffold") {
   for (const e of manifest.entries) {
     const path = `${GT}/${e.id}.json`;
     if (existsSync(path)) continue;
-    const tpl = {
+    const tpl: GroundTruth = {
       id: e.id,
-      _source_pdf: e.source_url,
-      _page_number: e.page_number,
+      source_document_id: e.publication_item_id,
+      source_page_number: e.page_number,
+      stratum_manifest: e.stratum_tentative,
       confirmed_stratum: "",
       reading_order_text: "",
       regions: [],
@@ -37,7 +44,12 @@ if (mode === "scaffold") {
       section_boundaries: [],
       page_alignment: { printed_page_label: "", gazette_page: "" },
       hebrew_fidelity_notes: "",
-      annotator: "", reviewed_by: "", confidence: "",
+      unresolved_reason: "",
+      state: "UNSTARTED",
+      annotator: "", annotated_at: "",
+      reviewed_by: "", reviewed_at: "", review_note: "",
+      conflict: null,
+      revision: 0,
     };
     writeFileSync(path, JSON.stringify(tpl, null, 2));
     created += 1;
@@ -46,37 +58,57 @@ if (mode === "scaffold") {
 } else if (mode === "freeze") {
   const stamp = process.argv[process.argv.indexOf("--stamp") + 1] ?? "";
   if (!stamp || stamp.startsWith("--")) { process.stderr.write("freeze requires --stamp <ISO-DATE>\n"); process.exit(2); }
-  const missing: string[] = [];
+
+  const blocking: string[] = [];
   const hashes: Record<string, string> = {};
   const byStratum: Record<string, { total: number; approved: number; unresolved: number }> = {};
-  for (const e of manifest.entries) {
-    const path = `${GT}/${e.id}.json`;
-    if (!existsSync(path)) { missing.push(`${e.id} (no file)`); continue; }
-    const gt = JSON.parse(readFileSync(path, "utf8"));
-    const okState = gt.state === "APPROVED" || gt.state === "UNRESOLVED"; // NEEDS_CORRECTION/blank block freeze
-    // UNRESOLVED needs no transcription (genuinely undeterminable ground truth); APPROVED does.
-    const okText = gt.state === "UNRESOLVED" || (typeof gt.reading_order_text === "string" && gt.reading_order_text.length > 0);
-    if (!gt.confirmed_stratum || !String(gt.reviewed_by ?? "").trim() || !okState || !okText) { missing.push(`${e.id} (state=${gt.state ?? "none"} reviewed=${!!String(gt.reviewed_by ?? "").trim()})`); continue; }
-    const s = gt.confirmed_stratum as string;
+  const reviewers = new Map<string, number>();
+  let approved = 0, unresolved = 0;
+
+  for (const e of manifest.entries as ManifestEntry[]) {
+    const gt = loadGroundTruth(DIR, e.id);
+    const issues = freezeIssues(gt, e);
+    if (issues.length) { blocking.push(...issues); continue; }
+    const g = gt as GroundTruth;
+    const s = effectiveStratum(g, e);
     byStratum[s] = byStratum[s] ?? { total: 0, approved: 0, unresolved: 0 };
-    byStratum[s].total += 1; if (gt.state === "APPROVED") byStratum[s].approved += 1; else byStratum[s].unresolved += 1;
-    hashes[e.id] = sha(JSON.stringify(gt));
+    byStratum[s].total += 1;
+    if (g.state === "APPROVED") { byStratum[s].approved += 1; approved += 1; }
+    else { byStratum[s].unresolved += 1; unresolved += 1; }
+    const rev = String(g.reviewed_by ?? "").trim();
+    reviewers.set(rev, (reviewers.get(rev) ?? 0) + 1);
+    hashes[e.id] = sha(readFileSync(`${GT}/${e.id}.json`, "utf8"));
   }
-  if (missing.length) { process.stderr.write(`CANNOT FREEZE — ${missing.length}/${manifest.entries.length} not yet reviewed/approved:\n${missing.slice(0, 40).join("\n")}${missing.length > 40 ? "\n…" : ""}\n`); process.exit(1); }
+
+  if (blocking.length) {
+    process.stderr.write(`CANNOT FREEZE — ${blocking.length} blocking issue(s) across ${manifest.entries.length} pages:\n${blocking.slice(0, 60).join("\n")}${blocking.length > 60 ? `\n… (+${blocking.length - 60} more)` : ""}\n`);
+    process.exit(1);
+  }
+
   const extra = readdirSync(GT).filter((f) => f.endsWith(".json") && !manifest.entries.some((e) => `${e.id}.json` === f));
   const frozen = {
     benchmark: "knesset-layout", version: "v1", frozen_at: stamp, status: "FROZEN — immutable",
     page_count: manifest.entries.length,
     reviewed: manifest.entries.length,
+    approved, unresolved,
     by_stratum: byStratum,
+    reviewers: Object.fromEntries([...reviewers.entries()].sort()),
+    final_states: FINAL_STATES,
     manifest_sha256: sha(readFileSync(`${DIR}/manifest-v1.json`, "utf8")),
     ground_truth_sha256: hashes,
     combined_sha256: sha(JSON.stringify(hashes)),
-    note: "Any change to a page or its ground truth requires a NEW version (v2), never editing v1.",
+    note: "Any change to a page or its ground truth requires a NEW version (v2), never editing v1. Scorer (score-benchmark.ts) may run only while this file exists.",
     extra_files_ignored: extra,
   };
   writeFileSync(`${DIR}/FROZEN-v1.json`, JSON.stringify(frozen, null, 2));
-  process.stdout.write(`FROZEN v1 — ${manifest.entries.length} pages, all reviewed.\ncombined_sha256: ${frozen.combined_sha256}\nby stratum: ${JSON.stringify(byStratum)}\nSTOP: do not run Phase 2 evaluation until this file is committed & approved.\n`);
+  process.stdout.write(
+    `FROZEN v1 — ${manifest.entries.length} pages, all second-reviewed.\n` +
+    `approved=${approved} unresolved=${unresolved}\n` +
+    `combined_sha256: ${frozen.combined_sha256}\n` +
+    `by stratum: ${JSON.stringify(byStratum)}\n` +
+    `reviewers: ${JSON.stringify(frozen.reviewers)}\n` +
+    `STOP: do not run Phase 2 evaluation until this file is committed & approved.\n`,
+  );
 } else {
   process.stdout.write("usage: --scaffold | --freeze --stamp <ISO-DATE>\n");
 }
