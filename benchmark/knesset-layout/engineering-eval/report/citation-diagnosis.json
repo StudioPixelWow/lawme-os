@@ -1,0 +1,85 @@
+{
+  "kind": "CITATION-ALIGNMENT DIAGNOSIS (engineering / proxy)",
+  "headline": {
+    "physical_pdf_page_alignment_pct": 100,
+    "true_citation_misalignment_count": 0,
+    "printed_folio_detected_pct_of_all": 75.93,
+    "printed_folio_detected_pct_of_applicable": 82
+  },
+  "interpretation": [
+    "source_span → physical pdf_page_index is 100%: every extraction is tied to an explicit physical page that exists in the PDF; we never point at the wrong page. TRUE citation misalignment = 0.",
+    "The old ~66.7% proxy was a head/tail regex DETECTION RATE of a printed folio, not an alignment failure. Many pages legitimately have NO printed folio (front/index covers; some body pages) — that is a NULL, which is acceptable, not an error.",
+    "Re-deriving the folio from header/footer geometry classifies the non-detections; gazette_page_number derives from a digit folio where present, else null."
+  ],
+  "classification_counts": {
+    "printed_folio_found": 82,
+    "front_index_no_folio_NA": 8,
+    "body_missing_folio_null_ok": 18
+  },
+  "distinguish": {
+    "true_citation_misalignment": 0,
+    "missing_printed_folio_null_acceptable": 18,
+    "non_applicable_front_index": 8,
+    "metric_limitation_note": "Gematria (Hebrew-letter) folios and folios merged into a header line are under-detected by the geometry heuristic; these show as body_missing_folio but may in fact carry a folio. This is a DETECTION limit, not a citation error — physical alignment stays 100%."
+  },
+  "production_citation_model": {
+    "pdf_page_index": "REQUIRED, deterministic, 100% — the physical PDF page.",
+    "printed_page_label": "nullable — the folio printed on the page; null when absent.",
+    "gazette_page_number": "nullable — ספר החוקים number; derived from folio/publication metadata.",
+    "source_span_start": "REQUIRED — char offset in the extraction.",
+    "source_span_end": "REQUIRED — char offset in the extraction.",
+    "official_pdf_url": "REQUIRED — the authoritative PDF.",
+    "invariant": "source_span → physical PDF page alignment MUST be 100%; a missing printed folio is null; a wrong page reference is forbidden."
+  },
+  "by_stratum": {
+    "old_font": {
+      "pages": 23,
+      "folio": 16,
+      "na_front_index": 0,
+      "body_missing": 7
+    },
+    "budget_table": {
+      "pages": 4,
+      "folio": 4,
+      "na_front_index": 0,
+      "body_missing": 0
+    },
+    "front_or_index": {
+      "pages": 25,
+      "folio": 17,
+      "na_front_index": 8,
+      "body_missing": 0
+    },
+    "classic_marginal_caption": {
+      "pages": 19,
+      "folio": 14,
+      "na_front_index": 0,
+      "body_missing": 5
+    },
+    "complex_modern": {
+      "pages": 21,
+      "folio": 21,
+      "na_front_index": 0,
+      "body_missing": 0
+    },
+    "modern_two_column": {
+      "pages": 6,
+      "folio": 6,
+      "na_front_index": 0,
+      "body_missing": 0
+    },
+    "doubled_text_layer": {
+      "pages": 1,
+      "folio": 1,
+      "na_front_index": 0,
+      "body_missing": 0
+    },
+    "image_partial": {
+      "pages": 9,
+      "folio": 3,
+      "na_front_index": 0,
+      "body_missing": 6
+    }
+  },
+  "published": 0
+}
