@@ -1,0 +1,138 @@
+name: Phase 3 — B2 eval + 50-pub hybrid reprocess (DEV, manual)
+
+# Manually-triggered, DEV-only. Runs ONLY the already-built Phase-3 gates:
+#   eng-azure.ts + eng-google.ts  → the 10 B2 residual pages
+#   eng-b2-compare.ts             → select the production B2 provider on evidence
+#   fetch-cohort-from-storage.ts  → pull a 50-publication cohort from Object Storage
+#   reprocess-hybrid.ts (dry-run) → routing + gate metrics (no DB write, published=0)
+# Credentials come exclusively from repo/environment SECRETS; nothing is echoed.
+# Uploads only evaluation/reprocess JSON artifacts. No architecture / extraction change.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEV to confirm this runs against the DEV project only'
+        required: true
+        default: ''
+      run_b2_eval:
+        description: 'Run the B2 residual eval (fetch + providers + compare)'
+        type: boolean
+        default: true
+      run_azure:
+        description: 'Include Azure Document Intelligence (needs AZURE_DI_* secrets)'
+        type: boolean
+        default: true
+      run_google:
+        description: 'Include Google Document AI (needs the WIF binding)'
+        type: boolean
+        default: true
+      run_reprocess:
+        description: 'Run the 50-publication hybrid reprocess (dry-run)'
+        type: boolean
+        default: true
+      cohort_size:
+        description: 'Number of publications for the reprocess cohort'
+        required: false
+        default: '50'
+
+concurrency:
+  group: phase3-b2-eval
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write   # required for keyless Google auth via OIDC / Workload Identity
+
+jobs:
+  phase3:
+    runs-on: ubuntu-latest
+    environment: dev            # bind to the DEV environment's protected secrets
+    env:
+      # Non-secret routing inputs
+      B2_IDS: bench-022,bench-023,bench-060,bench-061,bench-101,bench-102,bench-104,bench-105,bench-107,bench-108
+      # Non-secret GCP identifiers → repo/environment VARIABLES (not secrets).
+      GCP_PROJECT: ${{ vars.GCP_PROJECT }}
+      GCP_LOCATION: ${{ vars.GCP_LOCATION }}
+      GCP_DOCAI_PROCESSOR: ${{ vars.GCP_DOCAI_PROCESSOR }}
+      # Secrets (never printed). Configure in the repo/environment secret store.
+      AZURE_DI_ENDPOINT: ${{ secrets.AZURE_DI_ENDPOINT }}
+      AZURE_DI_KEY: ${{ secrets.AZURE_DI_KEY }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+    steps:
+      - name: Guard — DEV confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DEV" ]; then
+            echo "Refusing: type DEV in the 'confirm' input to run (DEV-only)."; exit 1; fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: System deps (poppler for raster/split, pdftk for single-page)
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils pdftk-java
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm i --no-save @google-cloud/documentai   # cloud adapter dep (CI-only)
+
+      - name: Authenticate to Google Cloud (OIDC / Workload Identity — keyless)
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+        # Exports short-lived ADC (GOOGLE_APPLICATION_CREDENTIALS) that the
+        # @google-cloud/documentai client picks up automatically. No stored key.
+
+      - name: B2 — fetch residual PDFs from Object Storage
+        if: ${{ github.event.inputs.run_b2_eval == 'true' }}
+        run: node --experimental-strip-types tools/legal-ingest/fetch-cohort-from-storage.ts
+
+      - name: B2 — Azure Document Intelligence (10 pages)
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_azure == 'true' }}
+        run: PDFS_DIR=benchmark/knesset-layout/pdfs node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-azure.ts
+
+      - name: B2 — Google Document AI (10 pages)
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
+        run: PDFS_DIR=benchmark/knesset-layout/pdfs node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-google.ts
+
+      - name: B2 — compare + select provider
+        if: ${{ github.event.inputs.run_b2_eval == 'true' }}
+        run: node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-b2-compare.ts
+
+      - name: Reprocess — fetch 50-publication cohort from Object Storage
+        if: ${{ github.event.inputs.run_reprocess == 'true' }}
+        env:
+          COHORT_SIZE: ${{ github.event.inputs.cohort_size }}
+          B2_IDS: ''   # unset ⇒ cohort mode
+        run: node --experimental-strip-types tools/legal-ingest/fetch-cohort-from-storage.ts
+
+      - name: Reprocess — hybrid dry-run over the cohort (routing + gate metrics)
+        if: ${{ github.event.inputs.run_reprocess == 'true' }}
+        run: |
+          PDFS_DIR=tools/legal-ingest/.cohort-pdfs \
+          WORKLIST=tools/legal-ingest/.cohort-worklist.json \
+          node --experimental-strip-types tools/legal-ingest/reprocess-hybrid.ts
+
+      - name: Collect JSON artifacts only (no PDFs, no secrets)
+        run: |
+          mkdir -p _artifacts/azure-di _artifacts/google-docai
+          E=benchmark/knesset-layout/engineering-eval
+          cp -f "$E/report/b2-comparison.json" _artifacts/ 2>/dev/null || true
+          cp -f "$E/outputs/azure-di/"*.json _artifacts/azure-di/ 2>/dev/null || true
+          cp -f "$E/outputs/google-docai/"*.json _artifacts/google-docai/ 2>/dev/null || true
+          cp -f tools/legal-ingest/.staging-hybrid/_reprocess-metrics.json _artifacts/ 2>/dev/null || true
+          echo "JSON artifacts:"; find _artifacts -type f -name '*.json' | sort
+
+      - name: Upload evaluation/reprocess JSON
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3-b2-eval-json
+          path: _artifacts/**/*.json
+          if-no-files-found: warn
