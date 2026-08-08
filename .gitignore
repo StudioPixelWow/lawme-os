@@ -66,3 +66,7 @@ pilot-live/
 
 # hybrid reprocess dry-run staging (regenerable)
 tools/legal-ingest/.staging-hybrid/
+
+# CI cohort fetch (regenerable, transient)
+tools/legal-ingest/.cohort-pdfs/
+tools/legal-ingest/.cohort-worklist.json
