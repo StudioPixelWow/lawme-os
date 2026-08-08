@@ -95,7 +95,7 @@ async function main(): Promise<void> {
   // Representative real pages captured for a committed regression fixture test.
   const fixtures: { label: string; pub: string; page: number; items: LayoutItem[] }[] = [];
   const conf = { "lt_0.34": 0, "0.34_0.6": 0, "0.6_0.8": 0, "0.8_1.0": 0 };
-  let pagesEval = 0, single = 0, twoCol = 0, fallback = 0, textLossPages = 0, falseRemovals = 0;
+  let pagesEval = 0, single = 0, twoCol = 0, twoBody = 0, unresolved = 0, fallback = 0, textLossPages = 0, falseRemovals = 0;
   let contamPages = 0, twoColContamDenom = 0, wellFormed = 0, secAgreeNum = 0, secAgreeDen = 0, captionsTotal = 0, docsEval = 0, pageNumberMargins = 0;
   const review: { kind: string; pub: string; page: number; url: string | null; columnType: string; captions: string[]; body: string }[] = [];
   const captionSample: { pub: string; page: number; caption: string }[] = [];
@@ -115,7 +115,10 @@ async function main(): Promise<void> {
       if (pagesEval >= TARGET_PAGES || perDoc >= MAX_PAGES_PER_DOC) break;
       const pg = doc.pages[p];
       pagesEval += 1; perDoc += 1;
-      if (pg.columnType === "two_column") twoCol += 1; else single += 1;
+      if (pg.columnType === "two_column") twoCol += 1;
+      else if (pg.columnType === "two_body_column") twoBody += 1;
+      else if (pg.columnType === "unresolved") unresolved += 1;
+      else single += 1;
       if (pg.fallbackUsed) fallback += 1;
 
       // Raw flat text for this page (all items, y↓ then x↓) for loss + section compare.
@@ -146,8 +149,8 @@ async function main(): Promise<void> {
 
       // Manual-review set with VARIETY: quotas per page kind so a human sees
       // two-column, single-column, and fallback (table/schedule) reconstructions.
-      const kind = pg.columnType === "two_column" ? "two_column" : pg.fallbackUsed ? "fallback" : "single";
-      const quota = kind === "two_column" ? 10 : 5;
+      const kind = pg.columnType; // single | two_column | two_body_column | unresolved | empty
+      const quota = kind === "two_column" ? 8 : kind === "unresolved" ? 8 : 5;
       if (review.filter((v) => v.kind === kind).length < quota) {
         review.push({ kind, pub: r.publication_item_id as string, page: p + 1, url: (r as { source_url?: string }).source_url ?? null, columnType: pg.columnType, captions: realCaps.map((c) => c.text), body: pg.bodyText.slice(0, 1600) });
       }
@@ -184,6 +187,8 @@ async function main(): Promise<void> {
     pages_evaluated: pagesEval,
     single_column_pages: single,
     two_column_pages: twoCol,
+    two_body_column_pages: twoBody,
+    unresolved_pages_flagged: unresolved,
     marginal_captions_detected: captionsTotal,
     page_number_margins_filtered: pageNumberMargins,
     marginal_caption_detection: "real captions (Hebrew) only; page-number/running-header margins counted separately. TRUE accuracy requires manual label of the sample (no silent ground truth)",

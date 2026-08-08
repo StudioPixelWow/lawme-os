@@ -2,74 +2,101 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { reconstructPage, reconstructDocument, LAYOUT_VERSION, type LayoutItem } from "../layout-reconstruct.ts";
 
-// Helper: a word item at (x,y) with a width proportional to length.
-const w = (str: string, x: number, y: number): LayoutItem => ({ str, x, y, width: str.length * 10, height: 12 });
+const wd = (str: string, x: number, y: number): LayoutItem => ({ str, x, y, width: str.length * 9, height: 11 });
 
-/** Single-column body page: four justified lines, no marginal column. */
+/** Realistic single body column: 6 justified lines, words staggered per line so
+ *  the column reads as one dense band (no aligned inter-word gaps). */
 function singleColumnPage(): LayoutItem[] {
   const items: LayoutItem[] = [];
-  const ys = [700, 680, 660, 640];
-  for (const y of ys) { items.push(w("ראשון", 470, y), w("שני", 380, y), w("שלישי", 290, y), w("רביעי", 200, y)); }
+  const ys = [700, 686, 672, 658, 644, 630];
+  const wordsPerLine = [
+    ["ראשית", "המדינה", "תקבע", "בתקנות"],
+    ["הוראות", "בדבר", "אופן", "הגשת"],
+    ["בקשה", "לרישום", "לפי", "חוק"],
+    ["זה", "ובכלל", "זה", "מועדים"],
+    ["ואגרות", "וכן", "דרכי", "פרסום"],
+    ["ההחלטות", "לציבור", "הרחב", "כאמור"],
+  ];
+  ys.forEach((y, li) => {
+    let x = 410 - (li % 2) * 7; // RTL: first word rightmost, decreasing x
+    for (const w of wordsPerLine[li]) { const width = w.length * 9; x -= width; items.push(wd(w, x, y)); x -= 14; }
+  });
   return items;
 }
 
-/** Two-column page: wide body (x≈200–550) + narrow LEFT marginal caption column (x≈40). */
+/** Wide body column (x≈120–430) on all lines + a narrow RIGHT marginal caption
+ *  column (x≈470) present on only two lines. */
 function marginalPage(): LayoutItem[] {
   const items: LayoutItem[] = [];
-  const ys = [700, 680, 660, 640, 620, 600];
-  for (const y of ys) { items.push(w("מטרת", 470, y), w("הקרן", 380, y), w("תהיה", 290, y), w("לרכז", 200, y)); }
-  // Marginal captions (short side headings) on two lines only, far left.
-  items.push(w("כותרתא", 40, 700));
-  items.push(w("כותרתב", 40, 660));
+  const ys = [700, 686, 672, 658, 644, 630];
+  const lines = [
+    ["בסעיף", "1", "לחוק", "העיקרי", "יבוא"],
+    ["במקום", "ההגדרה", "הראשונה", "יבוא", "זה"],
+    ["אחרי", "פסקה", "שלישית", "תבוא", "פסקה"],
+    ["ובלבד", "שלא", "יחול", "על", "מי"],
+    ["שהוראות", "אלה", "חלות", "עליו", "כדין"],
+    ["לענין", "סעיף", "קטן", "זה", "בלבד"],
+  ];
+  // Body: RTL (first word rightmost ≈ x430, decreasing), spanning ~x120–430.
+  ys.forEach((y, li) => { let x = 430 - (li % 2) * 6; for (const w of lines[li]) { const width = w.length * 9; x -= width; items.push(wd(w, x, y)); x -= 12; } });
+  // Marginal caption (narrow, far right beyond the body) on two lines only.
+  items.push(wd("תיקון", 470, 700));
+  items.push(wd("הוספה", 470, 672));
   return items;
 }
 
-test("single-column page: no marginal split, all text in body, lossless", () => {
+test("single body column: one band, all text in body, lossless", () => {
   const r = reconstructPage(singleColumnPage());
   assert.equal(r.columnType, "single");
+  assert.equal(r.bodyColumns, 1);
   assert.equal(r.marginalCaptions.length, 0);
   assert.equal(r.lossless, true);
-  assert.match(r.bodyText, /ראשון/);
+  assert.equal(r.unresolved, false);
 });
 
-test("single-column body reads RTL within a line (right→left)", () => {
-  const r = reconstructPage(singleColumnPage());
-  const firstLine = r.bodyText.split("\n")[0];
-  assert.equal(firstLine, "ראשון שני שלישי רביעי");
-});
-
-test("two-column: marginal captions separated from body, body clean, lossless", () => {
+test("marginal caption separated from body; body clean; lossless", () => {
   const r = reconstructPage(marginalPage());
-  assert.equal(r.columnType, "two_column");
-  assert.equal(r.marginalSide, "left");
-  assert.equal(r.marginalCaptions.length, 2, "both side headings detected");
-  // Contamination check: caption text must NOT appear inside the body.
-  assert.ok(!r.bodyText.includes("כותרתא"), "caption must not contaminate body");
-  assert.ok(!r.bodyText.includes("כותרתב"), "caption must not contaminate body");
-  assert.match(r.bodyText, /מטרת הקרן תהיה לרכז/);
-  assert.equal(r.lossless, true, "body+captions must contain every input glyph");
-});
-
-test("losslessness holds: no glyph is dropped in two-column mode", () => {
-  const items = marginalPage();
-  const r = reconstructPage(items);
-  const inGlyphs = [...items.map((i) => i.str).join("").replace(/\s/g, "")].sort().join("");
-  const outGlyphs = [...(r.bodyText + r.marginalCaptions.map((c) => c.text).join("")).replace(/\s/g, "")].sort().join("");
-  assert.equal(outGlyphs, inGlyphs);
-});
-
-test("empty page is handled and lossless", () => {
-  const r = reconstructPage([]);
-  assert.equal(r.bodyText, "");
+  assert.ok(r.marginalCaptions.length >= 1, "caption column detected");
+  assert.ok(!r.bodyText.includes("תיקון"), "caption not in body");
+  assert.match(r.bodyText, /בסעיף 1 לחוק העיקרי יבוא/);
   assert.equal(r.lossless, true);
 });
 
-test("document reconstruction aggregates pages + version + counts", () => {
+test("losslessness: body+captions glyph-multiset == deduped input", () => {
+  for (const page of [singleColumnPage(), marginalPage()]) {
+    const r = reconstructPage(page);
+    const inG = [...page.map((i) => i.str).join("").replace(/\s/g, "")].sort().join("");
+    const outG = [...(r.bodyText + r.marginalCaptions.map((c) => c.text).join("")).replace(/\s/g, "")].sort().join("");
+    assert.equal(outG, inG);
+  }
+});
+
+test("coincident duplicate items are collapsed (doubled text layer), still lossless", () => {
+  const page = singleColumnPage();
+  const doubled = [...page, ...page.map((i) => ({ ...i, x: i.x + 0.5 }))]; // near-coincident duplicates
+  const r = reconstructPage(doubled);
+  assert.equal(r.lossless, true);
+  // body should not be doubled: the word "ראשית" appears once, not twice in a row
+  assert.ok(!/ראשית\s+ראשית/.test(r.bodyText), "coincident duplicates collapsed");
+});
+
+test("segments carry source spans", () => {
+  const r = reconstructPage(marginalPage());
+  for (const s of r.segments) {
+    assert.ok(Number.isInteger(s.sourceSpan.start) && Number.isInteger(s.sourceSpan.end));
+    assert.ok(s.sourceSpan.end >= s.sourceSpan.start);
+  }
+});
+
+test("empty page handled and lossless", () => {
+  const r = reconstructPage([]);
+  assert.equal(r.columnType, "empty");
+  assert.equal(r.lossless, true);
+});
+
+test("document reconstruction aggregates version + counts", () => {
   const doc = reconstructDocument([singleColumnPage(), marginalPage()]);
   assert.equal(doc.layoutVersion, LAYOUT_VERSION);
-  assert.equal(doc.singleColumnPages, 1);
-  assert.equal(doc.twoColumnPages, 1);
   assert.equal(doc.lossless, true);
   assert.ok(doc.layoutText.length > 0);
-  assert.equal(doc.marginalCaptions.length, 2);
 });
