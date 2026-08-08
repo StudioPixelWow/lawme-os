@@ -102,9 +102,13 @@ jobs:
         if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
         run: PDFS_DIR=benchmark/knesset-layout/pdfs node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-google.ts
 
-      - name: B2 — compare + select provider
+      - name: B2 — compare + provider decision (Azure optional)
         if: ${{ github.event.inputs.run_b2_eval == 'true' }}
         run: node --experimental-strip-types benchmark/knesset-layout/engineering-eval/eng-b2-compare.ts
+
+      - name: B2 — retest cohort + table verification (§13/§14)
+        if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
+        run: node --experimental-strip-types benchmark/knesset-layout/engineering-eval/b2-retest.ts
 
       - name: Reprocess — fetch 50-publication cohort from Object Storage
         if: ${{ github.event.inputs.run_reprocess == 'true' }}
@@ -125,6 +129,8 @@ jobs:
           mkdir -p _artifacts/azure-di _artifacts/google-docai
           E=benchmark/knesset-layout/engineering-eval
           cp -f "$E/report/b2-comparison.json" _artifacts/ 2>/dev/null || true
+          cp -f "$E/report/b2-retest.json" _artifacts/ 2>/dev/null || true
+          cp -f "$E/report/b2-table-verification.json" _artifacts/ 2>/dev/null || true
           cp -f "$E/outputs/azure-di/"*.json _artifacts/azure-di/ 2>/dev/null || true
           cp -f "$E/outputs/google-docai/"*.json _artifacts/google-docai/ 2>/dev/null || true
           cp -f tools/legal-ingest/.staging-hybrid/_reprocess-metrics.json _artifacts/ 2>/dev/null || true
