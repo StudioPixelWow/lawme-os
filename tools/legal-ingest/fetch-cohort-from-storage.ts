@@ -48,17 +48,62 @@ async function main(): Promise<void> {
   }
 
   // Cohort mode: deterministic N publications with a stored PDF.
-  const N = Number(process.env.COHORT_SIZE ?? "50");
+  // COHORT_SIZE=ALL (or 0 / "all" / "full") → the FULL eligible corpus (no limit).
+  const sizeRaw = (process.env.COHORT_SIZE ?? "50").trim().toLowerCase();
+  const ALL = sizeRaw === "all" || sizeRaw === "full" || sizeRaw === "0";
+  const N = ALL ? Infinity : Number(sizeRaw);
   const OUT = process.env.COHORT_PDFS_DIR ?? "tools/legal-ingest/.cohort-pdfs";
   const WL = process.env.COHORT_WORKLIST ?? "tools/legal-ingest/.cohort-worklist.json";
-  const { data: pubs, error } = await supabase
-    .from("law_publications")
-    .select("publication_canonical_id, publication_item_id, pdf_object_key, page_count")
-    .not("pdf_object_key", "is", null)
-    .not("page_count", "is", null)
-    .order("publication_canonical_id", { ascending: true })
-    .limit(N);
-  if (error) { process.stderr.write(`fetch-cohort: DB error (${error.message})\n`); process.exit(1); }
+  const INV = process.env.CORPUS_INVENTORY ?? "tools/legal-ingest/.corpus-inventory.json";
+
+  // Eligible = full-text publication with a stored PDF object AND a known page count.
+  // Deterministic order by canonical id so cohorts are stable prefixes and ALL is a superset.
+  type Pub = { publication_canonical_id: string; publication_item_id: string; pdf_object_key: string | null; page_count: number | null };
+  const eligible: Pub[] = [];
+  if (ALL) {
+    // Paginate through the whole eligible set (Supabase caps ~1000 rows/request).
+    const PAGE = 1000;
+    for (let from = 0; ; from += PAGE) {
+      const { data, error } = await supabase
+        .from("law_publications")
+        .select("publication_canonical_id, publication_item_id, pdf_object_key, page_count")
+        .not("pdf_object_key", "is", null)
+        .not("page_count", "is", null)
+        .order("publication_canonical_id", { ascending: true })
+        .range(from, from + PAGE - 1);
+      if (error) { process.stderr.write(`fetch-cohort: DB error (${error.message})\n`); process.exit(1); }
+      const rows = (data ?? []) as Pub[];
+      eligible.push(...rows);
+      if (rows.length < PAGE) break;
+    }
+  } else {
+    const { data, error } = await supabase
+      .from("law_publications")
+      .select("publication_canonical_id, publication_item_id, pdf_object_key, page_count")
+      .not("pdf_object_key", "is", null)
+      .not("page_count", "is", null)
+      .order("publication_canonical_id", { ascending: true })
+      .limit(N);
+    if (error) { process.stderr.write(`fetch-cohort: DB error (${error.message})\n`); process.exit(1); }
+    eligible.push(...((data ?? []) as Pub[]));
+  }
+  const pubs = eligible;
+
+  // Inventory report — total eligible publications + expected pages — written BEFORE
+  // processing so the operator can see the corpus scope prior to any OCR.
+  const totalEligible = pubs.length;
+  const expectedPages = pubs.reduce((a, p) => a + Math.max(1, Number(p.page_count) || 1), 0);
+  writeFileSync(INV, JSON.stringify({
+    kind: "CORPUS-INVENTORY (pre-processing scope; DEV; Object-Storage only)",
+    mode: ALL ? "ALL" : `prefix:${N}`,
+    total_eligible_publications: totalEligible,
+    total_expected_pages: expectedPages,
+    total_pdf_objects_fetched: 0,   // updated after fetch below
+    missing_objects: 0,             // updated after fetch below
+    total_pages: 0,                 // updated after fetch below
+  }, null, 2));
+  process.stdout.write(`INVENTORY: ${totalEligible} eligible publications, ~${expectedPages} expected pages → ${INV}\n`);
+
   mkdirSync(OUT, { recursive: true });
   const worklist: { publication_item_id: string; page_number: number }[] = [];
   let ok = 0, miss = 0, pages = 0;
@@ -72,7 +117,18 @@ async function main(): Promise<void> {
     for (let pg = 1; pg <= pc; pg++) { worklist.push({ publication_item_id: item, page_number: pg }); pages += 1; }
   }
   writeFileSync(WL, JSON.stringify(worklist, null, 2));
-  process.stdout.write(`fetched ${ok} cohort PDFs (${miss} missing), ${pages} pages → ${OUT}/ · worklist → ${WL}\n` +
+  // Finalize inventory with actual fetch results (missing_objects = eligible pubs
+  // with no retrievable object → object-storage anomalies for the gate report).
+  writeFileSync(INV, JSON.stringify({
+    kind: "CORPUS-INVENTORY (pre-processing scope; DEV; Object-Storage only)",
+    mode: ALL ? "ALL" : `prefix:${N}`,
+    total_eligible_publications: totalEligible,
+    total_expected_pages: expectedPages,
+    total_pdf_objects_fetched: ok,
+    missing_objects: miss,
+    total_pages: pages,
+  }, null, 2));
+  process.stdout.write(`fetched ${ok} cohort PDFs (${miss} missing), ${pages} pages → ${OUT}/ · worklist → ${WL} · inventory → ${INV}\n` +
     `Next: PDFS_DIR=${OUT} WORKLIST=${WL} node --experimental-strip-types tools/legal-ingest/reprocess-hybrid.ts\n`);
 }
 main().catch((e) => { process.stderr.write(`fetch-cohort failed: ${(e as Error).message}\n`); process.exit(1); });

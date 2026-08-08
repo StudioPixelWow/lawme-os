@@ -32,7 +32,7 @@ on:
         type: boolean
         default: true
       cohort_size:
-        description: 'Number of publications for the reprocess cohort'
+        description: 'Reprocess cohort size: a number (e.g. 50/250/1000) or ALL for the full eligible corpus'
         required: false
         default: '50'
 
@@ -110,12 +110,15 @@ jobs:
         if: ${{ github.event.inputs.run_b2_eval == 'true' && github.event.inputs.run_google == 'true' }}
         run: node --experimental-strip-types benchmark/knesset-layout/engineering-eval/b2-retest.ts
 
-      - name: Reprocess — fetch 50-publication cohort from Object Storage
+      - name: Reprocess — resolve cohort/full-corpus inventory + fetch PDFs from Object Storage
         if: ${{ github.event.inputs.run_reprocess == 'true' }}
         env:
-          COHORT_SIZE: ${{ github.event.inputs.cohort_size }}
-          B2_IDS: ''   # unset ⇒ cohort mode
-        run: node --experimental-strip-types tools/legal-ingest/fetch-cohort-from-storage.ts
+          COHORT_SIZE: ${{ github.event.inputs.cohort_size }}   # number, or ALL for the full eligible corpus
+          B2_IDS: ''   # unset ⇒ cohort/full-corpus mode
+        run: |
+          node --experimental-strip-types tools/legal-ingest/fetch-cohort-from-storage.ts
+          echo "=== corpus inventory (pre-processing scope) ==="
+          cat tools/legal-ingest/.corpus-inventory.json || true
 
       - name: Reprocess — hybrid dry-run over the cohort (A/B1 local + live B2 Google OCR)
         if: ${{ github.event.inputs.run_reprocess == 'true' }}
@@ -139,6 +142,7 @@ jobs:
           cp -f "$E/outputs/azure-di/"*.json _artifacts/azure-di/ 2>/dev/null || true
           cp -f "$E/outputs/google-docai/"*.json _artifacts/google-docai/ 2>/dev/null || true
           cp -f tools/legal-ingest/.staging-hybrid/_reprocess-metrics.json _artifacts/ 2>/dev/null || true
+          cp -f tools/legal-ingest/.corpus-inventory.json _artifacts/ 2>/dev/null || true
           echo "JSON artifacts:"; find _artifacts -type f -name '*.json' | sort
 
       - name: Upload evaluation/reprocess JSON

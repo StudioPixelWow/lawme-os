@@ -79,7 +79,7 @@ async function main(): Promise<void> {
     const p = `${PDFS}/${w.publication_item_id}.pdf`;
     if (!existsSync(p)) {
       process.stderr.write(`  [no-pdf-in-object-storage-cache] ${w.publication_item_id}\n`);
-      records.push({ publication_item_id: w.publication_item_id, page_number: w.page_number, route: "B2", needs_review: true, physical_page_alignment: false, provenance_complete: false, published: 0, raw_overwritten: false, extraction_failure: true, google_call: false, b2: null });
+      records.push({ publication_item_id: w.publication_item_id, page_number: w.page_number, route: "B2", needs_review: true, physical_page_alignment: false, provenance_complete: false, published: 0, raw_overwritten: false, extraction_failure: true, google_call: false, object_storage_anomaly: true, b2: null });
       continue;
     }
     let pdf = cache.get(w.publication_item_id); if (!pdf) { pdf = new Uint8Array(readFileSync(p)); cache.set(w.publication_item_id, pdf); }
@@ -103,10 +103,12 @@ async function main(): Promise<void> {
 
     // ---- Path B2: live Google Document AI OCR + shared B2 assembly ----
     let b2: B2PageAssembly | null = null; let googleCall = false; let b2Latency: number | null = null;
+    let b2Confidence: number | null = null; let b2GoogleError = false;
     if (decision.route === "B2") {
       if (b2Live) {
-        try { const ocr = await ocrPageWithGoogle(p, w.page_number, OCR_CFG); googleCall = true; b2Latency = ocr.latency_ms; b2 = assembleB2Page({ text: ocr.text, layout: ocr.layout, mean_confidence: ocr.mean_confidence, token_count: ocr.token_count, line_count: ocr.line_count, block_count: ocr.block_count, allowGeometryFallback: ALLOW_GEOMETRY }); }
-        catch (err) { process.stderr.write(`  [b2-ocr-fail] ${w.publication_item_id} p${w.page_number}: ${(err as Error).message}\n`); b2 = assembleB2Page({ text: "", layout: { text: "", pages: [] }, mean_confidence: 0, ocr_error: true, allowGeometryFallback: ALLOW_GEOMETRY }); }
+        googleCall = true; // an OCR call is attempted; success/failure tracked separately
+        try { const ocr = await ocrPageWithGoogle(p, w.page_number, OCR_CFG); b2Latency = ocr.latency_ms; b2Confidence = ocr.mean_confidence ?? null; b2 = assembleB2Page({ text: ocr.text, layout: ocr.layout, mean_confidence: ocr.mean_confidence, token_count: ocr.token_count, line_count: ocr.line_count, block_count: ocr.block_count, allowGeometryFallback: ALLOW_GEOMETRY }); }
+        catch (err) { process.stderr.write(`  [b2-ocr-fail] ${w.publication_item_id} p${w.page_number}: ${(err as Error).message}\n`); b2GoogleError = true; b2Confidence = 0; b2 = assembleB2Page({ text: "", layout: { text: "", pages: [] }, mean_confidence: 0, ocr_error: true, allowGeometryFallback: ALLOW_GEOMETRY }); }
       } else {
         // No OCR credentials in this environment: quarantine, never fabricate OCR text.
         b2 = assembleB2Page({ text: "", layout: { text: "", pages: [] }, mean_confidence: 0, ocr_error: true, allowGeometryFallback: ALLOW_GEOMETRY });
@@ -119,7 +121,7 @@ async function main(): Promise<void> {
       needs_review: needsReview, physical_page_alignment: physical_ok, provenance_complete, published: 0,
       raw_overwritten: false, extraction_failure: extractionFailure, google_call: googleCall, latency_ms: b2Latency,
       glyph_loss: glyph, duplication_ab1: dupAb1, hebrew_share_ab1: hebAb1,
-      b2: b2 ? { decision: b2.verdict.decision, state: b2.classification.state, ocr_state: b2.ocr_state, chars: b2.chars, hebrew_share: b2.hebrew_share, duplication: b2.duplication, numeric_ratio: b2.numeric_ratio, table_count: b2.table_count, table_source: b2.table_source, reason_codes: b2.verdict.reason_codes } : null,
+      b2: b2 ? { decision: b2.verdict.decision, state: b2.classification.state, ocr_state: b2.ocr_state, chars: b2.chars, hebrew_share: b2.hebrew_share, duplication: b2.duplication, numeric_ratio: b2.numeric_ratio, table_count: b2.table_count, table_source: b2.table_source, reason_codes: b2.verdict.reason_codes, mean_confidence: b2Confidence, google_error: b2GoogleError } : null,
     });
 
     const record = {
@@ -138,7 +140,19 @@ async function main(): Promise<void> {
     writeFileSync(`${OUT}/${w.publication_item_id}_p${w.page_number}.extraction.json`, JSON.stringify(record, null, 2));
   }
 
-  const metrics = computeReprocessMetrics(records, pubs.size);
+  // Full-corpus inventory (written by fetch-cohort-from-storage). If present, it
+  // carries the eligible-publication count and the fetch-time object-storage
+  // anomalies (pubs eligible in the corpus but with no retrievable object).
+  const INVENTORY = process.env.CORPUS_INVENTORY ?? "tools/legal-ingest/.corpus-inventory.json";
+  let eligiblePublications = pubs.size; let objectStorageAnomaliesBaseline = 0;
+  if (existsSync(INVENTORY)) {
+    try {
+      const inv = JSON.parse(readFileSync(INVENTORY, "utf8")) as { total_eligible_publications?: number; missing_objects?: number };
+      if (typeof inv.total_eligible_publications === "number") eligiblePublications = inv.total_eligible_publications;
+      if (typeof inv.missing_objects === "number") objectStorageAnomaliesBaseline = inv.missing_objects;
+    } catch { /* inventory optional — fall back to worklist-derived counts */ }
+  }
+  const metrics = computeReprocessMetrics(records, pubs.size, { eligiblePublications, objectStorageAnomaliesBaseline });
   writeFileSync(`${OUT}/_reprocess-metrics.json`, JSON.stringify(metrics, null, 2));
   process.stdout.write(
     `DRY-RUN hybrid reprocess — ${metrics.publications_completed}/${metrics.publications_attempted} publications, ${metrics.total_pages} pages (staging → ${OUT}/)\n` +

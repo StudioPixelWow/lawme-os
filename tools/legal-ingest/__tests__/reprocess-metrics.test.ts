@@ -64,3 +64,55 @@ test("geometry table auto-accept is caught as a failure class", () => {
   const m = computeReprocessMetrics(recs, 1);
   assert.ok(m.newly_discovered_failure_classes.includes("GEOMETRY_TABLE_AUTO_ACCEPTED"));
 });
+
+test("eligible vs attempted vs completed + publications_failed", () => {
+  // 3 attempted, only 2 distinct pubs produced records → 1 failed; eligible=10 from inventory.
+  const recs = [A("p1", 1), A("p2", 1)];
+  const m = computeReprocessMetrics(recs, 3, { eligiblePublications: 10 });
+  assert.equal(m.eligible_publications, 10);
+  assert.equal(m.publications_attempted, 3);
+  assert.equal(m.publications_completed, 2);
+  assert.equal(m.publications_failed, 1);
+});
+
+test("google_b2_failures counts errored OCR calls, not successful ones", () => {
+  const ok = B2("p1", 1, { decision: "accepted", state: "content", ocr_state: "content", chars: 900, hebrew_share: 96, duplication: 2, numeric_ratio: 0.1, table_count: 0, table_source: "none", reason_codes: [], mean_confidence: 0.95 });
+  const failed = B2("p2", 1, { decision: "needs_review", state: "likely_blank", ocr_state: "likely_blank", chars: 0, hebrew_share: 0, duplication: 0, numeric_ratio: 0, table_count: 0, table_source: "none", reason_codes: ["B2_OCR_ERROR"], mean_confidence: 0, google_error: true });
+  const m = computeReprocessMetrics([ok, failed], 2);
+  assert.equal(m.google_b2_call_count, 2);
+  assert.equal(m.google_b2_failures, 1);
+});
+
+test("object-storage anomalies (baseline + per-page) flagged as failure class", () => {
+  const missing: ReprocessPageRecord = { ...A("p9", 1), route: "B2", extraction_failure: true, physical_page_alignment: false, provenance_complete: false, object_storage_anomaly: true, glyph_loss: null, duplication_ab1: null, hebrew_share_ab1: null, b2: null };
+  const m = computeReprocessMetrics([A("p1", 1), missing], 2, { objectStorageAnomaliesBaseline: 3 });
+  assert.equal(m.checksum_object_storage_anomalies, 4); // 3 baseline + 1 per-page
+  assert.ok(m.newly_discovered_failure_classes.includes("OBJECT_STORAGE_ANOMALY"));
+});
+
+test("B2 confidence distribution buckets (blank counted separately, never high)", () => {
+  const recs = [
+    B2("p1", 1, { decision: "accepted", state: "content", ocr_state: "content", chars: 900, hebrew_share: 96, duplication: 2, numeric_ratio: 0.1, table_count: 0, table_source: "none", reason_codes: [], mean_confidence: 0.97 }),
+    B2("p2", 1, { decision: "accepted", state: "content", ocr_state: "content", chars: 400, hebrew_share: 90, duplication: 2, numeric_ratio: 0.1, table_count: 0, table_source: "none", reason_codes: [], mean_confidence: 0.75 }),
+    B2("p3", 1, { decision: "needs_review", state: "content", ocr_state: "content", chars: 300, hebrew_share: 70, duplication: 2, numeric_ratio: 0.1, table_count: 0, table_source: "none", reason_codes: ["B2_LOW_CONFIDENCE"], mean_confidence: 0.55 }),
+    B2("p4", 1, { decision: "needs_review", state: "likely_blank", ocr_state: "likely_blank", chars: 0, hebrew_share: 0, duplication: 0, numeric_ratio: 0, table_count: 0, table_source: "none", reason_codes: ["B2_EMPTY_OCR"], mean_confidence: 0 }),
+  ];
+  const m = computeReprocessMetrics(recs, 4);
+  assert.equal(m.b2_confidence_distribution.high, 1);
+  assert.equal(m.b2_confidence_distribution.medium, 1);
+  assert.equal(m.b2_confidence_distribution.low, 1);
+  assert.equal(m.b2_confidence_distribution.blank_or_empty, 1);
+});
+
+test("needs_review breakdown by reason_code + ranked by volume", () => {
+  const recs = [
+    B2("p1", 1, { decision: "needs_review", state: "content", ocr_state: "content", chars: 500, hebrew_share: 70, duplication: 2, numeric_ratio: 0.5, table_count: 1, table_source: "geometry", reason_codes: ["B2_TABLE_STRUCTURE_UNCERTAIN"], mean_confidence: 0.8 }),
+    B2("p2", 1, { decision: "needs_review", state: "content", ocr_state: "content", chars: 500, hebrew_share: 70, duplication: 2, numeric_ratio: 0.5, table_count: 1, table_source: "geometry", reason_codes: ["B2_TABLE_STRUCTURE_UNCERTAIN"], mean_confidence: 0.8 }),
+    B2("p3", 1, { decision: "needs_review", state: "likely_blank", ocr_state: "likely_blank", chars: 0, hebrew_share: 0, duplication: 0, numeric_ratio: 0, table_count: 0, table_source: "none", reason_codes: ["B2_EMPTY_OCR"], mean_confidence: 0 }),
+  ];
+  const m = computeReprocessMetrics(recs, 3);
+  assert.equal(m.needs_review_by_reason_code["B2_TABLE_STRUCTURE_UNCERTAIN"], 2);
+  assert.equal(m.needs_review_by_reason_code["B2_EMPTY_OCR"], 1);
+  assert.equal(m.needs_review_reason_rank[0].reason_code, "B2_TABLE_STRUCTURE_UNCERTAIN");
+  assert.equal(m.needs_review_reason_rank[0].pages, 2);
+});
