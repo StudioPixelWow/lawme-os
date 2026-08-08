@@ -32,7 +32,7 @@ export interface MarginalCaption {
 }
 
 export interface PageReconstruction {
-  columnType: "single" | "two_column";
+  columnType: "single" | "two_column" | "two_body_column";
   marginalSide: "left" | "right" | null;
   bodyText: string;
   marginalCaptions: MarginalCaption[];
@@ -121,6 +121,52 @@ function detectGap(items: LayoutItem[], lines: LayoutItem[][]): { splitX: number
   return { splitX, marginalSide, clarity };
 }
 
+/**
+ * Detect a BALANCED two-body-column page (modern justified typesetting): a gap
+ * near the page center with substantial text on BOTH sides on MOST lines. Unlike
+ * the marginal case (narrow sparse side), here both columns are real body text,
+ * so we must read the right column fully then the left (RTL), not merge per line.
+ */
+function detectTwoBody(items: LayoutItem[], lines: LayoutItem[][]): { splitX: number; confidence: number } | null {
+  const minX = Math.min(...items.map((i) => i.x));
+  const maxX = Math.max(...items.map((i) => i.x + i.width));
+  const pageW = maxX - minX;
+  const totalLines = lines.length;
+  if (pageW <= 0 || totalLines < 6) return null;
+
+  const BINS = 60;
+  const binW = pageW / BINS;
+  const occ = new Array(BINS).fill(0);
+  for (const line of lines) {
+    const hit = new Set<number>();
+    for (const it of line) {
+      const b0 = Math.max(0, Math.floor((it.x - minX) / binW));
+      const b1 = Math.min(BINS - 1, Math.floor((it.x + it.width - minX) / binW));
+      for (let b = b0; b <= b1; b++) hit.add(b);
+    }
+    hit.forEach((b) => (occ[b] += 1));
+  }
+  // Sparsest bin in the central band (columns split near the middle).
+  const lo = Math.floor(BINS * 0.3), hi = Math.ceil(BINS * 0.7);
+  let gapBin = lo;
+  for (let b = lo; b <= hi; b++) if (occ[b] < occ[gapBin]) gapBin = b;
+  const splitX = minX + (gapBin + 0.5) * binW;
+
+  // Both columns must be substantial in width and densely filled across lines.
+  const leftW = splitX - minX, rightW = maxX - splitX;
+  if (Math.min(leftW, rightW) < pageW * 0.25) return null;
+  let leftLines = 0, rightLines = 0;
+  for (const line of lines) {
+    if (line.some((it) => it.x + it.width / 2 < splitX)) leftLines += 1;
+    if (line.some((it) => it.x + it.width / 2 >= splitX)) rightLines += 1;
+  }
+  const bothDense = leftLines >= 0.5 * totalLines && rightLines >= 0.5 * totalLines;
+  const gapSparse = occ[gapBin] <= totalLines * 0.35;
+  if (!bothDense || !gapSparse) return null;
+  const confidence = Math.max(0, Math.min(1, (totalLines * 0.35 - occ[gapBin]) / Math.max(1, totalLines * 0.35)));
+  return { splitX, confidence };
+}
+
 /** Reconstruct one page. Deterministic; lossless by construction. */
 export function reconstructPage(items: LayoutItem[]): PageReconstruction {
   const clean = items.filter((i) => i.str && i.str.trim().length > 0);
@@ -130,6 +176,22 @@ export function reconstructPage(items: LayoutItem[]): PageReconstruction {
   }
   const tol = yTol(clean);
   const lines = groupLines(clean, tol);
+
+  // Balanced two-body-column pages (modern justified laws): read the RIGHT column
+  // fully (RTL first), then the LEFT column — merging per line would interleave them.
+  const twoBody = detectTwoBody(clean, lines);
+  if (twoBody) {
+    const rightLines: LayoutItem[][] = [];
+    const leftLines: LayoutItem[][] = [];
+    for (const line of lines) {
+      const R = line.filter((it) => it.x + it.width / 2 >= twoBody.splitX);
+      const L = line.filter((it) => it.x + it.width / 2 < twoBody.splitX);
+      if (R.length) rightLines.push(R);
+      if (L.length) leftLines.push(L);
+    }
+    const bodyText = [...rightLines, ...leftLines].map(lineText).filter(Boolean).join("\n");
+    return { columnType: "two_body_column", marginalSide: null, bodyText, marginalCaptions: [], layoutConfidence: twoBody.confidence, fallbackUsed: false, lossless: glyphKey(bodyText) === inputKey };
+  }
 
   const gap = detectGap(clean, lines);
   // Single-column (or ambiguous gap): body = everything, in raw RTL reading order.
@@ -182,6 +244,7 @@ export interface DocumentReconstruction {
   pages: PageReconstruction[];
   layoutConfidence: number; // mean page confidence
   twoColumnPages: number;
+  twoBodyColumnPages: number;
   singleColumnPages: number;
   fallbackPages: number;
   lossless: boolean; // all pages lossless
@@ -200,6 +263,7 @@ export function reconstructDocument(pages: LayoutItem[][]): DocumentReconstructi
     pages: recon,
     layoutConfidence: conf,
     twoColumnPages: recon.filter((p) => p.columnType === "two_column").length,
+    twoBodyColumnPages: recon.filter((p) => p.columnType === "two_body_column").length,
     singleColumnPages: recon.filter((p) => p.columnType === "single").length,
     fallbackPages: recon.filter((p) => p.fallbackUsed).length,
     lossless: recon.every((p) => p.lossless),
