@@ -45,8 +45,16 @@ test("confidence is clamped to [0,1]; printed folio is never guessed", () => {
   assert.equal(toExtractionRow(base).gazette_page_number, null);
 });
 
-test("blank text ⇒ null structured ref (no fabricated content hash)", () => {
-  assert.equal(toExtractionRow({ ...base, reading_order_text: "" }).structured_extraction_ref, null);
+test("blank text ⇒ null structured ref + null structured_text (no fabricated content)", () => {
+  const row = toExtractionRow({ ...base, reading_order_text: "" });
+  assert.equal(row.structured_extraction_ref, null);
+  assert.equal(row.structured_text, null);
+});
+
+test("structured_text carries the machine-derived page text inline", () => {
+  const row = toExtractionRow({ ...base, reading_order_text: "טקסט מלא של העמוד" });
+  assert.equal(row.structured_text, "טקסט מלא של העמוד");
+  assert.ok(row.structured_extraction_ref?.startsWith("sha256:"));
 });
 
 test("summary counts accepted/needs_review/failed and asserts published=0", () => {

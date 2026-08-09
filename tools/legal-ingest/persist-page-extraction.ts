@@ -61,6 +61,7 @@ export interface ExtractionRow {
   extraction_status: "extracted" | "needs_review" | "failed";
   published: false;
   provenance: Record<string, unknown>;
+  structured_text: string | null;
 }
 
 const sha256 = (s: string): string => "sha256:" + createHash("sha256").update(s, "utf8").digest("hex");
@@ -103,6 +104,7 @@ export function toExtractionRow(r: StagingPageRecord): ExtractionRow {
     extraction_status: status,
     published: false,               // HARD-LOCKED — publishing is Phase 10
     provenance: (r.provenance as Record<string, unknown>) ?? {},
+    structured_text: text ? text : null,  // inline machine-derived page text (null when blank)
   };
 }
 
@@ -148,6 +150,21 @@ async function main(): Promise<void> {
   if (!url || !key) { process.stderr.write("REFUSING --commit: SUPABASE_URL and SUPABASE_SECRET_KEY required (service role; CI only).\n"); process.exit(1); }
   const { createClient } = await import("@supabase/supabase-js");
   const supa = createClient(url, key, { auth: { persistSession: false } });
+
+  // Resolve official_pdf_url from law_publications (single source of truth) and
+  // inject it onto each row. Paginated to cover the whole eligible set.
+  const urlByPub = new Map<string, string>();
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supa.schema("legalai").from("law_publications")
+      .select("publication_canonical_id, pdf_url, source_url").range(from, from + 999);
+    if (error) { process.stderr.write(`persist: law_publications url fetch failed: ${error.message}\n`); process.exit(1); }
+    const rowsPage = (data ?? []) as { publication_canonical_id: string; pdf_url: string | null; source_url: string | null }[];
+    for (const p of rowsPage) { const u = p.pdf_url ?? p.source_url; if (u) urlByPub.set(p.publication_canonical_id, u); }
+    if (rowsPage.length < 1000) break;
+  }
+  let urlFilled = 0;
+  for (const r of rows) { const u = urlByPub.get(r.publication_canonical_id); if (u) { r.official_pdf_url = u; urlFilled++; } }
+  process.stdout.write(`resolved official_pdf_url for ${urlFilled}/${rows.length} rows from law_publications\n`);
 
   const CHUNK = 500; let written = 0;
   for (let i = 0; i < rows.length; i += CHUNK) {
