@@ -116,3 +116,14 @@ test("needs_review breakdown by reason_code + ranked by volume", () => {
   assert.equal(m.needs_review_reason_rank[0].reason_code, "B2_TABLE_STRUCTURE_UNCERTAIN");
   assert.equal(m.needs_review_reason_rank[0].pages, 2);
 });
+
+test("confidence distribution normalizes a 0..100 percentage scale (DocAI page confidence)", () => {
+  // DocAI reports page mean_confidence on 0..100; buckets must not collapse to all-high.
+  const recs = [
+    B2("p1", 1, { decision: "accepted", state: "content", ocr_state: "content", chars: 900, hebrew_share: 96, duplication: 2, numeric_ratio: 0.1, table_count: 0, table_source: "none", reason_codes: [], mean_confidence: 96.0 }),
+    B2("p2", 1, { decision: "needs_review", state: "sparse", ocr_state: "sparse", chars: 2, hebrew_share: 0, duplication: 0, numeric_ratio: 1, table_count: 0, table_source: "none", reason_codes: ["B2_SPARSE_PAGE","B2_LOW_CONFIDENCE"], mean_confidence: 56.6 }),
+  ];
+  const m = computeReprocessMetrics(recs, 2);
+  assert.equal(m.b2_confidence_distribution.high, 1);
+  assert.equal(m.b2_confidence_distribution.low, 1);
+});

@@ -49,11 +49,14 @@ export interface ReprocessMetricsOptions {
   objectStorageAnomaliesBaseline?: number;
 }
 
-// B2 OCR-confidence buckets (DocAI page confidence, 0..1). Blank/empty pages
-// have no meaningful confidence and are counted separately, never as "high".
+// B2 OCR-confidence buckets. DocAI page confidence is reported on a 0..100
+// (percentage) scale by the OCR adapter, while some callers pass 0..1 — normalize
+// both to a 0..1 fraction before bucketing. Blank/empty pages have no meaningful
+// confidence and are counted separately, never as "high".
 function confidenceBucket(chars: number, conf: number | null | undefined): "blank_or_empty" | "high" | "medium" | "low" | "very_low" {
   if (!chars || chars <= 0) return "blank_or_empty";
-  const c = typeof conf === "number" && !Number.isNaN(conf) ? conf : 0;
+  let c = typeof conf === "number" && !Number.isNaN(conf) ? conf : 0;
+  if (c > 1) c = c / 100;   // normalize a 0..100 percentage to a 0..1 fraction
   if (c >= 0.9) return "high";
   if (c >= 0.7) return "medium";
   if (c >= 0.5) return "low";
