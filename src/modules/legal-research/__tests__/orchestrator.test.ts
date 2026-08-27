@@ -33,7 +33,7 @@ test("orchestrator runs the full pipeline and prefers binding legislation", asyn
   const r = await runLegalResearch({ question: Q_PREG, asOfISO: NOW });
   assert.equal(r.meta.version, LEGAL_RESEARCH_VERSION);
   assert.equal(r.domain.inScope, true);
-  assert.equal(r.executedSearches.length, 2);
+  assert.equal(r.executedSearches.length, 3);
   assert.ok(r.executedSearches.every((x) => x.available));
   assert.ok(r.matchedLegislation.some((s) => s.recordId === "E3B-LEG-007"));
   assert.ok(r.matchedCases.length >= 1);
@@ -71,7 +71,7 @@ test("the orchestrator is provider-agnostic — a new adapter drops in with no c
     async search() { return { sourceId: "regulation", sourceKind: "regulation", matchedCount: 1, sources: [stubSource], notesHe: [] }; },
   };
   const r = await runLegalResearch({ question: Q_PREG, asOfISO: NOW }, [...DEFAULT_ADAPTERS, stub]);
-  assert.equal(r.executedSearches.length, 3);
+  assert.equal(r.executedSearches.length, 4);
   assert.ok(r.sourceMetadata.some((m) => m.recordId === "REG-001"));
   assert.ok(r.ranking.some((x) => x.recordId === "REG-001"));
 });

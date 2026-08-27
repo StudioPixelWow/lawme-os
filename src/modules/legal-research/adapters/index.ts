@@ -9,9 +9,17 @@
 import type { KnowledgeSourceAdapter } from "../types.ts";
 import { legislationAdapter } from "./legislation.ts";
 import { caseLawAdapter } from "./case-law.ts";
+import { legalaiLegislationAdapter } from "../../legal-ai-israel/retrieval/legalai-legislation-adapter.ts";
 
 export { legislationAdapter } from "./legislation.ts";
 export { caseLawAdapter } from "./case-law.ts";
+export { legalaiLegislationAdapter } from "../../legal-ai-israel/retrieval/legalai-legislation-adapter.ts";
 
-/** The default, currently-available adapter set. */
-export const DEFAULT_ADAPTERS: readonly KnowledgeSourceAdapter[] = [legislationAdapter, caseLawAdapter];
+/**
+ * The default, currently-available adapter set. `legalaiLegislationAdapter`
+ * serves the real published legislation corpus (env-gated: inert without DB
+ * credentials, so suites without DB access are unaffected). The hand-curated
+ * `legislationAdapter` fixture is retained pending founder review (retire once
+ * the real corpus fully covers its doctrines).
+ */
+export const DEFAULT_ADAPTERS: readonly KnowledgeSourceAdapter[] = [legalaiLegislationAdapter, legislationAdapter, caseLawAdapter];
