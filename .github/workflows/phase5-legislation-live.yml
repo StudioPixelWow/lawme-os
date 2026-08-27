@@ -1,0 +1,63 @@
+name: Phase 5 — Legislation live (gate → publish → 20-Q proof) (DEV, manual)
+
+# Turns the SAFE legislation subset into published, retrievable, citation-grade
+# knowledge and proves it with 20 live questions through the REAL Dino pipeline.
+#   publication gate → build+publish section chunks → 20-question live QA
+# DEV-only; DB writes via service-role SECRETS; nothing echoed. Chunk publish is
+# gated on run_publish=true. Requires migration 20260809140000 (legal_chunks FTS
+# trigger) applied to DEV first.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type DEV to confirm this runs against the DEV project only'
+        required: true
+        default: ''
+      run_publish:
+        description: 'Build + publish the SAFE section chunks to DEV (writes legal_chunks.published=true)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: phase5-legislation-live
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+    steps:
+      - name: Guard — DEV confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "DEV" ]; then
+            echo "Refusing: type DEV to run (DEV-only)."; exit 1; fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - name: Install dependencies
+        run: npm ci
+      - name: Publication gate (read-only classification)
+        run: node --experimental-strip-types tools/legal-ingest/publication-gate.ts
+      - name: Build + publish SAFE section chunks (gated)
+        if: ${{ github.event.inputs.run_publish == 'true' }}
+        run: node --experimental-strip-types tools/legal-ingest/build-legislation-chunks.ts --commit
+      - name: 20-question live proof (real corpus, real pipeline)
+        if: ${{ github.event.inputs.run_publish == 'true' }}
+        run: node --experimental-strip-types tools/legal-ingest/legislation-live-qa.ts
+      - name: Collect JSON artifacts
+        run: |
+          mkdir -p _artifacts
+          for f in _publication-gate.json _chunk-build.json _legislation-qa.json; do
+            cp -f "tools/legal-ingest/.staging-hybrid/$f" _artifacts/ 2>/dev/null || true
+          done
+          echo "artifacts:"; find _artifacts -type f -name '*.json' | sort
+      - name: Upload JSON
+        uses: actions/upload-artifact@v4
+        with: { name: phase5-legislation-live-json, path: _artifacts/**/*.json, if-no-files-found: warn }
